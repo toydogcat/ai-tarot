@@ -89,16 +89,43 @@ def inject_custom_css():
     """, unsafe_allow_html=True)
 
 
-def load_card_image(image_path: str, is_reversed: bool = False) -> Image.Image | None:
-    """載入牌面圖片，逆位時旋轉 180°"""
-    full_path = ASSETS_DIR / image_path
-    if not full_path.exists():
-        return None
-
-    img = Image.open(full_path)
-    if is_reversed:
-        img = img.rotate(180)
-    return img
+def load_card_image(
+    image_path: str, is_reversed: bool = False, prefer_format: str = "jpg"
+) -> Image.Image | None:
+    """
+    載入牌面圖片，支援 JPG/PNG 優先順序
+    
+    Args:
+        image_path: 相對圖片路徑（如 major/00_the_fool.png）
+        is_reversed: 是否逆位（旋轉 180°）
+        prefer_format: 優先格式 'jpg' 或 'png'
+    """
+    base_path = ASSETS_DIR / image_path
+    stem = base_path.stem
+    parent = base_path.parent
+    
+    # 依照偏好格式建立搜尋順序
+    if prefer_format == "jpg":
+        candidates = [
+            parent / f"{stem}.jpg",
+            parent / f"{stem}.jpeg",
+            parent / f"{stem}.png",
+        ]
+    else:
+        candidates = [
+            parent / f"{stem}.png",
+            parent / f"{stem}.jpg",
+            parent / f"{stem}.jpeg",
+        ]
+    
+    for candidate in candidates:
+        if candidate.exists():
+            img = Image.open(candidate)
+            if is_reversed:
+                img = img.rotate(180)
+            return img
+    
+    return None
 
 
 def render_card(drawn_card: DrawnCard, position_name: str = "", show_meaning: bool = True):
@@ -111,8 +138,9 @@ def render_card(drawn_card: DrawnCard, position_name: str = "", show_meaning: bo
     if position_name:
         st.markdown(f'<div class="position-label">【{position_name}】</div>', unsafe_allow_html=True)
 
-    # 嘗試載入圖片
-    img = load_card_image(card.image, drawn_card.is_reversed)
+    # 嘗試載入圖片（使用 session state 中的格式偏好）
+    prefer_format = st.session_state.get("prefer_image_format", "jpg")
+    img = load_card_image(card.image, drawn_card.is_reversed, prefer_format)
     if img:
         st.image(img, use_container_width=True)
     else:
@@ -246,3 +274,29 @@ def render_spread_result(result: SpreadResult):
         rc1, rc2, rc3 = st.columns([1, 1, 1])
         with rc2:
             render_card(drawn[9], spread.positions[9].name)
+
+
+def render_ai_interpretation(interpretation: str):
+    """渲染 AI 解牌結果"""
+    st.divider()
+    st.markdown(
+        '<div class="spread-title">🤖 AI 塔羅解讀</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f"""
+        <div style="
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(232,213,183,0.15);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin: 16px auto;
+            max-width: 800px;
+            color: #ccc;
+            line-height: 2;
+            font-size: 1rem;
+            white-space: pre-wrap;
+        ">{interpretation}</div>
+        """,
+        unsafe_allow_html=True,
+    )

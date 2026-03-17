@@ -208,3 +208,5 @@ __marimo__/
 
 # AI Tarot 專案
 .streamlit/secrets.toml
+logs/
+history/
