@@ -1,0 +1,1682 @@
+[
+  {
+    "id": "wands_ace",
+    "number": 1,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "ace",
+    "name": "Ace of Wands",
+    "name_zh": "權杖王牌",
+    "image": "minor/wands/ace_of_wands.png",
+    "upright": {
+      "keywords": [
+        "新開始",
+        "靈感",
+        "潛力",
+        "創造力",
+        "機會"
+      ],
+      "meaning": "權杖王牌象徵一股全新的創造能量湧現。這是新計畫、新靈感或新機會的起點。充滿熱情與潛力的火種已經點燃，把握這股動能，勇敢開始行動吧。"
+    },
+    "reversed": {
+      "keywords": [
+        "延遲",
+        "缺乏動力",
+        "猶豫",
+        "錯失機會",
+        "創意受阻"
+      ],
+      "meaning": "逆位暗示你可能錯過了一個好機會，或者新計畫遲遲無法啟動。也許你對新事物缺乏熱情，或者感到創意受阻。重新找回你的熱情火焰。"
+    }
+  },
+  {
+    "id": "wands_two",
+    "number": 2,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "two",
+    "name": "Two of Wands",
+    "name_zh": "權杖二",
+    "image": "minor/wands/two_of_wands.png",
+    "upright": {
+      "keywords": [
+        "規劃",
+        "未來願景",
+        "決策",
+        "探索",
+        "進展"
+      ],
+      "meaning": "權杖二代表站在十字路口，手握世界地圖。你的計畫已有雛形，現在需要做出選擇並付諸行動。大膽展望未來，但也要有具體的執行計畫。"
+    },
+    "reversed": {
+      "keywords": [
+        "缺乏計畫",
+        "恐懼未知",
+        "選擇困難",
+        "目光短淺",
+        "猶豫不決"
+      ],
+      "meaning": "逆位暗示你可能對未來感到迷茫，缺乏明確的方向或計畫。也許你害怕踏出舒適圈。試著把目光放遠，不要被眼前的不確定性嚇倒。"
+    }
+  },
+  {
+    "id": "wands_three",
+    "number": 3,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "three",
+    "name": "Three of Wands",
+    "name_zh": "權杖三",
+    "image": "minor/wands/three_of_wands.png",
+    "upright": {
+      "keywords": [
+        "遠見",
+        "擴展",
+        "領導",
+        "商機",
+        "等待成果"
+      ],
+      "meaning": "權杖三象徵你的計畫已經啟動，正在等待第一批成果回報。你的遠見和領導力正引領你走向更大的舞台。保持耐心，機會正在醞釀中。"
+    },
+    "reversed": {
+      "keywords": [
+        "延遲回報",
+        "缺乏遠見",
+        "障礙",
+        "過度擴張",
+        "挫折"
+      ],
+      "meaning": "逆位暗示預期的成果遲遲未到，或計畫遇到了障礙。也許你擴張得太快，缺乏穩固的基礎。退一步重新評估，別急於求成。"
+    }
+  },
+  {
+    "id": "wands_four",
+    "number": 4,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "four",
+    "name": "Four of Wands",
+    "name_zh": "權杖四",
+    "image": "minor/wands/four_of_wands.png",
+    "upright": {
+      "keywords": [
+        "慶祝",
+        "和諧",
+        "家庭",
+        "穩定",
+        "里程碑"
+      ],
+      "meaning": "權杖四是一張慶祝的牌，象徵努力達成了穩定的成果。無論是完成專案、搬新家或人生大事，現在是享受成果、與親友同歡的時刻。"
+    },
+    "reversed": {
+      "keywords": [
+        "不穩定",
+        "過渡期",
+        "缺乏歸屬",
+        "衝突",
+        "慶祝過早"
+      ],
+      "meaning": "逆位暗示穩定感被打破，或你正處於動盪的過渡期。家庭或團隊中可能有不和諧的氣氛。在慶祝之前，先確認根基是否穩固。"
+    }
+  },
+  {
+    "id": "wands_five",
+    "number": 5,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "five",
+    "name": "Five of Wands",
+    "name_zh": "權杖五",
+    "image": "minor/wands/five_of_wands.png",
+    "upright": {
+      "keywords": [
+        "衝突",
+        "競爭",
+        "分歧",
+        "挑戰",
+        "辯論"
+      ],
+      "meaning": "權杖五代表衝突與競爭。你可能面臨意見分歧、內部爭鬥或激烈的競爭環境。這張牌提醒你把衝突視為成長的機會，在混亂中找到自己的立場。"
+    },
+    "reversed": {
+      "keywords": [
+        "避免衝突",
+        "內在矛盾",
+        "和解",
+        "壓抑怒火",
+        "退讓"
+      ],
+      "meaning": "逆位暗示你可能在逃避必要的衝突，或者內心充滿壓抑的憤怒。有時候衝突是解決問題的途徑，逃避只會讓問題惡化。勇敢表達你的立場。"
+    }
+  },
+  {
+    "id": "wands_six",
+    "number": 6,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "six",
+    "name": "Six of Wands",
+    "name_zh": "權杖六",
+    "image": "minor/wands/six_of_wands.png",
+    "upright": {
+      "keywords": [
+        "勝利",
+        "榮耀",
+        "認可",
+        "成就",
+        "自信"
+      ],
+      "meaning": "權杖六象徵凱旋歸來的榮耀時刻。你的努力終於得到了認可和讚賞。現在是享受勝利果實、接受掌聲的時候。自信地展現你的成就。"
+    },
+    "reversed": {
+      "keywords": [
+        "失敗",
+        "缺乏認可",
+        "自大",
+        "名譽受損",
+        "內在的勝利"
+      ],
+      "meaning": "逆位暗示你可能沒有得到應有的認可，或者勝利來得不那麼光彩。也許你過於在意外在的讚美。真正的成就不需要別人的掌聲來證明。"
+    }
+  },
+  {
+    "id": "wands_seven",
+    "number": 7,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "seven",
+    "name": "Seven of Wands",
+    "name_zh": "權杖七",
+    "image": "minor/wands/seven_of_wands.png",
+    "upright": {
+      "keywords": [
+        "堅守立場",
+        "防禦",
+        "堅持",
+        "挑戰",
+        "毅力"
+      ],
+      "meaning": "權杖七象徵在困難面前堅守陣地。你正面臨來自四面八方的挑戰，但你擁有居高臨下的優勢。堅持你的信念，不要輕易放棄，你比你想像的更強大。"
+    },
+    "reversed": {
+      "keywords": [
+        "不堪重負",
+        "放棄",
+        "妥協",
+        "退縮",
+        "力不從心"
+      ],
+      "meaning": "逆位暗示你可能被壓力壓垮，感到難以繼續堅持。也許是時候策略性地退讓，而非死守不放。知道何時堅持、何時退讓，是真正的智慧。"
+    }
+  },
+  {
+    "id": "wands_eight",
+    "number": 8,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "eight",
+    "name": "Eight of Wands",
+    "name_zh": "權杖八",
+    "image": "minor/wands/eight_of_wands.png",
+    "upright": {
+      "keywords": [
+        "快速進展",
+        "行動",
+        "動能",
+        "訊息",
+        "旅行"
+      ],
+      "meaning": "權杖八象徵事情正在快速發展，消息即將到來。一切都在加速推進，你需要做好準備迎接變化。抓住這股勢頭，讓事情順勢而為。"
+    },
+    "reversed": {
+      "keywords": [
+        "延遲",
+        "受阻",
+        "等待",
+        "內在調整",
+        "方向錯誤"
+      ],
+      "meaning": "逆位暗示進展受阻或計畫被延遲。也許你正朝著錯誤的方向衝刺。停下來重新確認方向，然後再出發。有時候慢就是快。"
+    }
+  },
+  {
+    "id": "wands_nine",
+    "number": 9,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "nine",
+    "name": "Nine of Wands",
+    "name_zh": "權杖九",
+    "image": "minor/wands/nine_of_wands.png",
+    "upright": {
+      "keywords": [
+        "堅韌",
+        "勇氣",
+        "最後考驗",
+        "界限",
+        "警戒"
+      ],
+      "meaning": "權杖九象徵你已歷經重重考驗，雖然疲憊但仍未倒下。最後的挑戰就在眼前，你已經走了這麼遠，不要在終點前放棄。保持警覺，勝利近在咫尺。"
+    },
+    "reversed": {
+      "keywords": [
+        "疲憊",
+        "放棄",
+        "偏執",
+        "不願求助",
+        "過度防衛"
+      ],
+      "meaning": "逆位暗示你可能已經精疲力竭，堅持已到極限。也許你太過固執，不願意接受他人的幫助。學會適時示弱，讓別人分擔你的重擔。"
+    }
+  },
+  {
+    "id": "wands_ten",
+    "number": 10,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "ten",
+    "name": "Ten of Wands",
+    "name_zh": "權杖十",
+    "image": "minor/wands/ten_of_wands.png",
+    "upright": {
+      "keywords": [
+        "負擔",
+        "責任過重",
+        "壓力",
+        "苦撐",
+        "過勞"
+      ],
+      "meaning": "權杖十象徵肩負過多的責任與壓力。你試圖一個人扛下所有事，已經快要不堪負荷。這張牌提醒你學會分擔、委派和放下不必要的負擔。"
+    },
+    "reversed": {
+      "keywords": [
+        "放下重擔",
+        "委派",
+        "減壓",
+        "崩潰",
+        "拒絕過度負擔"
+      ],
+      "meaning": "逆位暗示你正在學習放下過重的負擔，或者已經到達崩潰的臨界點。是時候重新評估什麼是真正重要的，把不必要的負擔交出去。"
+    }
+  },
+  {
+    "id": "wands_page",
+    "number": 11,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "page",
+    "name": "Page of Wands",
+    "name_zh": "權杖侍從",
+    "image": "minor/wands/page_of_wands.png",
+    "upright": {
+      "keywords": [
+        "熱情",
+        "探索",
+        "好奇心",
+        "新消息",
+        "冒險精神"
+      ],
+      "meaning": "權杖侍從帶來令人興奮的新消息或機會。他象徵年輕的熱情、無限的好奇心和對冒險的渴望。大膽嘗試新事物，讓你的熱情帶領你前進。"
+    },
+    "reversed": {
+      "keywords": [
+        "衝動",
+        "三分鐘熱度",
+        "沒有方向",
+        "壞消息",
+        "不成熟"
+      ],
+      "meaning": "逆位暗示缺乏方向的衝動行為，或者三分鐘熱度難以持久。也可能代表令人失望的消息。在行動之前，先確認你的熱情是否經得起時間考驗。"
+    }
+  },
+  {
+    "id": "wands_knight",
+    "number": 12,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "knight",
+    "name": "Knight of Wands",
+    "name_zh": "權杖騎士",
+    "image": "minor/wands/knight_of_wands.png",
+    "upright": {
+      "keywords": [
+        "行動力",
+        "冒險",
+        "熱情",
+        "衝勁",
+        "大膽"
+      ],
+      "meaning": "權杖騎士是行動的化身，充滿熱情與衝勁。他代表不顧一切向前衝的能量。現在是大膽行動、追求目標的時候。帶著你的熱情勇往直前。"
+    },
+    "reversed": {
+      "keywords": [
+        "魯莽",
+        "暴躁",
+        "方向不明",
+        "延遲行動",
+        "浮躁"
+      ],
+      "meaning": "逆位暗示行動過於魯莽或缺乏計畫。你的衝勁可能變成了浮躁與暴躁。在衝刺之前，確保你知道自己要去哪裡，否則只是在浪費能量。"
+    }
+  },
+  {
+    "id": "wands_queen",
+    "number": 13,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "queen",
+    "name": "Queen of Wands",
+    "name_zh": "權杖皇后",
+    "image": "minor/wands/queen_of_wands.png",
+    "upright": {
+      "keywords": [
+        "自信",
+        "獨立",
+        "熱情",
+        "決斷力",
+        "魅力"
+      ],
+      "meaning": "權杖皇后是充滿魅力與自信的領導者。她用熱情和溫暖感染周圍的人，同時保持堅定的意志。她鼓勵你相信自己，勇敢追求你的熱情所在。"
+    },
+    "reversed": {
+      "keywords": [
+        "固執",
+        "嫉妒",
+        "控制慾",
+        "自私",
+        "暴躁"
+      ],
+      "meaning": "逆位暗示自信可能變成了控制慾或嫉妒。你也許過於強勢，忽略了他人的感受。恢復你的溫暖與包容，領導不是靠控制而是靠影響力。"
+    }
+  },
+  {
+    "id": "wands_king",
+    "number": 14,
+    "suit": "wands",
+    "suit_zh": "權杖",
+    "rank": "king",
+    "name": "King of Wands",
+    "name_zh": "權杖國王",
+    "image": "minor/wands/king_of_wands.png",
+    "upright": {
+      "keywords": [
+        "領導力",
+        "遠見",
+        "企業家精神",
+        "果斷",
+        "激勵"
+      ],
+      "meaning": "權杖國王是天生的領導者，擁有遠大的願景和果斷的行動力。他激勵他人追隨他的腳步，用熱情與智慧推動大計。成為那個敢於做決定的人。"
+    },
+    "reversed": {
+      "keywords": [
+        "獨裁",
+        "衝動決策",
+        "目光短淺",
+        "暴君",
+        "不負責任"
+      ],
+      "meaning": "逆位暗示領導力變質為獨裁或衝動。決策缺乏深思熟慮，只顧短期利益。一個好的領導者需要兼顧遠見與責任，不要讓權力蒙蔽了你的判斷。"
+    }
+  },
+  {
+    "id": "cups_ace",
+    "number": 1,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "ace",
+    "name": "Ace of Cups",
+    "name_zh": "聖杯王牌",
+    "image": "minor/cups/ace_of_cups.png",
+    "upright": {
+      "keywords": [
+        "新感情",
+        "直覺",
+        "愛",
+        "情感開始",
+        "靈性"
+      ],
+      "meaning": "聖杯王牌象徵新感情或情感體驗的開始。一段新的愛情、友誼或創意靈感正在萌發。打開你的心，接受這份來自宇宙的情感祝福。"
+    },
+    "reversed": {
+      "keywords": [
+        "情感封閉",
+        "空虛",
+        "壓抑情感",
+        "拒絕愛",
+        "錯失情感連結"
+      ],
+      "meaning": "逆位暗示你可能把心門關上了，拒絕接受情感上的新機會。內心的空虛感可能是因為你壓抑了真實的感受。試著重新打開心扉。"
+    }
+  },
+  {
+    "id": "cups_two",
+    "number": 2,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "two",
+    "name": "Two of Cups",
+    "name_zh": "聖杯二",
+    "image": "minor/cups/two_of_cups.png",
+    "upright": {
+      "keywords": [
+        "合作",
+        "愛情",
+        "夥伴關係",
+        "互相吸引",
+        "連結"
+      ],
+      "meaning": "聖杯二象徵兩人之間的深層連結與愛的交流。無論是愛情、友情還是合作關係，你們之間有著美好的互動與共鳴。珍惜這份雙向的情感流動。"
+    },
+    "reversed": {
+      "keywords": [
+        "失衡的關係",
+        "溝通不良",
+        "分離",
+        "不信任",
+        "關係裂痕"
+      ],
+      "meaning": "逆位暗示關係中的失衡或溝通障礙。一方可能付出太多而另一方太少。重新審視你們的關係，坦誠溝通是修復裂痕的第一步。"
+    }
+  },
+  {
+    "id": "cups_three",
+    "number": 3,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "three",
+    "name": "Three of Cups",
+    "name_zh": "聖杯三",
+    "image": "minor/cups/three_of_cups.png",
+    "upright": {
+      "keywords": [
+        "友誼",
+        "慶祝",
+        "社交",
+        "合作",
+        "快樂聚會"
+      ],
+      "meaning": "聖杯三是歡樂聚會的象徵。和朋友們舉杯慶祝，享受社交帶來的溫暖與快樂。這也代表團隊合作的成功。展開雙臂，和你重視的人一起分享喜悅。"
+    },
+    "reversed": {
+      "keywords": [
+        "過度放縱",
+        "八卦",
+        "孤立",
+        "社交疲勞",
+        "表面關係"
+      ],
+      "meaning": "逆位暗示社交生活可能出了問題。也許你感到被孤立，或者對社交感到疲倦。也可能是周圍出現了八卦或表面的人際關係。重新評估你的社交圈。"
+    }
+  },
+  {
+    "id": "cups_four",
+    "number": 4,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "four",
+    "name": "Four of Cups",
+    "name_zh": "聖杯四",
+    "image": "minor/cups/four_of_cups.png",
+    "upright": {
+      "keywords": [
+        "倦怠",
+        "冷漠",
+        "不滿足",
+        "機會忽視",
+        "內心空虛"
+      ],
+      "meaning": "聖杯四象徵情感上的倦怠與冷漠。你對眼前的一切感到無趣，但同時也忽略了身邊的新機會。重新審視你的態度，也許幸福就在你不曾注意的角落。"
+    },
+    "reversed": {
+      "keywords": [
+        "覺醒",
+        "重新振作",
+        "新動力",
+        "接受機會",
+        "走出倦怠"
+      ],
+      "meaning": "逆位代表你正從倦怠中醒來，開始重新關注身邊的機會。你準備好從冷漠中走出，以新的態度面對生活。好好把握這股重新燃起的動力。"
+    }
+  },
+  {
+    "id": "cups_five",
+    "number": 5,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "five",
+    "name": "Five of Cups",
+    "name_zh": "聖杯五",
+    "image": "minor/cups/five_of_cups.png",
+    "upright": {
+      "keywords": [
+        "失落",
+        "遺憾",
+        "悲傷",
+        "專注負面",
+        "失望"
+      ],
+      "meaning": "聖杯五象徵一段失落與悲傷的時期。你可能過度專注於已經失去的東西，而忽略了仍然擁有的祝福。允許自己悲傷，但不要讓遺憾吞噬你的人生。"
+    },
+    "reversed": {
+      "keywords": [
+        "放下過去",
+        "接受",
+        "走出悲傷",
+        "新的感恩",
+        "重新開始"
+      ],
+      "meaning": "逆位代表你開始從失落中走出來，學會接受並放下。你的注意力正轉向那些仍然存在的美好事物。療癒的過程正在進行中。"
+    }
+  },
+  {
+    "id": "cups_six",
+    "number": 6,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "six",
+    "name": "Six of Cups",
+    "name_zh": "聖杯六",
+    "image": "minor/cups/six_of_cups.png",
+    "upright": {
+      "keywords": [
+        "懷舊",
+        "童年回憶",
+        "純真",
+        "善意",
+        "家鄉"
+      ],
+      "meaning": "聖杯六喚起溫暖的回憶與純真的時光。它象徵對過去美好時光的懷念，以及來自他人的善意。享受這份溫馨，但也別忘了活在當下。"
+    },
+    "reversed": {
+      "keywords": [
+        "活在過去",
+        "不切實際",
+        "放不下回憶",
+        "逃避現實",
+        "失去純真"
+      ],
+      "meaning": "逆位暗示你可能過度沉溺於過去，用回憶來逃避現實的挑戰。雖然過去很美好，但你的未來更值得期待。放下對過去的執著，往前看。"
+    }
+  },
+  {
+    "id": "cups_seven",
+    "number": 7,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "seven",
+    "name": "Seven of Cups",
+    "name_zh": "聖杯七",
+    "image": "minor/cups/seven_of_cups.png",
+    "upright": {
+      "keywords": [
+        "幻想",
+        "選擇",
+        "誘惑",
+        "白日夢",
+        "迷幻"
+      ],
+      "meaning": "聖杯七象徵眼花繚亂的選擇與充滿誘惑的幻想。你的眼前出現了許多看似美好的選項，但哪些是真實的？腳踏實地，分辨清楚什麼是幻象，什麼是值得追求的。"
+    },
+    "reversed": {
+      "keywords": [
+        "做出選擇",
+        "回歸現實",
+        "聚焦",
+        "打破幻想",
+        "明確目標"
+      ],
+      "meaning": "逆位代表你已經看破了幻象，準備做出明確的選擇。不再被不切實際的夢想迷惑，你開始腳踏實地面對現實。專注在真正重要的事上。"
+    }
+  },
+  {
+    "id": "cups_eight",
+    "number": 8,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "eight",
+    "name": "Eight of Cups",
+    "name_zh": "聖杯八",
+    "image": "minor/cups/eight_of_cups.png",
+    "upright": {
+      "keywords": [
+        "離開",
+        "放棄",
+        "尋找更深的意義",
+        "轉身",
+        "往前走"
+      ],
+      "meaning": "聖杯八象徵主動離開不再能滿足你的事物。即使這些東西看似不錯，但你的內心知道還有更有意義的事在等著你。鼓起勇氣轉身，踏上尋找真正渴望的道路。"
+    },
+    "reversed": {
+      "keywords": [
+        "逃避",
+        "害怕改變",
+        "徘徊不定",
+        "假裝滿足",
+        "留戀"
+      ],
+      "meaning": "逆位暗示你明知應該離開，卻捨不得放手。或者你在aimlessly漂泊，不知道自己到底在尋找什麼。停下來問問自己的心，你真正想要的是什麼。"
+    }
+  },
+  {
+    "id": "cups_nine",
+    "number": 9,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "nine",
+    "name": "Nine of Cups",
+    "name_zh": "聖杯九",
+    "image": "minor/cups/nine_of_cups.png",
+    "upright": {
+      "keywords": [
+        "願望成真",
+        "滿足",
+        "幸福",
+        "如願以償",
+        "感恩"
+      ],
+      "meaning": "聖杯九被稱為「許願牌」，象徵夢想成真和深深的滿足感。你的願望正在實現，好好享受這份來之不易的幸福。帶著感恩的心，擁抱生命的美好。"
+    },
+    "reversed": {
+      "keywords": [
+        "不滿足",
+        "貪婪",
+        "物質主義",
+        "夢想幻滅",
+        "不知感恩"
+      ],
+      "meaning": "逆位暗示即使夢想實現了你仍然感到不滿足，或者你的願望並未如預期般帶來快樂。也許你追求的並不是你真正需要的。重新定義什麼是真正的幸福。"
+    }
+  },
+  {
+    "id": "cups_ten",
+    "number": 10,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "ten",
+    "name": "Ten of Cups",
+    "name_zh": "聖杯十",
+    "image": "minor/cups/ten_of_cups.png",
+    "upright": {
+      "keywords": [
+        "幸福家庭",
+        "圓滿",
+        "和諧",
+        "情感富足",
+        "彩虹"
+      ],
+      "meaning": "聖杯十是塔羅牌中最幸福的牌之一，象徵家庭圓滿、情感豐盛與無比和諧的幸福。你正被愛包圍，享受著內心最深層的滿足。這就是你一直追求的幸福模樣。"
+    },
+    "reversed": {
+      "keywords": [
+        "家庭問題",
+        "關係破裂",
+        "不圓滿",
+        "價值觀衝突",
+        "失去和諧"
+      ],
+      "meaning": "逆位暗示家庭或關係中出現裂痕。曾經的和諧可能受到挑戰。不要讓小問題演變成大裂痕，用愛與耐心來修復關係中的不和諧。"
+    }
+  },
+  {
+    "id": "cups_page",
+    "number": 11,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "page",
+    "name": "Page of Cups",
+    "name_zh": "聖杯侍從",
+    "image": "minor/cups/page_of_cups.png",
+    "upright": {
+      "keywords": [
+        "浪漫消息",
+        "直覺",
+        "創意",
+        "情感敏銳",
+        "溫柔"
+      ],
+      "meaning": "聖杯侍從帶來浪漫的消息或是創意靈感的降臨。他是一個敏感、直覺敏銳的使者。打開你的心去感受生活中的美好與詩意，讓情感自由流動。"
+    },
+    "reversed": {
+      "keywords": [
+        "情感不成熟",
+        "逃避感受",
+        "過度敏感",
+        "創意受阻",
+        "愛慕虛榮"
+      ],
+      "meaning": "逆位暗示情感上的不成熟或過度敏感。你可能在逃避真實的感受，或被表面的浪漫所迷惑。成長意味著學會真實面對自己的情感。"
+    }
+  },
+  {
+    "id": "cups_knight",
+    "number": 12,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "knight",
+    "name": "Knight of Cups",
+    "name_zh": "聖杯騎士",
+    "image": "minor/cups/knight_of_cups.png",
+    "upright": {
+      "keywords": [
+        "浪漫",
+        "魅力",
+        "追求愛",
+        "理想主義",
+        "邀約"
+      ],
+      "meaning": "聖杯騎士是騎著白馬的浪漫王子。他代表對愛情的熱烈追求和理想主義的態度。一段充滿魅力與浪漫的追求正在展開，或者你正被邀請去探索情感的深處。"
+    },
+    "reversed": {
+      "keywords": [
+        "虛偽的浪漫",
+        "不切實際",
+        "情緒化",
+        "善變",
+        "失望"
+      ],
+      "meaning": "逆位暗示浪漫的承諾可能並不真實，或期望過於理想化。有人可能只是說得好聽卻無法兌現。分辨真心與花言巧語的區別很重要。"
+    }
+  },
+  {
+    "id": "cups_queen",
+    "number": 13,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "queen",
+    "name": "Queen of Cups",
+    "name_zh": "聖杯皇后",
+    "image": "minor/cups/queen_of_cups.png",
+    "upright": {
+      "keywords": [
+        "溫柔",
+        "直覺",
+        "關懷",
+        "情感成熟",
+        "同理心"
+      ],
+      "meaning": "聖杯皇后是情感智慧的化身。她用溫柔和關懷照顧身邊的每個人，同時擁有深厚的直覺力。她鼓勵你聆聽內心的聲音，以同理心和愛來面對一切。"
+    },
+    "reversed": {
+      "keywords": [
+        "情緒依賴",
+        "過度付出",
+        "自我犧牲",
+        "情緒操控",
+        "不安全感"
+      ],
+      "meaning": "逆位暗示你可能過度情緒化或對他人過度依賴。也許你因為自我犧牲而感到疲憊。記住，照顧自己的情感需求同樣重要。"
+    }
+  },
+  {
+    "id": "cups_king",
+    "number": 14,
+    "suit": "cups",
+    "suit_zh": "聖杯",
+    "rank": "king",
+    "name": "King of Cups",
+    "name_zh": "聖杯國王",
+    "image": "minor/cups/king_of_cups.png",
+    "upright": {
+      "keywords": [
+        "情感平衡",
+        "外交",
+        "冷靜",
+        "智慧",
+        "慷慨"
+      ],
+      "meaning": "聖杯國王是掌控情感的大師。他在波濤洶湧的情感海洋中保持冷靜與平衡，用智慧與慷慨對待他人。他教導你在情感與理性之間找到完美的平衡。"
+    },
+    "reversed": {
+      "keywords": [
+        "情緒壓抑",
+        "冷漠",
+        "操控",
+        "情緒不穩",
+        "逃避感情"
+      ],
+      "meaning": "逆位暗示你可能在壓抑情感或用冷漠來武裝自己。也可能代表情緒的不穩定或試圖操控他人的感受。打開心門，面對你真實的情感需求。"
+    }
+  },
+  {
+    "id": "swords_ace",
+    "number": 1,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "ace",
+    "name": "Ace of Swords",
+    "name_zh": "寶劍王牌",
+    "image": "minor/swords/ace_of_swords.png",
+    "upright": {
+      "keywords": [
+        "清晰",
+        "突破",
+        "真相",
+        "新想法",
+        "正義"
+      ],
+      "meaning": "寶劍王牌象徵思維的突破與清晰的洞見。真相的利劍劃破迷霧，帶來全新的理解與觀點。這是追求真理、展開新思路的最佳時機。"
+    },
+    "reversed": {
+      "keywords": [
+        "混亂",
+        "誤解",
+        "思維受阻",
+        "殘酷的真相",
+        "濫用智力"
+      ],
+      "meaning": "逆位暗示思維混亂或真相被扭曲。也許你正在逃避面對事實，或者你的想法缺乏清晰度。靜下心來，重新理清思路。"
+    }
+  },
+  {
+    "id": "swords_two",
+    "number": 2,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "two",
+    "name": "Two of Swords",
+    "name_zh": "寶劍二",
+    "image": "minor/swords/two_of_swords.png",
+    "upright": {
+      "keywords": [
+        "抉擇",
+        "膠著",
+        "迴避",
+        "僵局",
+        "內心掙扎"
+      ],
+      "meaning": "寶劍二象徵面對困難抉擇時的僵局。你蒙著雙眼，試圖迴避必須做的決定。但逃避不是辦法，唯有勇敢面對，才能打破僵局。"
+    },
+    "reversed": {
+      "keywords": [
+        "做出決定",
+        "資訊過載",
+        "焦慮",
+        "優柔寡斷",
+        "內心衝突加劇"
+      ],
+      "meaning": "逆位可能代表你終於準備做出決定，或者焦慮已經無法再忽視。信息太多反而讓你更加困惑。停止分析，聽從你的心。"
+    }
+  },
+  {
+    "id": "swords_three",
+    "number": 3,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "three",
+    "name": "Three of Swords",
+    "name_zh": "寶劍三",
+    "image": "minor/swords/three_of_swords.png",
+    "upright": {
+      "keywords": [
+        "心碎",
+        "悲痛",
+        "分離",
+        "背叛",
+        "傷痛"
+      ],
+      "meaning": "寶劍三是塔羅中最直接的傷痛之牌。它代表心碎、失去和無法迴避的痛苦。雖然很痛，但這份痛苦也是療癒的開始。允許自己哀傷，然後慢慢站起來。"
+    },
+    "reversed": {
+      "keywords": [
+        "療癒",
+        "放下傷痛",
+        "原諒",
+        "恢復",
+        "從悲傷中走出"
+      ],
+      "meaning": "逆位代表你正在從傷痛中恢復和療癒。雖然傷疤仍在，但你已經開始原諒和放下。療癒需要時間，但你正走在正確的道路上。"
+    }
+  },
+  {
+    "id": "swords_four",
+    "number": 4,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "four",
+    "name": "Four of Swords",
+    "name_zh": "寶劍四",
+    "image": "minor/swords/four_of_swords.png",
+    "upright": {
+      "keywords": [
+        "休息",
+        "恢復",
+        "靜養",
+        "充電",
+        "暫停"
+      ],
+      "meaning": "寶劍四象徵一段必要的休息與靜養時期。經歷了精神上的消耗，你的身心需要充電。放下一切，讓自己好好休息。這不是懶惰，而是為了更好的再出發。"
+    },
+    "reversed": {
+      "keywords": [
+        "躁動",
+        "倦怠",
+        "無法放鬆",
+        "重新活躍",
+        "過度休息"
+      ],
+      "meaning": "逆位暗示你可能休息夠了，是時候重新出發。或者相反，你雖然疲憊卻無法讓自己停下來。學會聆聽身體的信號，在活動與休息之間找到平衡。"
+    }
+  },
+  {
+    "id": "swords_five",
+    "number": 5,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "five",
+    "name": "Five of Swords",
+    "name_zh": "寶劍五",
+    "image": "minor/swords/five_of_swords.png",
+    "upright": {
+      "keywords": [
+        "衝突",
+        "爭吵",
+        "欺騙",
+        "不光彩的勝利",
+        "自私"
+      ],
+      "meaning": "寶劍五象徵一場不光彩的衝突。有人可能在做不正當的事來取得勝利。你需要評估這場爭鬥是否值得，以及你是否在用正確的方式面對衝突。"
+    },
+    "reversed": {
+      "keywords": [
+        "和解",
+        "反思",
+        "認錯",
+        "放下爭執",
+        "改變策略"
+      ],
+      "meaning": "逆位暗示衝突正在緩和，或你開始反思自己在爭執中的角色。也許是時候放下驕傲，承認錯誤，走向和解的道路。"
+    }
+  },
+  {
+    "id": "swords_six",
+    "number": 6,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "six",
+    "name": "Six of Swords",
+    "name_zh": "寶劍六",
+    "image": "minor/swords/six_of_swords.png",
+    "upright": {
+      "keywords": [
+        "過渡",
+        "離開困境",
+        "前進",
+        "恢復",
+        "旅程"
+      ],
+      "meaning": "寶劍六象徵離開困境，航向更平靜的水域。最糟的時期已經過去，你正在向更好的方向移動。雖然可能還帶著傷痕，但至少你已經在前進的道路上了。"
+    },
+    "reversed": {
+      "keywords": [
+        "困住",
+        "無法前進",
+        "未解決的問題",
+        "回到困境",
+        "逃避"
+      ],
+      "meaning": "逆位暗示你可能無法順利離開困境，或者又回到了之前的問題中。逃避不是解決問題的方式。面對那些未被解決的議題，才能真正離開風暴。"
+    }
+  },
+  {
+    "id": "swords_seven",
+    "number": 7,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "seven",
+    "name": "Seven of Swords",
+    "name_zh": "寶劍七",
+    "image": "minor/swords/seven_of_swords.png",
+    "upright": {
+      "keywords": [
+        "欺騙",
+        "策略",
+        "偷偷摸摸",
+        "機智",
+        "隱密行動"
+      ],
+      "meaning": "寶劍七暗示有人正在使用不正當的手段或隱藏議程。你可能需要運用策略來處理棘手的局面，但要注意道德的底線。不是所有的聰明都值得讚揚。"
+    },
+    "reversed": {
+      "keywords": [
+        "被揭穿",
+        "良心不安",
+        "坦白",
+        "放棄欺騙",
+        "面對後果"
+      ],
+      "meaning": "逆位暗示欺騙即將被揭穿，或者你正考慮坦白一切。也許你良心不安，決定不再隱瞞。誠實雖然困難，但終究是最好的策略。"
+    }
+  },
+  {
+    "id": "swords_eight",
+    "number": 8,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "eight",
+    "name": "Eight of Swords",
+    "name_zh": "寶劍八",
+    "image": "minor/swords/eight_of_swords.png",
+    "upright": {
+      "keywords": [
+        "受困",
+        "自我設限",
+        "無力感",
+        "被束縛",
+        "受害者心態"
+      ],
+      "meaning": "寶劍八象徵感到被困住和無力的狀態。你可能覺得動彈不得，但事實上這些束縛很大程度是你自己加上的。改變思維，你就能看到出路。"
+    },
+    "reversed": {
+      "keywords": [
+        "解脫",
+        "新視角",
+        "重獲自由",
+        "勇於行動",
+        "突破限制"
+      ],
+      "meaning": "逆位代表你正在掙脫自我設限的束縛，看到了新的可能性。曾經令你感到無力的情境正在改變。勇敢地走出陰影，自由就在前方。"
+    }
+  },
+  {
+    "id": "swords_nine",
+    "number": 9,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "nine",
+    "name": "Nine of Swords",
+    "name_zh": "寶劍九",
+    "image": "minor/swords/nine_of_swords.png",
+    "upright": {
+      "keywords": [
+        "焦慮",
+        "噩夢",
+        "絕望",
+        "過度擔憂",
+        "失眠"
+      ],
+      "meaning": "寶劍九象徵深層的焦慮與恐懼。夜深人靜時的擔憂和噩夢讓你難以安眠。但請記住，很多恐懼都是被放大的。面對你的焦慮，它們可能沒有你想像的那麼可怕。"
+    },
+    "reversed": {
+      "keywords": [
+        "走出焦慮",
+        "希望",
+        "面對恐懼",
+        "尋求幫助",
+        "最壞的已過去"
+      ],
+      "meaning": "逆位代表你正逐漸走出焦慮的深淵。也許你開始尋求幫助，或者你意識到最壞的情況其實不會發生。黎明前的黑暗最深，光明即將來臨。"
+    }
+  },
+  {
+    "id": "swords_ten",
+    "number": 10,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "ten",
+    "name": "Ten of Swords",
+    "name_zh": "寶劍十",
+    "image": "minor/swords/ten_of_swords.png",
+    "upright": {
+      "keywords": [
+        "結束",
+        "崩潰",
+        "背叛",
+        "致命打擊",
+        "觸底"
+      ],
+      "meaning": "寶劍十代表一個階段的徹底結束。雖然這可能是痛苦的結局，但它也意味著事情已經到了最壞的程度，接下來只會更好。這是涅槃重生前的最後一刻。"
+    },
+    "reversed": {
+      "keywords": [
+        "恢復",
+        "避開最壞",
+        "重生",
+        "學到教訓",
+        "拒絕認輸"
+      ],
+      "meaning": "逆位暗示最壞的情況可能得以避免，或者你正從崩潰中恢復。你已經觸底反彈，帶著慘痛的教訓重新開始。最痛的結束也是最有力的新開始。"
+    }
+  },
+  {
+    "id": "swords_page",
+    "number": 11,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "page",
+    "name": "Page of Swords",
+    "name_zh": "寶劍侍從",
+    "image": "minor/swords/page_of_swords.png",
+    "upright": {
+      "keywords": [
+        "好奇心",
+        "新想法",
+        "學習",
+        "真相",
+        "機敏"
+      ],
+      "meaning": "寶劍侍從帶來新的資訊和觀點。他敏銳、好奇、渴望學習。這張牌鼓勵你保持好奇心，勇敢追問真相，不要害怕挑戰既有觀念。"
+    },
+    "reversed": {
+      "keywords": [
+        "八卦",
+        "尖酸刻薄",
+        "缺乏深度",
+        "散播謠言",
+        "草率判斷"
+      ],
+      "meaning": "逆位暗示言語可能被用來傷害他人。也許有人在背後散播謠言，或者你的判斷過於草率。三思而後言，你的話語有超乎想像的力量。"
+    }
+  },
+  {
+    "id": "swords_knight",
+    "number": 12,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "knight",
+    "name": "Knight of Swords",
+    "name_zh": "寶劍騎士",
+    "image": "minor/swords/knight_of_swords.png",
+    "upright": {
+      "keywords": [
+        "果斷",
+        "直來直往",
+        "智力",
+        "野心",
+        "速度"
+      ],
+      "meaning": "寶劍騎士代表迅速而果斷的行動。他思維敏捷，直來直往，不會浪費時間在廢話上。現在是用清晰的思路快速推進計畫的時候。"
+    },
+    "reversed": {
+      "keywords": [
+        "衝動",
+        "尖銳",
+        "缺乏同理心",
+        "魯莽行動",
+        "言語傷人"
+      ],
+      "meaning": "逆位暗示行動過於魯莽或言語過於尖銳。你的直來直往可能變成了傷人的利刃。在追求效率的同時，別忘了顧及他人的感受。"
+    }
+  },
+  {
+    "id": "swords_queen",
+    "number": 13,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "queen",
+    "name": "Queen of Swords",
+    "name_zh": "寶劍皇后",
+    "image": "minor/swords/queen_of_swords.png",
+    "upright": {
+      "keywords": [
+        "清晰思考",
+        "獨立",
+        "坦率",
+        "洞察力",
+        "公正"
+      ],
+      "meaning": "寶劍皇后擁有銳利的洞察力和公正的心。她不被情感左右，用清晰的思維看穿事物的本質。她鼓勵你勇敢說出真相，並用理性來做出最好的判斷。"
+    },
+    "reversed": {
+      "keywords": [
+        "冷酷",
+        "偏見",
+        "刻薄",
+        "情感壓抑",
+        "苛刻"
+      ],
+      "meaning": "逆位暗示理性可能變成了冷酷和刻薄。你也許用智力作武器來攻擊他人，或壓抑自己的情感。真正的智慧包含了溫柔與慈悲。"
+    }
+  },
+  {
+    "id": "swords_king",
+    "number": 14,
+    "suit": "swords",
+    "suit_zh": "寶劍",
+    "rank": "king",
+    "name": "King of Swords",
+    "name_zh": "寶劍國王",
+    "image": "minor/swords/king_of_swords.png",
+    "upright": {
+      "keywords": [
+        "智慧權威",
+        "清晰判斷",
+        "真理",
+        "邏輯",
+        "公正"
+      ],
+      "meaning": "寶劍國王是智慧與公正的化身。他用邏輯和理性做出最公正的判斷。他提醒你在面對複雜局面時，運用清晰的思維和客觀的態度來做出決策。"
+    },
+    "reversed": {
+      "keywords": [
+        "殘酷",
+        "濫用權力",
+        "操控思想",
+        "不公正",
+        "冷血"
+      ],
+      "meaning": "逆位暗示智慧和權力被用在不正當的地方。也許有人正在操控資訊或做出不公正的判斷。警惕那些用聰明才智來行惡的人，包括審視你自己。"
+    }
+  },
+  {
+    "id": "pentacles_ace",
+    "number": 1,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "ace",
+    "name": "Ace of Pentacles",
+    "name_zh": "錢幣王牌",
+    "image": "minor/pentacles/ace_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "新財源",
+        "機會",
+        "物質基礎",
+        "繁榮",
+        "實際"
+      ],
+      "meaning": "錢幣王牌象徵一個嶄新的物質機會——可能是新工作、投資機會或財務上的好消息。宇宙正遞給你一顆金幣，伸手接住它，並用務實的態度將它發展壯大。"
+    },
+    "reversed": {
+      "keywords": [
+        "錯失機會",
+        "財務不穩",
+        "貪婪",
+        "計畫不周",
+        "物質執著"
+      ],
+      "meaning": "逆位暗示一個好機會可能被錯過，或者財務計畫不夠周全。也許你太過執著於金錢而忽略了其他重要的事。在追求物質的同時，不要忘了精神的富足。"
+    }
+  },
+  {
+    "id": "pentacles_two",
+    "number": 2,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "two",
+    "name": "Two of Pentacles",
+    "name_zh": "錢幣二",
+    "image": "minor/pentacles/two_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "平衡",
+        "多工",
+        "適應",
+        "時間管理",
+        "靈活"
+      ],
+      "meaning": "錢幣二象徵在多個事務之間靈活周旋。你正忙碌地平衡各種責任，就像同時拋接多顆球。保持靈活和幽默感，你有能力處理好一切。"
+    },
+    "reversed": {
+      "keywords": [
+        "失衡",
+        "勉強應付",
+        "優先順序混亂",
+        "過度忙碌",
+        "丟三落四"
+      ],
+      "meaning": "逆位暗示你可能承擔了太多事務，已經快要應付不來。優先順序需要重新調整。學會取捨，專注在最重要的事情上。"
+    }
+  },
+  {
+    "id": "pentacles_three",
+    "number": 3,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "three",
+    "name": "Three of Pentacles",
+    "name_zh": "錢幣三",
+    "image": "minor/pentacles/three_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "技藝",
+        "精進",
+        "團隊合作",
+        "品質",
+        "專業"
+      ],
+      "meaning": "錢幣三象徵在專業領域中精益求精。你的技能正被認可，也許你正參與一個需要專業能力的團隊合作項目。持續磨練你的手藝，追求卓越的品質。"
+    },
+    "reversed": {
+      "keywords": [
+        "技術不足",
+        "草率",
+        "缺乏團隊精神",
+        "平庸",
+        "偷工減料"
+      ],
+      "meaning": "逆位暗示可能存在品質問題或技能不足的挑戰。也許有人在偷工減料，或者團隊合作不順利。提升你的專業能力，不要接受平庸的標準。"
+    }
+  },
+  {
+    "id": "pentacles_four",
+    "number": 4,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "four",
+    "name": "Four of Pentacles",
+    "name_zh": "錢幣四",
+    "image": "minor/pentacles/four_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "安全感",
+        "守財",
+        "保守",
+        "控制",
+        "穩固"
+      ],
+      "meaning": "錢幣四象徵對物質安全感的強烈需求。你牢牢抓住你所擁有的，不願冒任何風險。適度的謹慎是好的，但過度守財可能讓你錯失成長的機會。"
+    },
+    "reversed": {
+      "keywords": [
+        "過度節儉",
+        "貪婪",
+        "財務不安",
+        "開始投資",
+        "放手"
+      ],
+      "meaning": "逆位暗示你可能過度吝嗇或對金錢過於焦慮。也可能代表你終於願意鬆開雙手，開始投資或分享你的資源。在安全和冒險之間找到健康的平衡。"
+    }
+  },
+  {
+    "id": "pentacles_five",
+    "number": 5,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "five",
+    "name": "Five of Pentacles",
+    "name_zh": "錢幣五",
+    "image": "minor/pentacles/five_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "困難",
+        "貧困",
+        "孤立",
+        "不安全感",
+        "物質匱乏"
+      ],
+      "meaning": "錢幣五象徵物質上的困難期。你可能面臨財務壓力、健康問題或感到被排斥和孤立。但記住，困難是暫時的。尋求幫助，有門會為你開啟。"
+    },
+    "reversed": {
+      "keywords": [
+        "走出困境",
+        "恢復",
+        "接受幫助",
+        "精神富足",
+        "轉機"
+      ],
+      "meaning": "逆位代表困難時期正在結束，你開始看到轉機。也許幫助正朝你而來，或者你找到了面對困境的內在力量。最黑暗的時候往往就是黎明前。"
+    }
+  },
+  {
+    "id": "pentacles_six",
+    "number": 6,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "six",
+    "name": "Six of Pentacles",
+    "name_zh": "錢幣六",
+    "image": "minor/pentacles/six_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "慷慨",
+        "施與受",
+        "分享",
+        "繁榮",
+        "公平"
+      ],
+      "meaning": "錢幣六象徵慷慨的施與受。你也許正處於能夠幫助他人的位置，或者你正在接受他人的善意。資源的流動是健康的——分享你的富足，宇宙會給予你回報。"
+    },
+    "reversed": {
+      "keywords": [
+        "單方面付出",
+        "自私",
+        "債務",
+        "不公平交易",
+        "有條件的給予"
+      ],
+      "meaning": "逆位暗示施與受之間的不平衡。也許你一直在付出卻得不到回報，或者有人的慷慨附帶了條件。確保你的給予和接受都是健康且公平的。"
+    }
+  },
+  {
+    "id": "pentacles_seven",
+    "number": 7,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "seven",
+    "name": "Seven of Pentacles",
+    "name_zh": "錢幣七",
+    "image": "minor/pentacles/seven_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "耐心",
+        "投資回報",
+        "長期計畫",
+        "評估",
+        "堅持"
+      ],
+      "meaning": "錢幣七象徵等待長期投資的回報。你已經播下了種子，現在需要耐心等待收穫。評估目前的進展，確認方向正確，然後繼續堅持下去。"
+    },
+    "reversed": {
+      "keywords": [
+        "回報不佳",
+        "缺乏耐心",
+        "放棄",
+        "方向錯誤",
+        "浪費時間"
+      ],
+      "meaning": "逆位暗示你的努力可能沒有得到預期的回報，讓你開始質疑自己的方向。也許你需要調整策略而非完全放棄。重新評估，但不要輕易認輸。"
+    }
+  },
+  {
+    "id": "pentacles_eight",
+    "number": 8,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "eight",
+    "name": "Eight of Pentacles",
+    "name_zh": "錢幣八",
+    "image": "minor/pentacles/eight_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "勤奮",
+        "技能提升",
+        "專注",
+        "細節",
+        "精通"
+      ],
+      "meaning": "錢幣八象徵全心投入工作、精進技藝的時期。你正在用心打磨你的技能，每一個細節都不馬虎。這種專注和勤奮終將使你成為領域中的佼佼者。"
+    },
+    "reversed": {
+      "keywords": [
+        "完美主義",
+        "缺乏熱情",
+        "重複勞動",
+        "技能停滯",
+        "無聊"
+      ],
+      "meaning": "逆位暗示你可能對工作失去了熱情，或者陷入了完美主義的陷阱。也許你感覺自己在做沒有意義的重複勞動。重新找到工作的意義和樂趣。"
+    }
+  },
+  {
+    "id": "pentacles_nine",
+    "number": 9,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "nine",
+    "name": "Nine of Pentacles",
+    "name_zh": "錢幣九",
+    "image": "minor/pentacles/nine_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "獨立",
+        "富裕",
+        "自給自足",
+        "成就",
+        "享受成果"
+      ],
+      "meaning": "錢幣九象徵獨立和自給自足的富足生活。你的辛勤努力終於帶來了豐碩的成果。現在你可以舒適地享受你所創造的一切。你值得這份成就和安逸。"
+    },
+    "reversed": {
+      "keywords": [
+        "過度依賴",
+        "財務損失",
+        "孤獨的富足",
+        "空虛",
+        "安全感不足"
+      ],
+      "meaning": "逆位暗示物質的富足並未帶來真正的滿足，或者你害怕失去目前擁有的一切。也可能代表財務上的意外損失。真正的富足不僅僅是金錢。"
+    }
+  },
+  {
+    "id": "pentacles_ten",
+    "number": 10,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "ten",
+    "name": "Ten of Pentacles",
+    "name_zh": "錢幣十",
+    "image": "minor/pentacles/ten_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "傳承",
+        "家族",
+        "長久財富",
+        "穩固基業",
+        "世代繁榮"
+      ],
+      "meaning": "錢幣十是物質世界中最圓滿的牌，象徵世代相傳的財富與穩固的家族基業。你正在建立能夠持續傳承的成就。這份富足不僅屬於你，也將恩澤後代。"
+    },
+    "reversed": {
+      "keywords": [
+        "家族紛爭",
+        "遺產問題",
+        "財富流失",
+        "不穩定",
+        "揮霍"
+      ],
+      "meaning": "逆位暗示家族或財務上的不穩定。也許你在擔心遺產、財富流失或家庭成員間的紛爭。建立穩固的財務基礎，同時處理好家庭關係。"
+    }
+  },
+  {
+    "id": "pentacles_page",
+    "number": 11,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "page",
+    "name": "Page of Pentacles",
+    "name_zh": "錢幣侍從",
+    "image": "minor/pentacles/page_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "學習",
+        "新技能",
+        "踏實",
+        "好消息",
+        "規劃"
+      ],
+      "meaning": "錢幣侍從帶來與學業、事業或財務相關的好消息。他象徵踏實學習新技能的開始。認真規劃你的目標，一步一腳印地朝著夢想前進。"
+    },
+    "reversed": {
+      "keywords": [
+        "不切實際",
+        "缺乏規劃",
+        "浪費資源",
+        "學習困難",
+        "短視"
+      ],
+      "meaning": "逆位暗示計畫可能不夠務實，或者學習遇到了瓶頸。也許你在浪費寶貴的資源。回到基本功，扎實地打好基礎比什麼都重要。"
+    }
+  },
+  {
+    "id": "pentacles_knight",
+    "number": 12,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "knight",
+    "name": "Knight of Pentacles",
+    "name_zh": "錢幣騎士",
+    "image": "minor/pentacles/knight_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "勤勞",
+        "負責任",
+        "穩健進步",
+        "堅守承諾",
+        "可靠"
+      ],
+      "meaning": "錢幣騎士是最可靠的行動者。他不華麗但踏實，用穩健的步伐朝目標邁進。他教導你堅守承諾、認真負責，一步步將計畫化為現實。"
+    },
+    "reversed": {
+      "keywords": [
+        "停滯",
+        "懶散",
+        "過度保守",
+        "固執己見",
+        "缺乏進展"
+      ],
+      "meaning": "逆位暗示你可能在原地踏步，缺乏前進的動力。也許你過於保守、不敢冒險，或者單純地變得懶散了。重新振作，穩健不代表停滯。"
+    }
+  },
+  {
+    "id": "pentacles_queen",
+    "number": 13,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "queen",
+    "name": "Queen of Pentacles",
+    "name_zh": "錢幣皇后",
+    "image": "minor/pentacles/queen_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "務實",
+        "滋養",
+        "財務管理",
+        "居家",
+        "實際智慧"
+      ],
+      "meaning": "錢幣皇后是務實和滋養的化身。她善於管理資源，創造溫馨舒適的環境。她教導你用實際的智慧來經營生活，在物質與精神之間找到豐盈的平衡。"
+    },
+    "reversed": {
+      "keywords": [
+        "財務問題",
+        "過度物質化",
+        "忽視精神",
+        "不安全感",
+        "吝嗇"
+      ],
+      "meaning": "逆位暗示可能過於專注物質而忽略了精神層面，或者在財務管理上出了問題。也許你因不安全感而變得吝嗇。記住，真正的富足是內外兼修。"
+    }
+  },
+  {
+    "id": "pentacles_king",
+    "number": 14,
+    "suit": "pentacles",
+    "suit_zh": "錢幣",
+    "rank": "king",
+    "name": "King of Pentacles",
+    "name_zh": "錢幣國王",
+    "image": "minor/pentacles/king_of_pentacles.png",
+    "upright": {
+      "keywords": [
+        "財富成就",
+        "成功企業",
+        "穩重",
+        "實際能力",
+        "豐饒"
+      ],
+      "meaning": "錢幣國王代表物質世界的巔峰成就。他是成功的企業家、可靠的領導者。他用務實的能力建立了令人欽佩的基業。你正走在通往物質成功的正確道路上。"
+    },
+    "reversed": {
+      "keywords": [
+        "守財奴",
+        "過度工作",
+        "物質主義",
+        "貪婪",
+        "忽略家庭"
+      ],
+      "meaning": "逆位暗示對財富的過度執著可能讓你失去更重要的東西。你也許沉迷於工作而忽略了家庭和健康。金錢是工具，不是人生的全部目的。"
+    }
+  }
+]
