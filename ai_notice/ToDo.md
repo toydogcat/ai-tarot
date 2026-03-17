@@ -79,7 +79,6 @@ dark mystical background with subtle starfield.
 9 隱者 (The Hermit)
 10 命運之輪 (Wheel of Fortune)
 11 正義 (Justice)
-這風格與大小的 11 正義 (Justice) 的圖
 12 吊人 (The Hanged Man)
 這風格與大小的 12 吊人 (The Hanged Man) 的圖
 13 死神 (Death)
