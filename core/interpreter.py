@@ -1,7 +1,9 @@
-"""Gemini AI 解牌模組"""
 import os
 from google import genai
 from core.models import SpreadResult
+from core.logger import get_logger
+
+logger = get_logger("interpreter")
 
 
 def get_gemini_client() -> genai.Client | None:
@@ -66,7 +68,7 @@ def build_interpretation_prompt(question: str, result: SpreadResult) -> str:
     return prompt
 
 
-def get_ai_interpretation(question: str, result: SpreadResult) -> str | None:
+def get_ai_interpretation(question: str, result: SpreadResult) -> str:
     """
     呼叫 Gemini API 取得 AI 解牌
 
@@ -75,19 +77,21 @@ def get_ai_interpretation(question: str, result: SpreadResult) -> str | None:
         result: 抽牌結果
 
     Returns:
-        AI 解牌文字，若失敗則回傳 None
+        AI 解牌文字，若失敗則回傳 "error"
     """
     client = get_gemini_client()
     if not client:
-        return None
+        return "⚠️ 請先在 .env 中設定 GEMINI_API_KEY 才能使用 AI 解牌功能。"
 
     prompt = build_interpretation_prompt(question, result)
 
     try:
+        logger.info("Calling Gemini API for interpretation...")
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             contents=prompt,
         )
         return response.text
     except Exception as e:
-        return f"⚠️ AI 解牌時發生錯誤：{str(e)}"
+        logger.error(f"Gemini API error: {e}")
+        return "error"
