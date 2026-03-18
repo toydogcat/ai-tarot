@@ -86,7 +86,7 @@ with st.sidebar:
         # 抽牌按鈕
         draw_button = st.button(
             "🃏 開始抽牌",
-            use_container_width=True,
+            width="stretch",
             type="primary",
         )
 

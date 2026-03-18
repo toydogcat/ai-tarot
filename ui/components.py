@@ -142,7 +142,7 @@ def render_card(drawn_card: DrawnCard, position_name: str = "", show_meaning: bo
     prefer_format = st.session_state.get("prefer_image_format", "jpg")
     img = load_card_image(card.image, drawn_card.is_reversed, prefer_format)
     if img:
-        st.image(img, use_container_width=True)
+        st.image(img, width="stretch")
     else:
         # 無圖片時顯示文字佔位
         bg_color = "#8b4557" if drawn_card.is_reversed else "#4a6741"
