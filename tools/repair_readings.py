@@ -12,6 +12,7 @@ load_dotenv()
 
 from google import genai
 from core.history import get_error_records, load_history, update_record_interpretation, get_history_dates
+from core.tts import generate_audio
 from core.logger import get_logger
 
 logger = get_logger("repair")
@@ -95,12 +96,17 @@ def repair_single(date: str, record_id: str) -> bool:
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.0-flash-lite",
             contents=prompt,
         )
         interpretation = response.text
 
-        success = update_record_interpretation(date, record_id, interpretation)
+        print("   🎵 正在生成語音...")
+        audio_path = generate_audio(interpretation, record_id)
+        if audio_path:
+            print("   ✅ 語音生成成功")
+
+        success = update_record_interpretation(date, record_id, interpretation, audio_path)
         if success:
             print(f"✅ 紀錄 {record_id} 已成功修復！")
             logger.info(f"紀錄 {record_id} 已修復")
@@ -115,32 +121,94 @@ def repair_single(date: str, record_id: str) -> bool:
         return False
 
 
+def get_missing_audio_records(date: str | None = None) -> list[dict]:
+    """取得已成功解讀但缺少語音路徑的紀錄"""
+    missing = []
+    if date:
+        dates = [date]
+    else:
+        dates = get_history_dates()
+
+    for d in dates:
+        records = load_history(d)
+        for r in records:
+            if r.get("ai_status") in ("success", "recovered") and not r.get("ai_interpretation_audio_path"):
+                r["_date"] = d
+                missing.append(r)
+    return missing
+
+
+def fix_audio_single(date: str, record_id: str) -> bool:
+    """為單筆紀錄補件語音"""
+    records = load_history(date)
+    target = None
+    for r in records:
+        if r["id"] == record_id:
+            target = r
+            break
+
+    if not target:
+        return False
+
+    interpretation = target.get("ai_interpretation")
+    if not interpretation or interpretation == "error":
+        return False
+
+    print(f"🎵 正在為紀錄 {record_id} 生成語音...")
+    audio_path = generate_audio(interpretation, record_id)
+    if audio_path:
+        # 這裡借用 update_record_interpretation 的邏輯，但只更新 audio_path
+        return update_record_interpretation(date, record_id, interpretation, audio_path)
+    return False
+
+
 def main():
-    parser = argparse.ArgumentParser(description="修復 AI 解牌失敗的歷史紀錄")
+    parser = argparse.ArgumentParser(description="修復 AI 解牌失敗或缺少語音的歷史紀錄")
     parser.add_argument("--list", action="store_true", help="列出所有 error 紀錄")
     parser.add_argument("--date", type=str, help="指定日期 (YYYY-MM-DD)")
     parser.add_argument("--id", type=str, help="指定紀錄 ID")
     parser.add_argument("--all", action="store_true", help="修復所有 error 紀錄")
+    parser.add_argument("--fix-audio", action="store_true", help="修復缺少語音的紀錄")
 
     args = parser.parse_args()
 
     if args.list:
         errors = get_error_records(args.date)
-        if not errors:
-            print("🎉 沒有任何 error 紀錄！")
+        missing_audio = get_missing_audio_records(args.date)
+        
+        if not errors and not missing_audio:
+            print("🎉 沒有任何需要修復的紀錄！")
             return
 
-        print(f"找到 {len(errors)} 筆 error 紀錄：\n")
-        for e in errors:
-            date = e.get("_date", "unknown")
-            print(f"  ❌ [{date}] ID={e['id']}  {e['question'][:50]}...")
-            print(f"     牌陣：{e['spread']['name']}")
-            cards_summary = ", ".join(
-                f"{c['card_name_zh']}({c['orientation']})"
-                for c in e["cards"]
-            )
-            print(f"     牌面：{cards_summary}")
+        if errors:
+            print(f"找到 {len(errors)} 筆 error 紀錄：\n")
+            for e in errors:
+                date = e.get("_date", "unknown")
+                print(f"  ❌ [{date}] ID={e['id']}  {e['question'][:50]}...")
             print()
+
+        if missing_audio:
+            print(f"找到 {len(missing_audio)} 筆缺少語音的紀錄：\n")
+            for m in missing_audio:
+                date = m.get("_date", "unknown")
+                print(f"  🎵 [{date}] ID={m['id']}  {m['question'][:50]}...")
+            print()
+        return
+
+    if args.fix_audio:
+        missing = get_missing_audio_records(args.date)
+        if not missing:
+            print("🎉 沒有任何紀錄需要補件語音！")
+            return
+
+        print(f"🔧 準備為 {len(missing)} 筆紀錄生成語音...\n")
+        success_count = 0
+        for m in missing:
+            date = m.get("_date", "unknown")
+            if fix_audio_single(date, m["id"]):
+                success_count += 1
+        
+        print(f"完成！成功補件 {success_count}/{len(missing)} 筆語音紀錄")
         return
 
     if args.all:

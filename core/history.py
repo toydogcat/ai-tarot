@@ -29,18 +29,19 @@ def _load_today_records() -> list[dict]:
     return []
 
 
-def _save_records(records: list[dict]):
+def _save_records(records: list[dict], filepath: Path | None = None):
     """儲存紀錄"""
-    filepath = _get_today_file()
+    if filepath is None:
+        filepath = _get_today_file()
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(records, f, ensure_ascii=False, indent=2)
-
 
 def save_reading(
     question: str,
     result: SpreadResult,
     interpretation: str | None,
     ai_prompt: str | None = None,
+    ai_interpretation_audio_path: str | None = None,
 ) -> str:
     """
     儲存一次占卜紀錄
@@ -96,6 +97,7 @@ def save_reading(
         "ai_prompt": ai_prompt or "",
         "ai_interpretation": interpretation,
         "ai_status": ai_status,
+        "ai_interpretation_audio_path": ai_interpretation_audio_path,
     }
 
     records = _load_today_records()
@@ -149,7 +151,7 @@ def get_error_records(date: str | None = None) -> list[dict]:
     return errors
 
 
-def update_record_interpretation(date: str, record_id: str, interpretation: str) -> bool:
+def update_record_interpretation(date: str, record_id: str, interpretation: str, audio_path: str | None = None) -> bool:
     """
     更新特定紀錄的 AI 解讀（用於修復 error）
 
@@ -171,8 +173,48 @@ def update_record_interpretation(date: str, record_id: str, interpretation: str)
             record["ai_interpretation"] = interpretation
             record["ai_status"] = "recovered"
             record["recovered_at"] = datetime.now().isoformat()
-            _save_records(records)
+            if audio_path:
+                record["ai_interpretation_audio_path"] = audio_path
+            _save_records(records, filepath)
             logger.info(f"紀錄 {record_id} AI 解讀已修復")
             return True
 
     return False
+
+def search_history_records(query: str, limit: int = 10) -> list[dict]:
+    """使用 thefuzz 進行歷史紀錄語意搜尋"""
+    if not query.strip():
+        return []
+
+    try:
+        from thefuzz import process
+    except ImportError:
+        logger.error("thefuzz 套件未安裝，無法進行搜尋")
+        return []
+
+    dates = get_history_dates()
+    all_records = []
+    
+    for d in dates:
+        records = load_history(d)
+        for r in records:
+            if r.get("ai_status") in ("success", "recovered") and r.get("ai_interpretation"):
+                r["_date"] = d
+                all_records.append(r)
+
+    if not all_records:
+        return []
+
+    choices = {i: r["ai_interpretation"] for i, r in enumerate(all_records)}
+    
+    results = process.extract(query, choices, limit=limit)
+    
+    matched_records = []
+    for match_str, score, key in results:
+        if score > 30: # fuzzy 門檻
+            record = all_records[key].copy()
+            record["_search_score"] = score
+            matched_records.append(record)
+            
+    return matched_records
+

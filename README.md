@@ -31,11 +31,25 @@ cp .env.example .env
 
 ### 3. 啟動應用
 
-```bash
-streamlit run app.py
-```
+本專案支援 **本機啟動** (0.0.0.0) 以及 **Ngrok 遠端分享**。
 
-瀏覽器會自動開啟 `http://localhost:8501`
+#### 一般啟動 (本機 0.0.0.0 分享)
+```bash
+python run.py
+# 或是直接使用 streamlit:
+# streamlit run app.py --server.address=0.0.0.0
+```
+瀏覽器會自動開啟 `http://localhost:8501`。相同區域網路下的設備可以透過您的區域 IP 存取 (例如 `http://192.168.1.xxx:8501`)。
+
+#### Ngrok 外網遠端分享啟動
+若需要將 Tarot App 分享給外網使用者，專案內建整合了 Ngrok：
+1. 前往 Ngrok 註冊並獲取 [Auth Token](https://dashboard.ngrok.com/get-started/your-authtoken)
+2. 將 Token 寫入 `.env` 檔案中：`NGROK_AUTHTOKEN=你的token`
+3. 執行統一啟動腳本：
+   ```bash
+   python run.py
+   ```
+4. 終端機會印出類似 `Ngrok 隧道開啟成功！遠端存取請前往: https://1234abcd.ngrok-free.app` 的網址，將該隨機網址分享給他人即可。
 
 ## 專案結構
 

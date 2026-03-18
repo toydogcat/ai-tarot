@@ -1,9 +1,9 @@
 ---
-name: tarot-error-recovery
-description: 修復占卜歷史中 AI 解牌失敗 (error) 的紀錄，使用 AI 重新生成解讀
+name: tarot-error-recovery-fast
+description: 快速修復占卜歷史中 AI 解牌失敗 (error) 的紀錄，使用 AI 重新生成解讀
 ---
 
-# 🔮 Tarot Error Recovery — AI 解牌救援技能
+# 🔮 Tarot Error Recovery Fast — AI 解牌救援技能
 
 ## 功能說明
 
@@ -19,13 +19,13 @@ description: 修復占卜歷史中 AI 解牌失敗 (error) 的紀錄，使用 AI
 
 ### 步驟 1：確認環境
 
-檢查 `.env` 檔中是否有有效的 `GEMINI_API_KEY`，還有確定python環境 `PYTHON_PATH`，`CONDA_ENV`。
+檢查 `.env` 檔中python環境 `PYTHON_PATH`，`CONDA_ENV`。
 
 ```bash
-cat .env | grep GEMINI_API_KEY
 cat .env | grep PYTHON_PATH
 cat .env | grep CONDA_ENV
 ```
+
 
 ### 步驟 2：查看 error 紀錄
 
@@ -40,27 +40,7 @@ python tools/repair_readings.py --list
 
 ### 步驟 3：修復特定紀錄
 
-如果有 有效的 `GEMINI_API_KEY`，則執行以下指令：
-
-修復單筆紀錄：
-
-```bash
-python tools/repair_readings.py --date 2026-03-17 --id abc12345
-```
-
-修復某天所有 error 紀錄：
-
-```bash
-python tools/repair_readings.py --date 2026-03-17 --all
-```
-
-修復所有日期的所有 error 紀錄：
-
-```bash
-python tools/repair_readings.py --all
-```
-
-如果沒有，找狀態為 error 的紀錄，就根據紀錄中的 `ai_prompt` 重新生成解讀，並更新 `ai_interpretation`。
+找狀態為 error 的紀錄，就根據紀錄中的 `ai_prompt` 重新生成解讀，並更新 `ai_interpretation`。
 
 ### 步驟 4：生成語音
 
@@ -70,7 +50,7 @@ python tools/repair_readings.py --all
 
 ### 步驟 5：驗證修復結果
 
-不管有沒有，有效的 `GEMINI_API_KEY`，修復後的紀錄 `ai_status` 都會變成 `"recovered"`，並加上 `recovered_at` 時間戳。
+修復後的紀錄 `ai_status` 都會變成 `"recovered"`，並加上 `recovered_at` 時間戳。
 
 在 Streamlit 歷史頁面中：
 - ✅ = 原始成功
@@ -86,7 +66,6 @@ python tools/repair_readings.py --all
 | `core/tts.py` | TTS 語音生成 |
 | `core/interpreter.py` | Gemini 提示詞建構 |
 | `history/*.json` | 占卜紀錄檔案 |
-
 
 ## 提示詞邏輯
 
