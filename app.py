@@ -11,6 +11,8 @@ from core.spreads import ALL_SPREADS, get_spread_by_id
 from core.logger import get_logger
 from core.history import save_reading, update_record_interpretation, search_history_records
 from core.tts import generate_audio
+from core.audio_input import process_transcription
+from streamlit_mic_recorder import mic_recorder
 from ui.components import inject_custom_css, render_spread_result, render_ai_interpretation
 
 # 載入 .env
@@ -100,12 +102,34 @@ with st.sidebar:
 
 # === 占卜頁面 ===
 if page == "🔮 占卜":
-    # 使用者提問輸入框
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown("🗣️ **語音輸入問題**")
+        audio_record = mic_recorder(
+            start_prompt="點擊開始錄音 🎤",
+            stop_prompt="停止並辨識 ⏹️",
+            key='recorder'
+        )
+        
+        if audio_record:
+            audio_bytes = audio_record['bytes']
+            audio_hash = hash(audio_bytes)
+            # 防止重新渲染時重複辨識
+            if st.session_state.get("last_audio_hash") != audio_hash:
+                result = process_transcription(audio_bytes, format_hint="webm")
+                if result and not result.startswith(("⚠️", "❌")):
+                    st.session_state["user_question_input"] = result
+                    st.success("✅ 辨識成功！請在下方確認或修改。")
+                else:
+                    st.error(result)
+                st.session_state["last_audio_hash"] = audio_hash
+
+    # 使用者提問輸入框 (若語音辨識成功，會透過 key 自動帶入)
     user_question = st.text_area(
-        "🔮 請輸入你想問塔羅牌的問題",
+        "🔮 請輸入你想問塔羅牌的問題，或用語音輸入直接修改：",
         placeholder="例如：我最近的感情運勢如何？/ 我該不該換工作？/ 這段關係的未來走向是什麼？",
         height=80,
-        key="user_question",
+        key="user_question_input",
     )
 
     if draw_button and selected_spread:
