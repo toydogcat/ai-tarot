@@ -8,6 +8,10 @@ AI 驅動的塔羅牌占卜 Web 應用，使用 Streamlit 打造。
 - 🔄 支援正位與逆位
 - 🃏 6 種經典牌陣：單牌、三牌、時間之流、二擇一、馬蹄形、凱爾特十字
 - 📖 每張牌附有繁體中文牌意解讀
+- 🗣️ **語音輸入提問**：支援麥克風語音轉文字辨識，並可於輸入框手動微調
+- 🔍 **Tavily 外部時事搜尋**：自動從網路搜尋最新話題/時事背景（由 Gemma 3 整理摘要）
+- 🤖 **Gemini AI 解牌**：結合牌陣與外部時事，透過最新 Gemini 3.1 Flash Lite 引擎做深入推演
+- 💾 **歷史紀錄與修復**：以複合狀態（Dictionary）完整紀錄解牌與語音狀態，支援 CLI 技能補件
 
 ## 快速開始
 
@@ -26,7 +30,10 @@ pip install -r requirements.txt
 ```bash
 # 複製 .env 範例檔
 cp .env.example .env
-# 編輯 .env 填入你的設定
+
+# 編輯 .env 填入必要的 API Keys:
+# GEMINI_API_KEY=your_gemini_key
+# TAVILY_API_KEY=your_tavily_key
 ```
 
 ### 3. 啟動應用
@@ -68,7 +75,15 @@ ai-tarot/
 │   ├── models.py           # 資料模型
 │   ├── deck.py             # 牌組管理
 │   ├── engine.py           # 抽牌引擎
-│   └── spreads.py          # 牌陣定義
+│   ├── spreads.py          # 牌陣定義
+│   ├── interpreter.py      # Gemini 解析器
+│   ├── search.py           # Tavily 搜尋與 Gemma 摘要
+│   ├── history.py          # 歷史紀錄管理
+│   ├── tts.py              # 語音合成生成
+│   └── audio_input.py      # 語音輸入與轉換處理
+├── tools/                  # 工具腳本
+│   ├── repair_readings.py  # 補件與修復程式
+│   └── migrate_history_status.py # 狀態格式轉換程式
 ├── ui/                     # UI 元件
 │   └── components.py       # Streamlit 元件
 └── ai_notice/              # 開發指南

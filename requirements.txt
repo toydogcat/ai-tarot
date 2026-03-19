@@ -7,3 +7,7 @@ pyttsx3>=2.90
 thefuzz>=0.22.1
 python-Levenshtein>=0.25.0
 ngrok>=1.4.0
+tavily-python
+SpeechRecognition
+pydub
+streamlit-mic-recorder
