@@ -122,14 +122,24 @@ if page == "🔮 占卜":
 
             logger.info(f"抽牌完成：{[dc.display_name for dc in result.drawn_cards]}")
 
+            # 執行外部搜尋
+            from core.search import perform_tavily_search
+            search_context, search_success = "", True
+            with st.spinner("🔍 正在搜尋相關新聞/資料..."):
+                search_context, search_success = perform_tavily_search(user_question.strip())
+                if search_context:
+                    st.success("成功搜尋到相關背景資訊！")
+                elif not search_success:
+                    st.warning("外部搜尋失敗，仍將根據牌面進行解讀。")
+
             # 產生 AI 提示詞
             from core.interpreter import build_interpretation_prompt
-            ai_prompt = build_interpretation_prompt(user_question.strip(), result)
+            ai_prompt = build_interpretation_prompt(user_question.strip(), result, search_context)
 
             # AI 解牌
             interpretation = None
             with st.spinner("🔮 AI 正在解讀你的塔羅牌..."):
-                interpretation = get_ai_interpretation(user_question.strip(), result)
+                interpretation = get_ai_interpretation(user_question.strip(), result, search_context)
 
             if interpretation and not interpretation.startswith("⚠️"):
                 logger.info("AI 解牌成功")
@@ -139,7 +149,9 @@ if page == "🔮 占卜":
             st.session_state["last_interpretation"] = interpretation
 
             # 儲存 history（含 prompt）
-            record_id = save_reading(user_question.strip(), result, interpretation, ai_prompt=ai_prompt)
+            record_id = save_reading(
+                user_question.strip(), result, interpretation, ai_prompt=ai_prompt, search_success=search_success
+            )
             st.session_state["last_record_id"] = record_id
             logger.info(f"紀錄已儲存 [ID={record_id}]")
 
@@ -194,8 +206,21 @@ elif page == "📜 歷史紀錄":
     st.markdown("---")
 
     def render_history_record(record, show_date=False):
-        ai_status = record.get("ai_status", "unknown")
-        status_icon = {"success": "✅", "error": "❌", "recovered": "🔄"}.get(ai_status, "❓")
+        ai_status = record.get("ai_status", {})
+        if isinstance(ai_status, str):
+            ai_status = {"interpretation": ai_status, "audio": "error"}
+            
+        text_status = ai_status.get("interpretation", "error")
+        audio_status = ai_status.get("audio", "error")
+        search_status = ai_status.get("search", "skipped")
+        
+        if text_status == "error":
+            status_icon = "❌"
+        elif audio_status == "error":
+            status_icon = "⚠️"
+        else:
+            status_icon = "✅"
+
         date_str = f"[{record.get('_date', '')} " if show_date and "_date" in record else "["
         title_time = f"{date_str}{record['time_display']}] "
         score_str = f" (相似度: {record.get('_search_score', 0)}%)" if "_search_score" in record else ""
@@ -207,7 +232,7 @@ elif page == "📜 歷史紀錄":
             st.markdown(f"**問題：** {record['question']}")
             st.markdown(f"**牌陣：** {record['spread']['name']}（{record['spread']['card_count']} 張）")
             st.markdown(f"**ID：** `{record['id']}`")
-            st.markdown(f"**AI 狀態：** {status_icon} {ai_status}")
+            st.markdown(f"**AI 狀態：** {status_icon} (解讀: {text_status}, 語音: {audio_status}, 搜尋: {search_status})")
 
             st.markdown("---")
             st.markdown("**🃏 牌面：**")
@@ -219,7 +244,7 @@ elif page == "📜 歷史紀錄":
                 )
 
             st.markdown("---")
-            if record["ai_interpretation"] == "error":
+            if text_status == "error":
                 st.error("AI 解牌失敗。可使用 Gemini CLI 技能修復此紀錄。")
                 st.code(f"修復指令參考：\n日期: {record.get('_date', 'YYYY-MM-DD')}\nID: {record['id']}", language="text")
             else:
@@ -227,6 +252,8 @@ elif page == "📜 歷史紀錄":
                     st.success(f"已於 {record['recovered_at']} 修復")
                 if record.get("ai_interpretation_audio_path"):
                     st.audio(record.get("ai_interpretation_audio_path"))
+                else:
+                    st.warning("⚠️ 此紀錄缺少語音解讀。可使用補件功能修復。")
                 st.markdown(f"**AI 解讀：**\n\n{record['ai_interpretation']}")
 
     search_query = st.text_input("🔍 搜尋歷史解讀（輸入關鍵字）", "")

@@ -77,8 +77,12 @@ def repair_single(date: str, record_id: str) -> bool:
         print(f"❌ 找不到紀錄 [日期={date}, ID={record_id}]")
         return False
 
-    if target.get("ai_status") != "error":
-        print(f"⏭ 紀錄 {record_id} 狀態為 '{target.get('ai_status')}'，非 error，跳過")
+    ai_status = target.get("ai_status", {})
+    if isinstance(ai_status, str):
+        ai_status = {"interpretation": ai_status, "audio": "error"}
+
+    if ai_status.get("interpretation") != "error":
+        print(f"⏭ 紀錄 {record_id} 狀態為 '{ai_status.get('interpretation')}'，非 error，跳過")
         return False
 
     print(f"🔄 正在修復紀錄 {record_id}...")
@@ -132,7 +136,11 @@ def get_missing_audio_records(date: str | None = None) -> list[dict]:
     for d in dates:
         records = load_history(d)
         for r in records:
-            if r.get("ai_status") in ("success", "recovered") and not r.get("ai_interpretation_audio_path"):
+            ai_status = r.get("ai_status", {})
+            if isinstance(ai_status, str):
+                ai_status = {"interpretation": ai_status, "audio": "error"}
+                
+            if ai_status.get("interpretation") in ("success", "recovered") and not r.get("ai_interpretation_audio_path"):
                 r["_date"] = d
                 missing.append(r)
     return missing

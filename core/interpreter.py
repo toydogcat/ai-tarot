@@ -1,5 +1,7 @@
 import os
+import time
 from google import genai
+from google.genai import errors
 from core.models import SpreadResult
 from core.logger import get_logger
 
@@ -14,7 +16,7 @@ def get_gemini_client() -> genai.Client | None:
     return genai.Client(api_key=api_key)
 
 
-def build_interpretation_prompt(question: str, result: SpreadResult) -> str:
+def build_interpretation_prompt(question: str, result: SpreadResult, search_context: str = "") -> str:
     """
     根據使用者問題、牌陣與抽牌結果，建構 Gemini 提示詞
 
@@ -47,7 +49,7 @@ def build_interpretation_prompt(question: str, result: SpreadResult) -> str:
 
 ## 求問者的問題
 {question}
-
+{search_context}
 ## 使用的牌陣
 {spread.name}（共 {spread.card_count} 張牌）
 說明：{spread.description}
@@ -68,13 +70,14 @@ def build_interpretation_prompt(question: str, result: SpreadResult) -> str:
     return prompt
 
 
-def get_ai_interpretation(question: str, result: SpreadResult) -> str:
+def get_ai_interpretation(question: str, result: SpreadResult, search_context: str = "", max_retries: int = 3) -> str:
     """
     呼叫 Gemini API 取得 AI 解牌
 
     Args:
         question: 使用者問題
         result: 抽牌結果
+        max_retries: 最大重試次數
 
     Returns:
         AI 解牌文字，若失敗則回傳 "error"
@@ -83,15 +86,38 @@ def get_ai_interpretation(question: str, result: SpreadResult) -> str:
     if not client:
         return "⚠️ 請先在 .env 中設定 GEMINI_API_KEY 才能使用 AI 解牌功能。"
 
-    prompt = build_interpretation_prompt(question, result)
+    MODEL_ID = "gemini-3.1-flash-lite-preview"
+    prompt = build_interpretation_prompt(question, result, search_context)
 
-    try:
-        logger.info("Calling Gemini API for interpretation...")
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-        )
-        return response.text
-    except Exception as e:
-        logger.error(f"Gemini API error: {e}")
-        return "error"
+    for attempt in range(max_retries):
+        try:
+            logger.info(f"Calling {MODEL_ID} for interpretation (Attempt {attempt + 1}/{max_retries})...")
+            response = client.models.generate_content(
+                model=MODEL_ID,
+                contents=prompt,
+            )
+            return response.text
+            
+        except errors.ClientError as e:
+            # 偵測是否為配額已滿 (HTTP 429)
+            if e.code == 429:
+                wait_time = (attempt + 1) * 10
+                logger.warning(f"⚠️ 配額已滿 (429 Error)。將在 {wait_time} 秒後重試...")
+                
+                if attempt < max_retries - 1:
+                    time.sleep(wait_time)
+                    continue
+                else:
+                    logger.error("API quota exceeded after max retries.")
+                    return "❌ 目前 API 使用量已達上限 (Quota Exceeded)，請稍後再試。"
+            
+            # 其他 Client 錯誤
+            logger.error(f"Gemini Client Error: {e}")
+            return "error"
+
+        except Exception as e:
+            # 系統性錯誤
+            logger.error(f"Unexpected error: {e}")
+            return "error"
+
+    return "error"

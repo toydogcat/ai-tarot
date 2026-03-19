@@ -7,7 +7,7 @@ description: 修復占卜歷史中 AI 解牌失敗 (error) 的紀錄，使用 AI
 
 ## 功能說明
 
-修復 `history/` 資料夾中 `ai_status` 為 `"error"` 的占卜紀錄。根據該次紀錄中的使用者提問、牌陣和抽牌結果，重新呼叫 Gemini API 生成解讀。
+修復 `history/` 資料夾中 `ai_status.interpretation` 為 `"error"` 的占卜紀錄。使用 `--fix-audio` 也可以為 `ai_status.audio` 為 `"error"` 或缺失語音的紀錄補件。根據該次紀錄中的使用者提問、牌陣和抽牌結果，自動呼叫 Gemini 與 TTS API 重新生成。
 
 ## 使用時機
 
@@ -36,7 +36,7 @@ conda activate toby
 python tools/repair_readings.py --list
 ```
 
-這會列出所有 AI 狀態為 error 的紀錄，包含日期、ID、問題和牌面。
+這會列出所有文字解牌 (`interpretation`) 或語音 (`audio`) 錯誤的紀錄，包含日期、ID、問題和牌面。
 
 ### 步驟 3：修復特定紀錄
 
@@ -60,7 +60,7 @@ python tools/repair_readings.py --date 2026-03-17 --all
 python tools/repair_readings.py --all
 ```
 
-如果沒有，找狀態為 error 的紀錄，就根據紀錄中的 `ai_prompt` 重新生成解讀，並更新 `ai_interpretation`。
+如果沒有，找 `ai_status.interpretation` 為 error 的紀錄，就根據紀錄中的 `ai_prompt` 重新生成解讀，並更新 `ai_interpretation`。
 
 ### 步驟 4：生成語音
 
@@ -70,7 +70,7 @@ python tools/repair_readings.py --all
 
 ### 步驟 5：驗證修復結果
 
-不管有沒有，有效的 `GEMINI_API_KEY`，修復後的紀錄 `ai_status` 都會變成 `"recovered"`，並加上 `recovered_at` 時間戳。
+不管有沒有有效的 `GEMINI_API_KEY`，修復後的紀錄 `ai_status.interpretation` 皆會更新為 `"success"`（若語音也成功則 `ai_status.audio` 為 `"success"`），並統一加上 `recovered_at` 時間戳。
 
 在 Streamlit 歷史頁面中：
 - ✅ = 原始成功

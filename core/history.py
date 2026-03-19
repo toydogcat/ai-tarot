@@ -42,6 +42,7 @@ def save_reading(
     interpretation: str | None,
     ai_prompt: str | None = None,
     ai_interpretation_audio_path: str | None = None,
+    search_success: bool = True,
 ) -> str:
     """
     儲存一次占卜紀錄
@@ -75,13 +76,17 @@ def save_reading(
         })
 
     # 判斷 AI 狀態
-    ai_status = "success"
-    if interpretation is None:
-        ai_status = "error"
+    ai_status = {
+        "interpretation": "success",
+        "audio": "error",
+        "search": "success" if search_success else "error"
+    }
+    
+    if interpretation is None or interpretation == "error" or interpretation.startswith("⚠️") or interpretation.startswith("❌"):
+        ai_status["interpretation"] = "error"
         interpretation = "error"
-    elif interpretation.startswith("⚠️"):
-        ai_status = "error"
-        interpretation = "error"
+    elif ai_interpretation_audio_path:
+        ai_status["audio"] = "success"
 
     record = {
         "id": record_id,
@@ -145,7 +150,12 @@ def get_error_records(date: str | None = None) -> list[dict]:
     for d in dates:
         records = load_history(d)
         for r in records:
-            if r.get("ai_status") == "error":
+            ai_status = r.get("ai_status", {})
+            if isinstance(ai_status, str):
+                if ai_status == "error":
+                    r["_date"] = d
+                    errors.append(r)
+            elif ai_status.get("interpretation") == "error":
                 r["_date"] = d
                 errors.append(r)
     return errors
@@ -170,11 +180,20 @@ def update_record_interpretation(date: str, record_id: str, interpretation: str,
     records = load_history(date)
     for record in records:
         if record["id"] == record_id:
-            record["ai_interpretation"] = interpretation
-            record["ai_status"] = "recovered"
-            record["recovered_at"] = datetime.now().isoformat()
+            # 確保 ai_status 是字典
+            if isinstance(record.get("ai_status"), str) or "ai_status" not in record:
+                record["ai_status"] = {"interpretation": "error", "audio": "error", "search": "skipped"}
+                
+            if interpretation:
+                record["ai_interpretation"] = interpretation
+                record["ai_status"]["interpretation"] = "success"
+            
             if audio_path:
                 record["ai_interpretation_audio_path"] = audio_path
+                record["ai_status"]["audio"] = "success"
+                
+            record["recovered_at"] = datetime.now().isoformat()
+            
             _save_records(records, filepath)
             logger.info(f"紀錄 {record_id} AI 解讀已修復")
             return True
@@ -198,7 +217,14 @@ def search_history_records(query: str, limit: int = 10) -> list[dict]:
     for d in dates:
         records = load_history(d)
         for r in records:
-            if r.get("ai_status") in ("success", "recovered") and r.get("ai_interpretation"):
+            ai_status = r.get("ai_status", {})
+            is_valid = False
+            if isinstance(ai_status, str):
+                is_valid = ai_status in ("success", "recovered")
+            else:
+                is_valid = ai_status.get("interpretation") == "success"
+                
+            if is_valid and r.get("ai_interpretation"):
                 r["_date"] = d
                 all_records.append(r)
 
