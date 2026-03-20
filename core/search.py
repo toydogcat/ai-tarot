@@ -3,6 +3,7 @@ import os
 from google import genai
 from tavily import TavilyClient
 from core.logger import get_logger
+from core.config_manager import config_manager
 
 logger = get_logger("search")
 
@@ -19,23 +20,10 @@ def summarize_with_gemma(tavily_text: str) -> str:
         return tavily_text
 
     client = genai.Client(api_key=api_key)
+    conf = config_manager.get()
     
-    # 使用 Gemma 3 27B 作為內容生成的引擎
-    MODEL_ID = "gemma-3-27b-it"
-    
-    # 建構 Prompt 提示詞
-    prompt = f"""
-    你是一位專業的內容編輯。請閱讀以下來自外部搜尋引擎的原始資訊，
-    並將其整理成一段約 200 字的繁體中文流暢摘要。
-    
-    要求：
-    1. 剔除重複的資訊。
-    2. 使用專業、客觀的語氣。
-    3. 在摘要結尾，列出 3 個核心關鍵字。
-    
-    原始資訊：
-    {tavily_text}
-    """
+    MODEL_ID = conf.ai_models.summarization_model
+    prompt = f"{conf.prompts.search_summarizer}\n\n原始資訊：\n{tavily_text}"
 
     try:
         logger.info(f"正在呼叫 {MODEL_ID} 進行摘要整理...")

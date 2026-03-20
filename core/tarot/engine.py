@@ -2,8 +2,8 @@
 import random
 
 from config import REVERSE_PROBABILITY
-from core.deck import TarotDeck
-from core.models import Card, DrawnCard, SpreadResult, SpreadType
+from core.tarot.deck import TarotDeck
+from core.tarot.models import Card, DrawnCard, SpreadResult, SpreadType
 
 
 class DrawEngine:

@@ -1,19 +1,27 @@
 """全域設定檔"""
 from pathlib import Path
+from core.config_manager import config_manager
+
+# 取得目前設定
+conf = config_manager.get()
 
 # 專案根目錄
 BASE_DIR = Path(__file__).resolve().parent
 
 # 資料路徑
-DATA_DIR = BASE_DIR / "data" / "cards"
-MAJOR_ARCANA_FILE = DATA_DIR / "major_arcana.json"
-MINOR_ARCANA_FILE = DATA_DIR / "minor_arcana.json"
+TAROT_DATA_DIR = BASE_DIR / conf.paths.data_dir / "tarot"
+MAJOR_ARCANA_FILE = TAROT_DATA_DIR / "major_arcana.json"
+MINOR_ARCANA_FILE = TAROT_DATA_DIR / "minor_arcana.json"
+
+ICHING_DATA_DIR = BASE_DIR / conf.paths.data_dir / "iching"
 
 # 圖片路徑
-ASSETS_DIR = BASE_DIR / "assets" / "images"
-CARD_BACK_IMAGE = ASSETS_DIR / "card_back.png"
-MAJOR_IMAGES_DIR = ASSETS_DIR / "major"
-MINOR_IMAGES_DIR = ASSETS_DIR / "minor"
+TAROT_ASSETS_DIR = BASE_DIR / conf.paths.assets_dir / "tarot"
+CARD_BACK_IMAGE = TAROT_ASSETS_DIR / "card_back.png"
+MAJOR_IMAGES_DIR = TAROT_ASSETS_DIR / "major"
+MINOR_IMAGES_DIR = TAROT_ASSETS_DIR / "minor"
+
+ICHING_ASSETS_DIR = BASE_DIR / conf.paths.assets_dir / "iching"
 
 # 牌組設定
 TOTAL_CARDS = 78
@@ -31,6 +39,6 @@ SUITS_ZH = {
 }
 
 # Streamlit 頁面設定
-PAGE_TITLE = "🔮 AI 塔羅占卜"
-PAGE_ICON = "🔮"
+PAGE_TITLE = "🌟 AI 智慧占卜"
+PAGE_ICON = "🌟"
 PAGE_LAYOUT = "wide"

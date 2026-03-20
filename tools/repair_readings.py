@@ -20,22 +20,32 @@ logger = get_logger("repair")
 
 def build_repair_prompt(record: dict) -> str:
     """從 history 紀錄建構 Gemini 提示詞"""
-    spread = record["spread"]
-    cards = record["cards"]
-    question = record["question"]
+    record_type = record.get("type", "tarot")
+    
+    if record_type == "iching":
+        from core.iching.interpreter import build_interpretation_prompt as build_iching_prompt
+        # For older I-Ching records without saved prompt, we rebuild it.
+        # We might not have search_context in history, so we pass empty string.
+        return build_iching_prompt(record["question"], record["result"], "")
+    
+    # Tarot fallback
+    else:
+        spread = record["spread"]
+        cards = record["cards"]
+        question = record["question"]
 
-    cards_info = []
-    for card in cards:
-        cards_info.append(
-            f"  位置【{card['position']}】（{card['position_desc']}）\n"
-            f"  牌面：{card['card_name_zh']}（{card['card_name']}）— {card['orientation']}\n"
-            f"  關鍵詞：{', '.join(card['keywords'])}\n"
-            f"  牌意：{card['meaning']}"
-        )
+        cards_info = []
+        for card in cards:
+            cards_info.append(
+                f"  位置【{card['position']}】（{card['position_desc']}）\n"
+                f"  牌面：{card['card_name_zh']}（{card['card_name']}）— {card['orientation']}\n"
+                f"  關鍵詞：{', '.join(card['keywords'])}\n"
+                f"  牌意：{card['meaning']}"
+            )
 
-    cards_text = "\n\n".join(cards_info)
+        cards_text = "\n\n".join(cards_info)
 
-    return f"""你是一位經驗豐富、溫暖而睿智的塔羅牌解讀師。
+        return f"""你是一位經驗豐富、溫暖而睿智的塔羅牌解讀師。
 請根據以下塔羅牌占卜結果，為求問者提供深入且具有洞察力的解讀。
 
 ## 求問者的問題
@@ -57,6 +67,7 @@ def build_repair_prompt(record: dict) -> str:
 7. 不要使用任何 markdown 格式符號（如 #, *, ** 等），用純文字呈現
 8. 段落之間用空行分隔，讓閱讀更舒適
 """
+
 
 
 def repair_single(date: str, record_id: str) -> bool:
@@ -86,8 +97,8 @@ def repair_single(date: str, record_id: str) -> bool:
         return False
 
     print(f"🔄 正在修復紀錄 {record_id}...")
+    print(f"   類型：{target.get('type', 'tarot')}")
     print(f"   問題：{target['question'][:50]}...")
-    print(f"   牌陣：{target['spread']['name']}")
 
     # 優先使用已儲存的 prompt，否則重新建構
     prompt = target.get("ai_prompt", "")

@@ -1,5 +1,5 @@
 """牌陣定義"""
-from core.models import SpreadPosition, SpreadType
+from core.tarot.models import SpreadPosition, SpreadType
 
 # === 單牌占卜 ===
 SINGLE_CARD = SpreadType(

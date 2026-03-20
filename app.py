@@ -5,15 +5,20 @@ from dotenv import load_dotenv
 from datetime import datetime
 
 from config import PAGE_TITLE, PAGE_ICON, PAGE_LAYOUT
-from core.engine import DrawEngine
-from core.interpreter import get_ai_interpretation, build_interpretation_prompt
-from core.spreads import ALL_SPREADS, get_spread_by_id
+from core.tarot.engine import DrawEngine
+from core.tarot.interpreter import get_ai_interpretation, build_interpretation_prompt
+from core.tarot.spreads import ALL_SPREADS, get_spread_by_id
 from core.logger import get_logger
 from core.history import save_reading, update_record_interpretation, search_history_records
 from core.tts import generate_audio
 from core.audio_input import process_transcription
+from core.iching.engine import perform_divination
+from core.iching.interpreter import get_ai_interpretation as get_iching_interp, build_interpretation_prompt as build_iching_prompt
+from core.iching.interpreter import get_ai_interpretation as get_iching_interp, build_interpretation_prompt as build_iching_prompt
+from ui.iching_ui import render_hexagram
 from streamlit_mic_recorder import mic_recorder
-from ui.components import inject_custom_css, render_spread_result, render_ai_interpretation
+from ui.tarot_ui import inject_custom_css, render_spread_result, render_ai_interpretation
+from core.config_manager import config_manager
 
 # 載入 .env
 load_dotenv()
@@ -40,19 +45,19 @@ engine = get_engine()
 
 # === 側邊欄 ===
 with st.sidebar:
-    st.markdown("# 🔮 AI 塔羅占卜")
+    st.markdown("# 🌟 AI 智慧占卜")
     st.markdown("---")
 
     # 頁面切換
     page = st.radio(
         "📄 頁面",
-        ["🔮 占卜", "📜 歷史紀錄"],
+        ["🔮 塔羅占卜", "☯️ 易經卜卦", "📜 歷史紀錄", "⚙️ 設定管理"],
         label_visibility="collapsed",
     )
 
     st.markdown("---")
 
-    if page == "🔮 占卜":
+    if page == "🔮 塔羅占卜":
         # 牌陣選擇
         st.markdown("### 選擇牌陣")
         spread_options = {s.id: f"{s.icon} {s.name}（{s.card_count} 張）" for s in ALL_SPREADS}
@@ -99,9 +104,41 @@ with st.sidebar:
             "</p>",
             unsafe_allow_html=True,
         )
+        
+    elif page == "☯️ 易經卜卦":
+        st.markdown("### 🎲 卜卦方式")
+        st.info("系統將為您模擬六次金錢卦擲爻，由下而上產生本卦與變卦。")
+        st.markdown("---")
+        
+        # 圖片格式選擇
+        st.markdown("### 🖼️ 圖片格式")
+        prefer_format_iching = st.radio(
+            label="圖片格式",
+            options=["jpg", "png"],
+            index=0,
+            horizontal=True,
+            label_visibility="collapsed",
+            key="iching_format"
+        )
+        st.session_state["prefer_image_format"] = prefer_format_iching
 
-# === 占卜頁面 ===
-if page == "🔮 占卜":
+        st.markdown("---")
+        
+        iching_draw_button = st.button(
+            "🎲 開始卜卦",
+            use_container_width=True,
+            type="primary",
+        )
+        st.markdown("---")
+        st.markdown(
+            "<p style='text-align:center; color:#888; font-size:0.8rem;'>"
+            "✨ 面北靜心冥想你的疑問<br>祈求吉凶禍福指示 ✨"
+            "</p>",
+            unsafe_allow_html=True,
+        )
+
+# === 塔羅占卜頁面 ===
+if page == "🔮 塔羅占卜":
     col1, col2 = st.columns([1, 1])
     with col1:
         st.markdown("🗣️ **語音輸入問題**")
@@ -157,7 +194,7 @@ if page == "🔮 占卜":
                     st.warning("外部搜尋失敗，仍將根據牌面進行解讀。")
 
             # 產生 AI 提示詞
-            from core.interpreter import build_interpretation_prompt
+            from core.tarot.interpreter import build_interpretation_prompt
             ai_prompt = build_interpretation_prompt(user_question.strip(), result, search_context)
 
             # AI 解牌
@@ -174,7 +211,12 @@ if page == "🔮 占卜":
 
             # 儲存 history（含 prompt）
             record_id = save_reading(
-                user_question.strip(), result, interpretation, ai_prompt=ai_prompt, search_success=search_success
+                record_type="tarot",
+                question=user_question.strip(), 
+                result=result, 
+                interpretation=interpretation, 
+                ai_prompt=ai_prompt, 
+                search_success=search_success
             )
             st.session_state["last_record_id"] = record_id
             logger.info(f"紀錄已儲存 [ID={record_id}]")
@@ -222,7 +264,126 @@ if page == "🔮 占卜":
         </div>
         """, unsafe_allow_html=True)
 
-# === 歷史紀錄頁面 ===
+# === 易經卜卦頁面 ===
+elif page == "☯️ 易經卜卦":
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown("🗣️ **語音輸入問題**")
+        audio_record = mic_recorder(
+            start_prompt="點擊開始錄音 🎤",
+            stop_prompt="停止並辨識 ⏹️",
+            key='iching_recorder'
+        )
+        
+        if audio_record:
+            audio_bytes = audio_record['bytes']
+            audio_hash = hash(audio_bytes)
+            if st.session_state.get("last_iching_audio_hash") != audio_hash:
+                result = process_transcription(audio_bytes, format_hint="webm")
+                if result and not result.startswith(("⚠️", "❌")):
+                    st.session_state["iching_user_question_input"] = result
+                    st.success("✅ 辨識成功！請在下方確認或修改。")
+                else:
+                    st.error(result)
+                st.session_state["last_iching_audio_hash"] = audio_hash
+
+    user_question = st.text_area(
+        "☯️ 請輸入你想問易經的問題，或用語音輸入直接修改：",
+        placeholder="例如：這個專案未來的發展如何？/ 這次投資順利嗎？",
+        height=80,
+        key="iching_user_question_input",
+    )
+
+    if "iching_draw_button" in locals() and iching_draw_button:
+        if not user_question.strip():
+            st.warning("請先輸入你想卜問的問題 🙏")
+        else:
+            logger.info(f"使用者提問(易經)：{user_question.strip()}")
+
+            result = perform_divination()
+            st.session_state["last_iching_result"] = result
+            st.session_state["last_iching_question"] = user_question.strip()
+
+            from core.search import perform_tavily_search
+            search_context, search_success = "", True
+            with st.spinner("🔍 正在搜尋相關新聞/資料..."):
+                search_context, search_success = perform_tavily_search(user_question.strip())
+                if search_context:
+                    st.success("成功搜尋到相關背景資訊！")
+                elif not search_success:
+                    st.warning("外部搜尋失敗，仍將根據卦象進行解讀。")
+
+            ai_prompt = build_iching_prompt(user_question.strip(), result, search_context)
+            
+            interpretation = None
+            with st.spinner("☯️ AI 正在解讀你的卦象..."):
+                interpretation = get_iching_interp(user_question.strip(), result, search_context)
+
+            if interpretation and not interpretation.startswith("⚠️"):
+                logger.info("易經 AI 解卦成功")
+            else:
+                logger.error(f"易經 AI 解卦失敗: {interpretation}")
+
+            st.session_state["last_iching_interpretation"] = interpretation
+
+            record_id = save_reading(
+                record_type="iching",
+                question=user_question.strip(), 
+                result=result, 
+                interpretation=interpretation, 
+                ai_prompt=ai_prompt, 
+                search_success=search_success
+            )
+            st.session_state["last_iching_record_id"] = record_id
+            
+            if interpretation and not interpretation.startswith("⚠️"):
+                with st.spinner("🎵 正在生成語音..."):
+                    audio_path = generate_audio(interpretation, record_id)
+                if audio_path:
+                    update_record_interpretation(datetime.now().strftime("%Y-%m-%d"), record_id, interpretation, audio_path)
+                    st.session_state["last_iching_audio_path"] = audio_path
+                else:
+                    st.session_state["last_iching_audio_path"] = None
+
+    if "last_iching_result" in st.session_state:
+        res = st.session_state["last_iching_result"]
+        lines_binary = [l["original"] for l in res["lines_info"]]
+        moving_indices = [i for i, l in enumerate(res["lines_info"]) if l["moving"]]
+        
+        st.markdown("---")
+        cc1, cc2 = st.columns(2)
+        with cc1:
+            st.markdown("### 本卦 (Original)")
+            render_hexagram(res["original_hexagram"], lines_binary, moving_indices)
+            
+        with cc2:
+            if res["has_moving_lines"]:
+                st.markdown("### 之卦 (Changed)")
+                changed_binary = [l["changed"] for l in res["lines_info"]]
+                render_hexagram(res["changed_hexagram"], changed_binary)
+            else:
+                st.info("無動爻，只有本卦")
+
+        if "last_iching_interpretation" in st.session_state and st.session_state["last_iching_interpretation"]:
+            interpretation = st.session_state["last_iching_interpretation"]
+            if interpretation == "error" or (isinstance(interpretation, str) and interpretation.startswith("⚠️")):
+                st.error("AI 錯誤。紀錄保留。")
+            else:
+                if st.session_state.get("last_iching_audio_path"):
+                    st.audio(st.session_state["last_iching_audio_path"])
+                render_ai_interpretation(interpretation, title="☯️ AI 易經解讀")
+    else:
+        st.markdown("""
+        <div style="text-align: center; padding: 60px 20px;">
+            <div style="font-size: 5rem; margin-bottom: 20px;">☯️</div>
+            <h1 style="color: #E8D5B7; font-family: 'Noto Serif TC', serif;">
+                AI 易經卜卦
+            </h1>
+            <p style="color: #B8A88A; font-size: 1.2rem; max-width: 500px; margin: 20px auto; line-height: 1.8;">
+                金錢卦模擬，AI 詳盡六十四卦解析。
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 elif page == "📜 歷史紀錄":
     from core.history import get_history_dates, load_history
 
@@ -254,18 +415,34 @@ elif page == "📜 歷史紀錄":
         
         with st.expander(title):
             st.markdown(f"**問題：** {record['question']}")
-            st.markdown(f"**牌陣：** {record['spread']['name']}（{record['spread']['card_count']} 張）")
+            
+            record_type = record.get("type", "tarot")
+            if record_type == "tarot":
+                spread = record.get('spread', {})
+                st.markdown(f"**占卜類型：** 🔮 塔羅牌 ({spread.get('name', '')} {spread.get('card_count', '')}張)")
+            else:
+                st.markdown("**占卜類型：** ☯️ 易經")
+                
             st.markdown(f"**ID：** `{record['id']}`")
             st.markdown(f"**AI 狀態：** {status_icon} (解讀: {text_status}, 語音: {audio_status}, 搜尋: {search_status})")
 
             st.markdown("---")
-            st.markdown("**🃏 牌面：**")
-            for card in record["cards"]:
-                orient_color = "🟢" if card["orientation"] == "正位" else "🔴"
-                st.markdown(
-                    f"- {orient_color} **{card['position']}**：{card['card_name_zh']}（{card['orientation']}）"
-                    f" — {', '.join(card['keywords'][:3])}"
-                )
+            if record_type == "tarot":
+                st.markdown("**🃏 牌面：**")
+                for card in record.get("cards", []):
+                    orient_color = "🟢" if card.get("orientation") == "正位" else "🔴"
+                    st.markdown(
+                        f"- {orient_color} **{card.get('position')}**：{card.get('card_name_zh')}（{card.get('orientation')}）"
+                        f" — {', '.join(card.get('keywords', [])[:3])}"
+                    )
+            elif record_type == "iching":
+                res = record.get("result", {})
+                st.markdown("**☯️ 卦象：**")
+                st.markdown(f"- **本卦：** {res.get('original_hexagram')}")
+                if res.get('has_moving_lines'):
+                    st.markdown(f"- **之卦：** {res.get('changed_hexagram')}")
+                    moving = [i+1 for i, v in enumerate(res.get('lines_info', [])) if v.get('moving')]
+                    st.markdown(f"- **動爻：** 第 {', '.join(map(str, moving))} 爻")
 
             st.markdown("---")
             if text_status == "error":
@@ -307,3 +484,71 @@ elif page == "📜 歷史紀錄":
                 for record in reversed(records):
                     record["_date"] = selected_date
                     render_history_record(record)
+
+# === 設定管理頁面 ===
+elif page == "⚙️ 設定管理":
+    st.markdown("# ⚙️ 設定管理 (Configuration)")
+    st.markdown("---")
+    
+    # 選擇目前使用的設定檔
+    st.markdown("### 👤 選擇設定檔 (Profile)")
+    profiles = ["customer1", "customer2"]
+    current_index = profiles.index(config_manager.active_profile) if config_manager.active_profile in profiles else 0
+    
+    selected_profile = st.selectbox("載入設定檔", profiles, index=current_index)
+    
+    # 若有切換，則更新設定管理器的設定並重新載入畫面
+    if selected_profile != config_manager.active_profile:
+        config_manager.set_active_profile(selected_profile)
+        st.rerun()
+        
+    st.markdown("---")
+    
+    conf = config_manager.get()
+    
+    with st.form("config_form"):
+        st.markdown("### 🖥️ 應用程式設定 (App config)")
+        app_port = st.number_input("伺服器通訊埠 (Port)", value=int(conf.app.port), step=1)
+        st.caption("提示：修改 Port 需要在啟動時套用 (或於 .streamlit/config.toml 設定)，這裡僅供狀態記錄與檢視。")
+
+        st.markdown("### 🤖 AI 模型設定 (AI Models)")
+        divination_model = st.text_input("主解讀模型 (Divination Model)", value=conf.ai_models.divination_model)
+        summarization_model = st.text_input("時事摘要模型 (Summarizer)", value=conf.ai_models.summarization_model)
+        tts_voice = st.text_input("語音合成口音 (TTS Voice)", value=conf.ai_models.tts_voice)
+        
+        st.markdown("### 🔮 塔羅牌提示詞設定 (Tarot Prompts)")
+        tarot_system = st.text_area("系統提示詞 (System Prompt)", value=conf.prompts.tarot_system, height=100)
+        tarot_requirements = st.text_area("解讀要求 (Requirements)", value=conf.prompts.tarot_requirements, height=200)
+
+        st.markdown("### ☯️ 易經提示詞設定 (I-Ching Prompts)")
+        iching_system = st.text_area("系統提示詞 (System Prompt)", value=conf.prompts.iching_system, height=100)
+        iching_requirements = st.text_area("解讀要求 (Requirements)", value=conf.prompts.iching_requirements, height=200)
+
+        st.markdown("### 🔍 搜尋摘要提示詞設定 (Search Summarizer Prompts)")
+        search_summarizer = st.text_area("搜尋摘要提示詞 (Summarizer Prompt)", value=conf.prompts.search_summarizer, height=150)
+        
+        submit = st.form_submit_button("💾 儲存設定 (Save Configuration)")
+        
+        if submit:
+            conf.app.port = app_port
+            conf.ai_models.divination_model = divination_model
+            conf.ai_models.summarization_model = summarization_model
+            conf.ai_models.tts_voice = tts_voice
+            
+            conf.prompts.tarot_system = tarot_system
+            conf.prompts.tarot_requirements = tarot_requirements
+            
+            conf.prompts.iching_system = iching_system
+            conf.prompts.iching_requirements = iching_requirements
+            
+            conf.prompts.search_summarizer = search_summarizer
+            
+            config_manager.save()
+            st.success(f"✅ 設定檔 `{selected_profile}` 已成功儲存！")
+            
+    st.markdown("---")
+    st.markdown("### 🔄 還原出廠設定")
+    if st.button("還原為預設值 (Factory Reset)", type="secondary"):
+        config_manager.reset_to_default()
+        st.success(f"已成功將 `{selected_profile}` 還原為出廠預設值！")
+        st.rerun()

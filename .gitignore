@@ -210,3 +210,7 @@ __marimo__/
 .streamlit/secrets.toml
 logs/
 history/
+
+# 忽略大型圖檔與壓縮檔
+assets/images/
+assets/*.zip

@@ -1,17 +1,17 @@
 ---
-name: tarot-error-recovery-fast
-description: 快速修復占卜歷史中 AI 解牌失敗 (error) 的紀錄，使用 AI 重新生成解讀
+name: tarot-iching-error-recovery-fast
+description: 快速修復占卜歷史中 AI 解牌/解卦失敗 (error) 的紀錄，使用 AI 重新生成解讀
 ---
 
-# 🔮 Tarot Error Recovery Fast — AI 解牌救援技能
+# 🔮 Tarot & ☯️ I-Ching Error Recovery Fast — AI 解讀快速救援技能
 
 ## 功能說明
 
-修復 `history/` 資料夾中 `ai_status.interpretation` 為 `"error"` 的占卜紀錄。根據該次紀錄中的使用者提問、牌陣和抽牌結果，重新呼叫 Gemini API 生成解讀。
+修復 `history/` 資料夾中 `ai_status.interpretation` 為 `"error"` 的占卜紀錄。根據該次紀錄中的使用者提問、占卜類型 (塔羅/易經) 和結果，重新呼叫 Gemini API 生成解讀。
 
 ## 使用時機
 
-- 使用者回報 AI 解牌失敗
+- 使用者回報 AI 解牌或解卦失敗
 - 在 Streamlit 歷史紀錄頁面看到 ❌ 標記的紀錄
 - 批次修復所有 error 紀錄
 

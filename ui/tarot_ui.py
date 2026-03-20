@@ -3,8 +3,8 @@ import streamlit as st
 from pathlib import Path
 from PIL import Image
 
-from config import ASSETS_DIR, CARD_BACK_IMAGE
-from core.models import DrawnCard, SpreadResult
+from config import TAROT_ASSETS_DIR, CARD_BACK_IMAGE
+from core.tarot.models import DrawnCard, SpreadResult
 
 
 def inject_custom_css():
@@ -100,7 +100,7 @@ def load_card_image(
         is_reversed: 是否逆位（旋轉 180°）
         prefer_format: 優先格式 'jpg' 或 'png'
     """
-    base_path = ASSETS_DIR / image_path
+    base_path = TAROT_ASSETS_DIR / image_path
     stem = base_path.stem
     parent = base_path.parent
     
@@ -276,11 +276,11 @@ def render_spread_result(result: SpreadResult):
             render_card(drawn[9], spread.positions[9].name)
 
 
-def render_ai_interpretation(interpretation: str):
+def render_ai_interpretation(interpretation: str, title: str = "🤖 AI 塔羅解讀"):
     """渲染 AI 解牌結果"""
     st.divider()
     st.markdown(
-        '<div class="spread-title">🤖 AI 塔羅解讀</div>',
+        f'<div class="spread-title">{title}</div>',
         unsafe_allow_html=True,
     )
     st.markdown(

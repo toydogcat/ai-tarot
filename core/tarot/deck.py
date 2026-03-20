@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from config import MAJOR_ARCANA_FILE, MINOR_ARCANA_FILE
-from core.models import Card, CardMeaning
+from core.tarot.models import Card, CardMeaning
 
 
 class TarotDeck:

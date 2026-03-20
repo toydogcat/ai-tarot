@@ -2,8 +2,9 @@ import os
 import time
 from google import genai
 from google.genai import errors
-from core.models import SpreadResult
+from core.tarot.models import SpreadResult
 from core.logger import get_logger
+from core.config_manager import config_manager
 
 logger = get_logger("interpreter")
 
@@ -43,30 +44,16 @@ def build_interpretation_prompt(question: str, result: SpreadResult, search_cont
         )
 
     cards_text = "\n\n".join(cards_info)
+    conf = config_manager.get()
 
-    prompt = f"""你是一位經驗豐富、溫暖而睿智的塔羅牌解讀師。
-請根據以下塔羅牌占卜結果，為求問者提供深入且具有洞察力的解讀。
+    prompt = f"{conf.prompts.tarot_system}\n\n"
+    prompt += f"## 求問者的問題\n{question}\n"
+    if search_context:
+        prompt += f"{search_context}\n\n"
+    prompt += f"## 使用的牌陣\n{spread.name}（共 {spread.card_count} 張牌）\n說明：{spread.description}\n\n"
+    prompt += f"## 抽牌結果\n{cards_text}\n\n"
+    prompt += f"## 解讀要求\n{conf.prompts.tarot_requirements}\n"
 
-## 求問者的問題
-{question}
-{search_context}
-## 使用的牌陣
-{spread.name}（共 {spread.card_count} 張牌）
-說明：{spread.description}
-
-## 抽牌結果
-{cards_text}
-
-## 解讀要求
-1. 先簡要概述整體牌面的能量與氛圍
-2. 逐一解讀每個位置的牌面含義，並連結到求問者的問題
-3. 特別注意牌與牌之間的關聯性和故事線
-4. 如果有逆位的牌，請特別說明它的提醒意義
-5. 最後給出整體建議與行動指引
-6. 語氣溫暖、專業、有同理心，使用繁體中文
-7. 不要使用任何 markdown 格式符號（如 #, *, ** 等），用純文字呈現
-8. 段落之間用空行分隔，讓閱讀更舒適
-"""
     return prompt
 
 
@@ -86,7 +73,9 @@ def get_ai_interpretation(question: str, result: SpreadResult, search_context: s
     if not client:
         return "⚠️ 請先在 .env 中設定 GEMINI_API_KEY 才能使用 AI 解牌功能。"
 
-    MODEL_ID = "gemini-3.1-flash-lite-preview"
+    conf = config_manager.get()
+    MODEL_ID = conf.ai_models.divination_model
+    
     prompt = build_interpretation_prompt(question, result, search_context)
 
     for attempt in range(max_retries):

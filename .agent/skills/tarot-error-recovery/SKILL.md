@@ -1,17 +1,17 @@
 ---
-name: tarot-error-recovery
-description: 修復占卜歷史中 AI 解牌失敗 (error) 的紀錄，使用 AI 重新生成解讀
+name: tarot-iching-error-recovery
+description: 修復占卜歷史中 AI 解牌失敗 (error) 的紀錄，支援塔羅牌與易經卜卦，使用 AI 重新生成解讀
 ---
 
-# 🔮 Tarot Error Recovery — AI 解牌救援技能
+# 🔮 Tarot & ☯️ I-Ching Error Recovery — AI 解牌/解卦救援技能
 
 ## 功能說明
 
-修復 `history/` 資料夾中 `ai_status.interpretation` 為 `"error"` 的占卜紀錄。使用 `--fix-audio` 也可以為 `ai_status.audio` 為 `"error"` 或缺失語音的紀錄補件。根據該次紀錄中的使用者提問、牌陣和抽牌結果，自動呼叫 Gemini 與 TTS API 重新生成。
+修復 `history/` 資料夾中 `ai_status.interpretation` 為 `"error"` 的占卜紀錄。使用 `--fix-audio` 也可以為 `ai_status.audio` 為 `"error"` 或缺失語音的紀錄補件。根據該次紀錄中的使用者提問、占卜類型 (塔羅/易經) 和結果，自動呼叫 Gemini 與 TTS API 重新生成。
 
 ## 使用時機
 
-- 使用者回報 AI 解牌失敗
+- 使用者回報 AI 解牌或解卦失敗
 - 在 Streamlit 歷史紀錄頁面看到 ❌ 標記的紀錄
 - 批次修復所有 error 紀錄
 

@@ -7,10 +7,13 @@ from pathlib import Path
 
 from core.logger import get_logger
 from config import BASE_DIR
+from core.config_manager import config_manager
 
 logger = get_logger("tts")
 
-AUDIO_DIR = BASE_DIR / "history" / "audio"
+# Note: Using config.py which loaded via config_manager
+conf = config_manager.get()
+AUDIO_DIR = BASE_DIR / conf.paths.history_dir / "audio"
 AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 
 def check_internet(host="8.8.8.8", port=53, timeout=2) -> bool:
@@ -34,7 +37,8 @@ async def _edge_tts_generate(text: str, output_path: str):
     """"使用 edge-tts非同步生成語音"""
     # edge-tts 本身有 python API
     import edge_tts
-    VOICE = "zh-TW-HsiaoChenNeural" # 台灣口音女聲
+    conf = config_manager.get()
+    VOICE = conf.ai_models.tts_voice
     communicate = edge_tts.Communicate(text, VOICE)
     await communicate.save(output_path)
 
