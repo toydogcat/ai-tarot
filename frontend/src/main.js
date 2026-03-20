@@ -478,7 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap;">
             <div class="glass-panel" style="text-align: center; margin-bottom: 1rem; flex:1; min-width:250px;">
               <h2 style="color: #E8D5B7;">本卦：${data.hexagram_name}</h2>
-              <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${data.hexagram_id}.png" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
+              <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${data.hexagram_id}.jpg" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
               <div style="color: #B8A88A; margin-top: 0.5rem;">${data.upper_trigram}上 ${data.lower_trigram}下</div>
               <p style="margin-top: 1rem; color: #ccc;">${data.hexagram_description}</p>
               <div class="hexagram-lines" style="margin-top:1rem;">${linesHtml}</div>
@@ -486,7 +486,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ${data.changed_hexagram_id ? `
             <div class="glass-panel" style="text-align: center; margin-bottom: 1rem; flex:1; min-width:250px;">
               <h2 style="color: #E8D5B7;">之卦：${data.changed_hexagram_name}</h2>
-              <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${data.changed_hexagram_id}.png" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
+              <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${data.changed_hexagram_id}.jpg" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
               <p style="margin-top: 1rem; color: #ccc;">（動爻變化產生）</p>
             </div>
             ` : ''}

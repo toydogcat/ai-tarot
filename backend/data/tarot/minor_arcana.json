@@ -7,7 +7,7 @@
     "rank": "ace",
     "name": "Ace of Wands",
     "name_zh": "權杖王牌",
-    "image": "minor/wands/ace_of_wands.png",
+    "image": "minor/wands/ace_of_wands.jpg",
     "upright": {
       "keywords": [
         "新開始",
@@ -37,7 +37,7 @@
     "rank": "two",
     "name": "Two of Wands",
     "name_zh": "權杖二",
-    "image": "minor/wands/two_of_wands.png",
+    "image": "minor/wands/two_of_wands.jpg",
     "upright": {
       "keywords": [
         "規劃",
@@ -67,7 +67,7 @@
     "rank": "three",
     "name": "Three of Wands",
     "name_zh": "權杖三",
-    "image": "minor/wands/three_of_wands.png",
+    "image": "minor/wands/three_of_wands.jpg",
     "upright": {
       "keywords": [
         "遠見",
@@ -97,7 +97,7 @@
     "rank": "four",
     "name": "Four of Wands",
     "name_zh": "權杖四",
-    "image": "minor/wands/four_of_wands.png",
+    "image": "minor/wands/four_of_wands.jpg",
     "upright": {
       "keywords": [
         "慶祝",
@@ -127,7 +127,7 @@
     "rank": "five",
     "name": "Five of Wands",
     "name_zh": "權杖五",
-    "image": "minor/wands/five_of_wands.png",
+    "image": "minor/wands/five_of_wands.jpg",
     "upright": {
       "keywords": [
         "衝突",
@@ -157,7 +157,7 @@
     "rank": "six",
     "name": "Six of Wands",
     "name_zh": "權杖六",
-    "image": "minor/wands/six_of_wands.png",
+    "image": "minor/wands/six_of_wands.jpg",
     "upright": {
       "keywords": [
         "勝利",
@@ -187,7 +187,7 @@
     "rank": "seven",
     "name": "Seven of Wands",
     "name_zh": "權杖七",
-    "image": "minor/wands/seven_of_wands.png",
+    "image": "minor/wands/seven_of_wands.jpg",
     "upright": {
       "keywords": [
         "堅守立場",
@@ -217,7 +217,7 @@
     "rank": "eight",
     "name": "Eight of Wands",
     "name_zh": "權杖八",
-    "image": "minor/wands/eight_of_wands.png",
+    "image": "minor/wands/eight_of_wands.jpg",
     "upright": {
       "keywords": [
         "快速進展",
@@ -247,7 +247,7 @@
     "rank": "nine",
     "name": "Nine of Wands",
     "name_zh": "權杖九",
-    "image": "minor/wands/nine_of_wands.png",
+    "image": "minor/wands/nine_of_wands.jpg",
     "upright": {
       "keywords": [
         "堅韌",
@@ -277,7 +277,7 @@
     "rank": "ten",
     "name": "Ten of Wands",
     "name_zh": "權杖十",
-    "image": "minor/wands/ten_of_wands.png",
+    "image": "minor/wands/ten_of_wands.jpg",
     "upright": {
       "keywords": [
         "負擔",
@@ -307,7 +307,7 @@
     "rank": "page",
     "name": "Page of Wands",
     "name_zh": "權杖侍從",
-    "image": "minor/wands/page_of_wands.png",
+    "image": "minor/wands/page_of_wands.jpg",
     "upright": {
       "keywords": [
         "熱情",
@@ -337,7 +337,7 @@
     "rank": "knight",
     "name": "Knight of Wands",
     "name_zh": "權杖騎士",
-    "image": "minor/wands/knight_of_wands.png",
+    "image": "minor/wands/knight_of_wands.jpg",
     "upright": {
       "keywords": [
         "行動力",
@@ -367,7 +367,7 @@
     "rank": "queen",
     "name": "Queen of Wands",
     "name_zh": "權杖皇后",
-    "image": "minor/wands/queen_of_wands.png",
+    "image": "minor/wands/queen_of_wands.jpg",
     "upright": {
       "keywords": [
         "自信",
@@ -397,7 +397,7 @@
     "rank": "king",
     "name": "King of Wands",
     "name_zh": "權杖國王",
-    "image": "minor/wands/king_of_wands.png",
+    "image": "minor/wands/king_of_wands.jpg",
     "upright": {
       "keywords": [
         "領導力",
@@ -427,7 +427,7 @@
     "rank": "ace",
     "name": "Ace of Cups",
     "name_zh": "聖杯王牌",
-    "image": "minor/cups/ace_of_cups.png",
+    "image": "minor/cups/ace_of_cups.jpg",
     "upright": {
       "keywords": [
         "新感情",
@@ -457,7 +457,7 @@
     "rank": "two",
     "name": "Two of Cups",
     "name_zh": "聖杯二",
-    "image": "minor/cups/two_of_cups.png",
+    "image": "minor/cups/two_of_cups.jpg",
     "upright": {
       "keywords": [
         "合作",
@@ -487,7 +487,7 @@
     "rank": "three",
     "name": "Three of Cups",
     "name_zh": "聖杯三",
-    "image": "minor/cups/three_of_cups.png",
+    "image": "minor/cups/three_of_cups.jpg",
     "upright": {
       "keywords": [
         "友誼",
@@ -517,7 +517,7 @@
     "rank": "four",
     "name": "Four of Cups",
     "name_zh": "聖杯四",
-    "image": "minor/cups/four_of_cups.png",
+    "image": "minor/cups/four_of_cups.jpg",
     "upright": {
       "keywords": [
         "倦怠",
@@ -547,7 +547,7 @@
     "rank": "five",
     "name": "Five of Cups",
     "name_zh": "聖杯五",
-    "image": "minor/cups/five_of_cups.png",
+    "image": "minor/cups/five_of_cups.jpg",
     "upright": {
       "keywords": [
         "失落",
@@ -577,7 +577,7 @@
     "rank": "six",
     "name": "Six of Cups",
     "name_zh": "聖杯六",
-    "image": "minor/cups/six_of_cups.png",
+    "image": "minor/cups/six_of_cups.jpg",
     "upright": {
       "keywords": [
         "懷舊",
@@ -607,7 +607,7 @@
     "rank": "seven",
     "name": "Seven of Cups",
     "name_zh": "聖杯七",
-    "image": "minor/cups/seven_of_cups.png",
+    "image": "minor/cups/seven_of_cups.jpg",
     "upright": {
       "keywords": [
         "幻想",
@@ -637,7 +637,7 @@
     "rank": "eight",
     "name": "Eight of Cups",
     "name_zh": "聖杯八",
-    "image": "minor/cups/eight_of_cups.png",
+    "image": "minor/cups/eight_of_cups.jpg",
     "upright": {
       "keywords": [
         "離開",
@@ -667,7 +667,7 @@
     "rank": "nine",
     "name": "Nine of Cups",
     "name_zh": "聖杯九",
-    "image": "minor/cups/nine_of_cups.png",
+    "image": "minor/cups/nine_of_cups.jpg",
     "upright": {
       "keywords": [
         "願望成真",
@@ -697,7 +697,7 @@
     "rank": "ten",
     "name": "Ten of Cups",
     "name_zh": "聖杯十",
-    "image": "minor/cups/ten_of_cups.png",
+    "image": "minor/cups/ten_of_cups.jpg",
     "upright": {
       "keywords": [
         "幸福家庭",
@@ -727,7 +727,7 @@
     "rank": "page",
     "name": "Page of Cups",
     "name_zh": "聖杯侍從",
-    "image": "minor/cups/page_of_cups.png",
+    "image": "minor/cups/page_of_cups.jpg",
     "upright": {
       "keywords": [
         "浪漫消息",
@@ -757,7 +757,7 @@
     "rank": "knight",
     "name": "Knight of Cups",
     "name_zh": "聖杯騎士",
-    "image": "minor/cups/knight_of_cups.png",
+    "image": "minor/cups/knight_of_cups.jpg",
     "upright": {
       "keywords": [
         "浪漫",
@@ -787,7 +787,7 @@
     "rank": "queen",
     "name": "Queen of Cups",
     "name_zh": "聖杯皇后",
-    "image": "minor/cups/queen_of_cups.png",
+    "image": "minor/cups/queen_of_cups.jpg",
     "upright": {
       "keywords": [
         "溫柔",
@@ -817,7 +817,7 @@
     "rank": "king",
     "name": "King of Cups",
     "name_zh": "聖杯國王",
-    "image": "minor/cups/king_of_cups.png",
+    "image": "minor/cups/king_of_cups.jpg",
     "upright": {
       "keywords": [
         "情感平衡",
@@ -847,7 +847,7 @@
     "rank": "ace",
     "name": "Ace of Swords",
     "name_zh": "寶劍王牌",
-    "image": "minor/swords/ace_of_swords.png",
+    "image": "minor/swords/ace_of_swords.jpg",
     "upright": {
       "keywords": [
         "清晰",
@@ -877,7 +877,7 @@
     "rank": "two",
     "name": "Two of Swords",
     "name_zh": "寶劍二",
-    "image": "minor/swords/two_of_swords.png",
+    "image": "minor/swords/two_of_swords.jpg",
     "upright": {
       "keywords": [
         "抉擇",
@@ -907,7 +907,7 @@
     "rank": "three",
     "name": "Three of Swords",
     "name_zh": "寶劍三",
-    "image": "minor/swords/three_of_swords.png",
+    "image": "minor/swords/three_of_swords.jpg",
     "upright": {
       "keywords": [
         "心碎",
@@ -937,7 +937,7 @@
     "rank": "four",
     "name": "Four of Swords",
     "name_zh": "寶劍四",
-    "image": "minor/swords/four_of_swords.png",
+    "image": "minor/swords/four_of_swords.jpg",
     "upright": {
       "keywords": [
         "休息",
@@ -967,7 +967,7 @@
     "rank": "five",
     "name": "Five of Swords",
     "name_zh": "寶劍五",
-    "image": "minor/swords/five_of_swords.png",
+    "image": "minor/swords/five_of_swords.jpg",
     "upright": {
       "keywords": [
         "衝突",
@@ -997,7 +997,7 @@
     "rank": "six",
     "name": "Six of Swords",
     "name_zh": "寶劍六",
-    "image": "minor/swords/six_of_swords.png",
+    "image": "minor/swords/six_of_swords.jpg",
     "upright": {
       "keywords": [
         "過渡",
@@ -1027,7 +1027,7 @@
     "rank": "seven",
     "name": "Seven of Swords",
     "name_zh": "寶劍七",
-    "image": "minor/swords/seven_of_swords.png",
+    "image": "minor/swords/seven_of_swords.jpg",
     "upright": {
       "keywords": [
         "欺騙",
@@ -1057,7 +1057,7 @@
     "rank": "eight",
     "name": "Eight of Swords",
     "name_zh": "寶劍八",
-    "image": "minor/swords/eight_of_swords.png",
+    "image": "minor/swords/eight_of_swords.jpg",
     "upright": {
       "keywords": [
         "受困",
@@ -1087,7 +1087,7 @@
     "rank": "nine",
     "name": "Nine of Swords",
     "name_zh": "寶劍九",
-    "image": "minor/swords/nine_of_swords.png",
+    "image": "minor/swords/nine_of_swords.jpg",
     "upright": {
       "keywords": [
         "焦慮",
@@ -1117,7 +1117,7 @@
     "rank": "ten",
     "name": "Ten of Swords",
     "name_zh": "寶劍十",
-    "image": "minor/swords/ten_of_swords.png",
+    "image": "minor/swords/ten_of_swords.jpg",
     "upright": {
       "keywords": [
         "結束",
@@ -1147,7 +1147,7 @@
     "rank": "page",
     "name": "Page of Swords",
     "name_zh": "寶劍侍從",
-    "image": "minor/swords/page_of_swords.png",
+    "image": "minor/swords/page_of_swords.jpg",
     "upright": {
       "keywords": [
         "好奇心",
@@ -1177,7 +1177,7 @@
     "rank": "knight",
     "name": "Knight of Swords",
     "name_zh": "寶劍騎士",
-    "image": "minor/swords/knight_of_swords.png",
+    "image": "minor/swords/knight_of_swords.jpg",
     "upright": {
       "keywords": [
         "果斷",
@@ -1207,7 +1207,7 @@
     "rank": "queen",
     "name": "Queen of Swords",
     "name_zh": "寶劍皇后",
-    "image": "minor/swords/queen_of_swords.png",
+    "image": "minor/swords/queen_of_swords.jpg",
     "upright": {
       "keywords": [
         "清晰思考",
@@ -1237,7 +1237,7 @@
     "rank": "king",
     "name": "King of Swords",
     "name_zh": "寶劍國王",
-    "image": "minor/swords/king_of_swords.png",
+    "image": "minor/swords/king_of_swords.jpg",
     "upright": {
       "keywords": [
         "智慧權威",
@@ -1267,7 +1267,7 @@
     "rank": "ace",
     "name": "Ace of Pentacles",
     "name_zh": "錢幣王牌",
-    "image": "minor/pentacles/ace_of_pentacles.png",
+    "image": "minor/pentacles/ace_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "新財源",
@@ -1297,7 +1297,7 @@
     "rank": "two",
     "name": "Two of Pentacles",
     "name_zh": "錢幣二",
-    "image": "minor/pentacles/two_of_pentacles.png",
+    "image": "minor/pentacles/two_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "平衡",
@@ -1327,7 +1327,7 @@
     "rank": "three",
     "name": "Three of Pentacles",
     "name_zh": "錢幣三",
-    "image": "minor/pentacles/three_of_pentacles.png",
+    "image": "minor/pentacles/three_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "技藝",
@@ -1357,7 +1357,7 @@
     "rank": "four",
     "name": "Four of Pentacles",
     "name_zh": "錢幣四",
-    "image": "minor/pentacles/four_of_pentacles.png",
+    "image": "minor/pentacles/four_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "安全感",
@@ -1387,7 +1387,7 @@
     "rank": "five",
     "name": "Five of Pentacles",
     "name_zh": "錢幣五",
-    "image": "minor/pentacles/five_of_pentacles.png",
+    "image": "minor/pentacles/five_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "困難",
@@ -1417,7 +1417,7 @@
     "rank": "six",
     "name": "Six of Pentacles",
     "name_zh": "錢幣六",
-    "image": "minor/pentacles/six_of_pentacles.png",
+    "image": "minor/pentacles/six_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "慷慨",
@@ -1447,7 +1447,7 @@
     "rank": "seven",
     "name": "Seven of Pentacles",
     "name_zh": "錢幣七",
-    "image": "minor/pentacles/seven_of_pentacles.png",
+    "image": "minor/pentacles/seven_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "耐心",
@@ -1477,7 +1477,7 @@
     "rank": "eight",
     "name": "Eight of Pentacles",
     "name_zh": "錢幣八",
-    "image": "minor/pentacles/eight_of_pentacles.png",
+    "image": "minor/pentacles/eight_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "勤奮",
@@ -1507,7 +1507,7 @@
     "rank": "nine",
     "name": "Nine of Pentacles",
     "name_zh": "錢幣九",
-    "image": "minor/pentacles/nine_of_pentacles.png",
+    "image": "minor/pentacles/nine_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "獨立",
@@ -1537,7 +1537,7 @@
     "rank": "ten",
     "name": "Ten of Pentacles",
     "name_zh": "錢幣十",
-    "image": "minor/pentacles/ten_of_pentacles.png",
+    "image": "minor/pentacles/ten_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "傳承",
@@ -1567,7 +1567,7 @@
     "rank": "page",
     "name": "Page of Pentacles",
     "name_zh": "錢幣侍從",
-    "image": "minor/pentacles/page_of_pentacles.png",
+    "image": "minor/pentacles/page_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "學習",
@@ -1597,7 +1597,7 @@
     "rank": "knight",
     "name": "Knight of Pentacles",
     "name_zh": "錢幣騎士",
-    "image": "minor/pentacles/knight_of_pentacles.png",
+    "image": "minor/pentacles/knight_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "勤勞",
@@ -1627,7 +1627,7 @@
     "rank": "queen",
     "name": "Queen of Pentacles",
     "name_zh": "錢幣皇后",
-    "image": "minor/pentacles/queen_of_pentacles.png",
+    "image": "minor/pentacles/queen_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "務實",
@@ -1657,7 +1657,7 @@
     "rank": "king",
     "name": "King of Pentacles",
     "name_zh": "錢幣國王",
-    "image": "minor/pentacles/king_of_pentacles.png",
+    "image": "minor/pentacles/king_of_pentacles.jpg",
     "upright": {
       "keywords": [
         "財富成就",

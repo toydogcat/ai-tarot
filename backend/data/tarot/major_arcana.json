@@ -4,7 +4,7 @@
     "number": 0,
     "name": "The Fool",
     "name_zh": "愚者",
-    "image": "major/00_the_fool.png",
+    "image": "major/00_the_fool.jpg",
     "upright": {
       "keywords": ["新開始", "冒險", "天真", "自由", "純真"],
       "meaning": "愚者代表一段全新旅程的起點。它象徵著無限的可能性、對未知的信任，以及勇於踏出第一步的勇氣。此時正是展開新計畫、嘗試新事物的好時機。帶著開放的心態，擁抱前方的一切。"
@@ -19,7 +19,7 @@
     "number": 1,
     "name": "The Magician",
     "name_zh": "魔術師",
-    "image": "major/01_the_magician.png",
+    "image": "major/01_the_magician.jpg",
     "upright": {
       "keywords": ["意志力", "創造力", "技巧", "自信", "行動"],
       "meaning": "魔術師象徵你擁有將想法化為現實的一切資源與能力。你的意志力強大，創造力旺盛，現在是採取行動實現目標的最佳時機。善用你所擁有的工具和才華，專注於你的目標。"
@@ -34,7 +34,7 @@
     "number": 2,
     "name": "The High Priestess",
     "name_zh": "女祭司",
-    "image": "major/02_the_high_priestess.png",
+    "image": "major/02_the_high_priestess.jpg",
     "upright": {
       "keywords": ["直覺", "潛意識", "神秘", "內在智慧", "靜默"],
       "meaning": "女祭司代表深層的直覺與內在智慧。她提醒你傾聽內心的聲音，信任你的直覺。答案不在外在世界，而在你的內心深處。現在是靜下心來、反思與冥想的時候。"
@@ -49,7 +49,7 @@
     "number": 3,
     "name": "The Empress",
     "name_zh": "皇后",
-    "image": "major/03_the_empress.png",
+    "image": "major/03_the_empress.jpg",
     "upright": {
       "keywords": ["豐饒", "母性", "自然", "美麗", "富足"],
       "meaning": "皇后代表豐盛、滋養與創造力的流動。她象徵著大自然的美麗與生命的繁茂。這張牌鼓勵你享受生活中的美好事物，培養你的創意，並且以愛與關懷對待身邊的人。"
@@ -64,7 +64,7 @@
     "number": 4,
     "name": "The Emperor",
     "name_zh": "皇帝",
-    "image": "major/04_the_emperor.png",
+    "image": "major/04_the_emperor.jpg",
     "upright": {
       "keywords": ["權威", "結構", "領導力", "紀律", "穩定"],
       "meaning": "皇帝代表秩序、權威與穩固的基礎。他象徵著領導力、組織能力與堅定的意志。這張牌建議你建立清晰的規則與結構，用理性與紀律來管理你的事務，成為自己生活的主導者。"
@@ -79,7 +79,7 @@
     "number": 5,
     "name": "The Hierophant",
     "name_zh": "教皇",
-    "image": "major/05_the_hierophant.png",
+    "image": "major/05_the_hierophant.jpg",
     "upright": {
       "keywords": ["傳統", "信仰", "教導", "體制", "精神指引"],
       "meaning": "教皇代表傳統價值觀、信仰體系與精神上的指引。他象徵著向導師或體制學習的重要性。這張牌建議你尊重傳統、遵循既有規範，或者尋求一位經驗豐富的導師來指引方向。"
@@ -94,7 +94,7 @@
     "number": 6,
     "name": "The Lovers",
     "name_zh": "戀人",
-    "image": "major/06_the_lovers.png",
+    "image": "major/06_the_lovers.jpg",
     "upright": {
       "keywords": ["愛情", "結合", "選擇", "和諧", "價值觀"],
       "meaning": "戀人牌不僅代表浪漫的愛情，更象徵重要的選擇與價值觀的統一。它代表兩個人或兩件事之間的深層連結與和諧。面對重大選擇時，請跟隨你的心，做出與你真正價值觀一致的決定。"
@@ -109,7 +109,7 @@
     "number": 7,
     "name": "The Chariot",
     "name_zh": "戰車",
-    "image": "major/07_the_chariot.png",
+    "image": "major/07_the_chariot.jpg",
     "upright": {
       "keywords": ["勝利", "決心", "意志力", "前進", "征服"],
       "meaning": "戰車象徵以堅定的決心和意志力克服障礙，取得勝利。你正在掌控局面，朝著目標全速前進。這張牌鼓勵你保持專注與自律，即使面對挑戰也不要退縮，勝利就在前方。"
@@ -124,7 +124,7 @@
     "number": 8,
     "name": "Strength",
     "name_zh": "力量",
-    "image": "major/08_strength.png",
+    "image": "major/08_strength.jpg",
     "upright": {
       "keywords": ["內在力量", "勇氣", "耐心", "慈悲", "自信"],
       "meaning": "力量牌代表的不是蠻力，而是內在的堅韌、勇氣與慈悲。它教導我們用溫柔與耐心來面對挑戰，以內在的力量來馴服恐懼與衝動。相信自己有能力克服一切困難。"
@@ -139,7 +139,7 @@
     "number": 9,
     "name": "The Hermit",
     "name_zh": "隱士",
-    "image": "major/09_the_hermit.png",
+    "image": "major/09_the_hermit.jpg",
     "upright": {
       "keywords": ["獨處", "內省", "尋求真理", "智慧", "指引"],
       "meaning": "隱士代表退隱、內省與尋求更深層的真理。他手持的燈籠照亮前方的道路，象徵著內在的智慧。這張牌建議你暫時從喧囂中抽身，獨自思考，找到屬於你的答案。"
@@ -154,7 +154,7 @@
     "number": 10,
     "name": "Wheel of Fortune",
     "name_zh": "命運之輪",
-    "image": "major/10_wheel_of_fortune.png",
+    "image": "major/10_wheel_of_fortune.jpg",
     "upright": {
       "keywords": ["命運", "轉變", "循環", "機運", "轉捩點"],
       "meaning": "命運之輪象徵人生的起伏循環與命運的轉折。好運正在來臨，事情即將出現重大轉變。這張牌提醒你，變化是生命的常態，要學會順應時勢，抓住命運帶來的機會。"
@@ -169,7 +169,7 @@
     "number": 11,
     "name": "Justice",
     "name_zh": "正義",
-    "image": "major/11_justice.png",
+    "image": "major/11_justice.jpg",
     "upright": {
       "keywords": ["公正", "真相", "因果", "法律", "平衡"],
       "meaning": "正義牌象徵公平、真相與因果法則。你的行為將會得到公正的回報，真相終將水落石出。這張牌提醒你做出公正的決定，為自己的行為負責，並尋求生活中的平衡。"
@@ -184,7 +184,7 @@
     "number": 12,
     "name": "The Hanged Man",
     "name_zh": "吊人",
-    "image": "major/12_the_hanged_man.png",
+    "image": "major/12_the_hanged_man.jpg",
     "upright": {
       "keywords": ["暫停", "犧牲", "新視角", "放手", "等待"],
       "meaning": "吊人代表自願的暫停與犧牲，以換取新的視角與洞見。有時候不行動才是最好的行動。這張牌建議你放慢腳步，換個角度看待事物，也許會有意想不到的收穫。"
@@ -199,7 +199,7 @@
     "number": 13,
     "name": "Death",
     "name_zh": "死神",
-    "image": "major/13_death.png",
+    "image": "major/13_death.jpg",
     "upright": {
       "keywords": ["結束", "轉變", "蛻變", "放下", "新生"],
       "meaning": "死神牌並不代表實際的死亡，而是象徵一個重要階段的結束與全新開始。舊的必須結束，新的才能誕生。這張牌鼓勵你放下不再適合的事物，擁抱即將到來的蛻變與重生。"
@@ -214,7 +214,7 @@
     "number": 14,
     "name": "Temperance",
     "name_zh": "節制",
-    "image": "major/14_temperance.png",
+    "image": "major/14_temperance.jpg",
     "upright": {
       "keywords": ["平衡", "中庸", "耐心", "和諧", "適度"],
       "meaning": "節制代表平衡、調和與適度。它教導我們在極端之間找到中庸之道。這張牌建議你保持耐心，不要急躁，讓事情自然而然地發展。在各個面向之間找到完美的平衡點。"
@@ -229,7 +229,7 @@
     "number": 15,
     "name": "The Devil",
     "name_zh": "惡魔",
-    "image": "major/15_the_devil.png",
+    "image": "major/15_the_devil.jpg",
     "upright": {
       "keywords": ["誘惑", "束縛", "慾望", "執著", "陰暗面"],
       "meaning": "惡魔代表物質世界的誘惑、心理的束縛與難以掙脫的執著。它揭示你可能受到不健康的依附、上癮行為或負面模式的控制。認清這些枷鎖是虛幻的，你有力量解放自己。"
@@ -244,7 +244,7 @@
     "number": 16,
     "name": "The Tower",
     "name_zh": "高塔",
-    "image": "major/16_the_tower.png",
+    "image": "major/16_the_tower.jpg",
     "upright": {
       "keywords": ["巨變", "崩塌", "啟示", "覺醒", "突發事件"],
       "meaning": "高塔代表突如其來的劇變與既有結構的崩塌。這可能是一次震驚的事件，打破你原本的認知與安全感。雖然過程令人不安，但高塔的摧毀是為了讓你在更真實的基礎上重建。"
@@ -259,7 +259,7 @@
     "number": 17,
     "name": "The Star",
     "name_zh": "星星",
-    "image": "major/17_the_star.png",
+    "image": "major/17_the_star.jpg",
     "upright": {
       "keywords": ["希望", "靈感", "寧靜", "信心", "療癒"],
       "meaning": "星星牌帶來希望、靈感與深層的寧靜。經歷了高塔的動盪之後，星星為你指引方向，帶來療癒與重生的能量。保持信心，好的事情正在路上。你的未來充滿光明與可能。"
@@ -274,7 +274,7 @@
     "number": 18,
     "name": "The Moon",
     "name_zh": "月亮",
-    "image": "major/18_the_moon.png",
+    "image": "major/18_the_moon.jpg",
     "upright": {
       "keywords": ["幻象", "恐懼", "潛意識", "迷惑", "直覺"],
       "meaning": "月亮代表潛意識深處的恐懼與幻象。事情可能並不如表面所見，隱藏的真相尚未完全揭露。這張牌提醒你注意自己的恐懼與焦慮，但不要被它們所欺騙。信任你的直覺去分辨真實與虛幻。"
@@ -289,7 +289,7 @@
     "number": 19,
     "name": "The Sun",
     "name_zh": "太陽",
-    "image": "major/19_the_sun.png",
+    "image": "major/19_the_sun.jpg",
     "upright": {
       "keywords": ["喜悅", "成功", "活力", "光明", "樂觀"],
       "meaning": "太陽是塔羅牌中最正面的牌之一，象徵著成功、快樂與充沛的生命力。陽光照耀一切，帶來溫暖與光明。無論你正在進行什麼，這張牌都預示著正面的結果與幸福的時光。"
@@ -304,7 +304,7 @@
     "number": 20,
     "name": "Judgement",
     "name_zh": "審判",
-    "image": "major/20_judgement.png",
+    "image": "major/20_judgement.jpg",
     "upright": {
       "keywords": ["覺醒", "重生", "評價", "召喚", "反思"],
       "meaning": "審判牌代表重大的自我覺醒與生命的重新評估。它象徵著對過去的反思、對自我的審視，以及回應更高召喚的時刻。放下過去的遺憾，接受自己的全部，準備迎接重生。"
@@ -319,7 +319,7 @@
     "number": 21,
     "name": "The World",
     "name_zh": "世界",
-    "image": "major/21_the_world.png",
+    "image": "major/21_the_world.jpg",
     "upright": {
       "keywords": ["完成", "圓滿", "成就", "旅程結束", "整合"],
       "meaning": "世界牌是大阿爾克那的最後一張牌，象徵一個重要旅程的圓滿完成。你已經達到了目標，整合了所有的經驗與教訓。這是慶祝成就的時刻，同時也是新循環即將開始的預兆。"
