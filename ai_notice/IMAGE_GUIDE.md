@@ -1,4 +1,4 @@
-# 塔羅牌圖片生成指南（Nano Banana）
+# 塔羅牌圖片生成指南（Nano Banana2）
 
 ## 圖片存放位置
 
@@ -76,7 +76,7 @@ assets/images/
 
 ---
 
-## Nano Banana 範例提示詞
+## Nano Banana2 範例提示詞
 
 ### 統一風格前綴（建議每張都加）
 
@@ -198,7 +198,7 @@ Tarot card illustration, mystical art nouveau style, ornate golden border frame,
 - 錢幣 Pentacles → earth element（土）
 
 
-# 易經圖片生成指南（Nano Banana）
+# 易經圖片生成指南（Nano Banana2）
 
 ## 專案視覺定位
 易經不同於塔羅牌的具象敘事，其核心在於「陰陽符號」的抽象組合與「天地人」的氣場流動。

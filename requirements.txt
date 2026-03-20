@@ -13,3 +13,5 @@ pydub
 streamlit-mic-recorder
 omegaconf
 hydra-core
+fastapi
+uvicorn

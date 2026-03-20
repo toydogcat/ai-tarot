@@ -129,13 +129,22 @@ with st.sidebar:
             use_container_width=True,
             type="primary",
         )
-        st.markdown("---")
         st.markdown(
             "<p style='text-align:center; color:#888; font-size:0.8rem;'>"
             "✨ 面北靜心冥想你的疑問<br>祈求吉凶禍福指示 ✨"
             "</p>",
             unsafe_allow_html=True,
         )
+
+    # === 背景音樂 ===
+    conf = config_manager.get()
+    bgm_id = conf.app.get("bgm_id", 1)
+    bgm_path = f"assets/music/background{bgm_id}.mp3"
+    import os
+    if os.path.exists(bgm_path):
+        st.markdown("---")
+        st.markdown("<p style='text-align:center; color:#B8A88A; margin-bottom:-10px;'>🎵 背景音樂</p>", unsafe_allow_html=True)
+        st.audio(bgm_path, format="audio/mp3", autoplay=True, loop=True)
 
 # === 塔羅占卜頁面 ===
 if page == "🔮 塔羅占卜":
@@ -509,7 +518,16 @@ elif page == "⚙️ 設定管理":
     with st.form("config_form"):
         st.markdown("### 🖥️ 應用程式設定 (App config)")
         app_port = st.number_input("伺服器通訊埠 (Port)", value=int(conf.app.port), step=1)
+        api_port = st.number_input("API 伺服器通訊埠 (API Port)", value=int(conf.app.get('api_port', 8000)), step=1)
         st.caption("提示：修改 Port 需要在啟動時套用 (或於 .streamlit/config.toml 設定)，這裡僅供狀態記錄與檢視。")
+
+        bgm_options = {"BGM 1": 1, "BGM 2": 2}
+        bgm_labels = list(bgm_options.keys())
+        bgm_values = list(bgm_options.values())
+        current_bgm = conf.app.get('bgm_id', 1)
+        bgm_index = bgm_values.index(current_bgm) if current_bgm in bgm_values else 0
+        bgm_label_selected = st.selectbox("背景音樂 (Background Music)", bgm_labels, index=bgm_index)
+        app_bgm_id = bgm_options[bgm_label_selected]
 
         st.markdown("### 🤖 AI 模型設定 (AI Models)")
         divination_model = st.text_input("主解讀模型 (Divination Model)", value=conf.ai_models.divination_model)
@@ -531,6 +549,9 @@ elif page == "⚙️ 設定管理":
         
         if submit:
             conf.app.port = app_port
+            conf.app.api_port = api_port
+            conf.app.bgm_id = app_bgm_id
+            
             conf.ai_models.divination_model = divination_model
             conf.ai_models.summarization_model = summarization_model
             conf.ai_models.tts_voice = tts_voice

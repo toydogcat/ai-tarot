@@ -1,92 +1,46 @@
-# AI Tarot 專案開發注意事項
+# 🌟 AI 智慧占卜 (Tarot & I-Ching) 專案開發注意事項
 
 ## 環境設定
-- **Python 環境**：使用 Conda `toby` 環境
-  - 路徑：`/home/toymsi/miniconda3/envs/toby/bin/python`
-  - 啟用方式：`conda activate toby`
-- **環境變數**：複製 `.env.example` 為 `.env` 並填入你的 `GEMINI_API_KEY` 與 `TAVILY_API_KEY`
-- **依賴安裝**：`pip install -r requirements.txt` (請確認套件含 `tavily-python`, `SpeechRecognition`, `pydub`, `streamlit-mic-recorder` 等最新相依套件)
+- **Python 環境**：使用 Conda `toby` 環境 (啟用方式：`conda activate toby`)
+- **環境變數**：複製 `.env.example` 為 `.env` 並填入 `GEMINI_API_KEY`、`TAVILY_API_KEY` 與 `NGROK_AUTHTOKEN`。
+- **依賴安裝**：`pip install -r requirements.txt`，確保包含 `tavily-python`, `SpeechRecognition`, `pydub`, `streamlit-mic-recorder`, `fastapi`, `uvicorn`, `hydra-core` 等套件。
 
 ## 專案結構規範
 | 目錄 | 用途 |
 |------|------|
-| `data/cards/` | 塔羅牌意 JSON 資料（大小阿爾克那） |
-| `assets/images/` | 牌面圖片資源 |
-| `core/` | 核心邏輯（包含：引擎、牌陣、AI 解析器、Tavily 搜尋、語音處理、歷史狀態） |
-| `tools/` | 輔助工具（例如佔卜狀態修復腳本與結構轉換腳本） |
-| `history/` | 使用者歷史紀錄 JSON 以及生成的音訊 |
-| `ui/` | Streamlit UI 元件與主要頁面 |
+| `api/` | FastAPI 後端路由與 Pydantic 結構定義。 |
+| `config/` | Hydra 動態設定檔 (default.yaml, customer1/2.yaml)，管理模型與 BGM。 |
+| `data/` | 靜態資料庫 (包含塔羅牌意與易經六十四卦 JSON)。 |
+| `assets/images/` | 牌面與卦象圖片資源。 |
+| `assets/music/` | 背景音樂檔案 (`background1.mp3`, `background2.mp3`)。 |
+| `core/` | 核心邏輯 (包含：抽牌引擎、金錢卦計算、設定檔管理、AI 解析、搜尋、語音處理、歷史狀態)。 |
+| `tools/` | 輔助工具 (修復腳本與結構轉換腳本)。 |
+| `history/` | 使用者歷史紀錄 JSON 以及生成的音訊 mp3。 |
+| `ui/` | Streamlit UI 元件與管理介面。 |
+| `.agent/skills/` | 給 AI Agent 使用的專屬技能操作說明 (`SKILL.md`)。 |
 
-## 圖片資源
-- 圖片放置於 `assets/images/` 下，分為 `major/` 與 `minor/` 子資料夾
-- 小阿爾克那再依花色分：`wands/`、`cups/`、`swords/`、`pentacles/`
-- 命名規則：
-  - 大阿爾克那：`{編號}_{英文名}.png`，例如 `00_the_fool.png`
-  - 小阿爾克那：`{英文名}.png`，例如 `ace_of_wands.png`
-- 目前使用程式生成的佔位圖，可直接替換為真實牌圖（保持相同檔名）
+## 核心配置與背景音樂 (BGM)
+- **設定檔載入**：使用 `core/config_manager.py` (Singleton)，預設讀取 `customer1.yaml`，可於 Streamlit 左側「設定管理」選單動態修改模型、Prompt 與首頁背景音樂。
+- **音樂播放**：Streamlit 將自動播放 `config/` 所選的背景音樂 (BGM 1 或 2)。
 
-## 牌意資料格式
-- 使用 JSON 格式，存放於 `data/cards/`
-- 每張牌包含：`id`、`name`、`name_zh`、`image`、`upright`、`reversed`
-- 牌意以**繁體中文**撰寫
+## 雙系統核心邏輯
+### 1. 塔羅占卜
+- 支援 6 種以上牌陣與正逆位。
+- 牌意資料存放於 `data/cards/`，抽牌引擎在 `core/tarot/engine.py`。
+### 2. 易經卜卦 (金錢卦)
+- 模擬 6 次擲幣產生初爻至上爻，正面(陽)=3，反面(陰)=2。6(老陰)、9(老陽)為動爻，進一步產生變卦。
+- 卦象資料存放於 `data/hexagrams/64_hexagrams.json`。
 
-## 開發規範
-- 執行 Streamlit：`streamlit run app.py`
-- 所有的環境變數與敏感資訊（`GEMINI_API_KEY`、`TAVILY_API_KEY`、`NGROK_AUTHTOKEN`）放入 `.env`，禁止 commit
-- 核心邏輯需模組化（例如搜尋交給 `search.py`、音訊交給 `audio_input.py`）
-- 在操作 `history`（`ai_status`）時，務必確保使用的是 Dictionary (`{"interpretation": "...", "audio": "...", "search": "..."}`) 而非舊式字串
+## UI 與前端開發規範
+- 執行指令：`streamlit run app.py` (預設啟動於 8501 Port)。
+- 畫面包含四個主頁籤：塔羅占卜、易經卜卦、歷史紀錄、設定管理。
+- 圖片統一以 `assets/images/` 為準。
+
+## FastAPI 與 AI Skill 整合
+- 執行指令：`python run_api.py` (獨立於 Streamlit，預設啟動於 API Port，例如 8000)。
+- 作為外部介面，API 端點 (如 `/api/tarot/draw`, `/api/iching/cast`) 讓 AI Agent 能夠免寫爬蟲直接取用。
+- AI Agent 可直接閱讀 `.agent/skills/ai-divination-api/SKILL.md` 的說明文件了解操作方法，大幅提升專案的擴展性。
 
 ## 未來擴充
-- 進一步強化牌意資料庫（加入逆位特化情境或故事背景）
-- 支援使用者自定義牌陣或問題分類
-- RAG（檢索增強生成）：讓 AI 自動回顧使用者過往的測算紀錄並給出綜合建言
-
-
-# AI I Ching (易經自動算命) 專案開發注意事項
-
-## 環境設定
-- **Python 環境**：使用 Conda `toby` 環境
-  - 路徑：`/home/toymsi/miniconda3/envs/toby/bin/python`
-  - 啟用方式：`conda activate toby`
-- **環境變數**：複製 `.env.example` 為 `.env` 並填入實際值（如 LLM API Key、Ngrok Token）
-- **依賴安裝**：`pip install -r requirements.txt` (需包含 streamlit, python-dotenv 等)
-
-## 專案結構規範
-| 目錄 | 用途 |
-|------|------|
-| `data/hexagrams/` | 易經六十四卦 JSON 資料庫 |
-| `assets/images/` | 卦象圖片與視覺資源 |
-| `core/` | 核心邏輯（金錢卦引擎、語音辨識/合成、Tavily 搜尋、AI 解卦與歷史機制） |
-| `ui/` | Streamlit UI 元件與頁面（呈現本卦、變卦與解說） |
-
-## 易經算命核心邏輯 (金錢卦流程)
-請在 `core/engine.py` 中實作以下算命流程：
-1. **模擬擲幣 (Coin Toss)**：
-   - 每次隨機擲出 3 枚硬幣，執行 6 次（由下而上產生：初爻、二爻、三爻、四爻、五爻、上爻）。
-2. **陰陽數值計算**：
-   - 設定：正面（陽）= 3，反面（陰）= 2。
-   - 每次加總 3 枚硬幣的數值，會得出 6, 7, 8, 9 四種結果。
-3. **爻象判定與變卦**：
-   - **6 (老陰)**：原本為陰爻，屬於「動爻」（變卦時轉為陽爻），記為 `x`。
-   - **7 (少陽)**：原本為陽爻，屬於「靜爻」（不變），記為 `—`。
-   - **8 (少陰)**：原本為陰爻，屬於「靜爻」（不變），記為 `--`。
-   - **9 (老陽)**：原本為陽爻，屬於「動爻」（變卦時轉為陰爻），記為 `o`。
-4. **產出結果**：
-   - **本卦 (Original Hexagram)**：由擲幣當下的 6 個爻組成。
-   - **變卦 (Changed Hexagram)**：將本卦中的動爻（6 變陽、9 變陰）轉換後形成的新卦象。若無動爻，則無變卦。
-
-## 卦象資料格式
-- 使用 JSON 格式，存放於 `data/hexagrams/64_hexagrams.json`。
-- 每個卦象物件需包含：`id` (1-64)、`name` (卦名，如：乾為天)、`trigrams` (上下卦組合)、`description` (整體卦辭)、`lines` (初爻至上爻的爻辭)。
-- 內容以**繁體中文**撰寫。
-
-## 開發規範
-- 執行 Streamlit：`streamlit run app.py`
-- 支援本機端啟動 (`0.0.0.0`) 與 Ngrok 遠端分享。
-- 所有敏感資訊放入 `.env`，禁止 commit。
-- UI 需清晰並列呈現「本卦」與「變卦」的圖形，並高亮標示出「動爻」的位置。
-
-## 未來擴充規劃
-- **歷史與哲學知識庫 (RAG)**：在現有 Tavily 外部搜尋之上，導入專屬的易經文獻向量庫，豐富 AI 解答的歷史與典故厚度。
-- **AI Agent 互動對話**：設計對話代理人，引導使用者收斂問題、靜心卜卦，並透過連續對話釐清占卜結果。
-
+- RAG（檢索增強生成）：導入專屬的易經/塔羅文獻向量庫，豐富 AI 解答的歷史與典故厚度。
+- AI Agent 互動對話：設計對話代理人，引導使用者收斂問題、靜心卜卦。

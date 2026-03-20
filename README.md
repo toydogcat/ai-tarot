@@ -11,7 +11,9 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，使用 Streamlit 打造。
 - 🤖 **Gemini AI 深度解析**：結合牌陣/卦象與外部時事，透過最新 Gemini 3.1 Flash/Pro 引擎做深入推演。
 - 💾 **統一歷史紀錄與修復**：完整紀錄解讀與語音狀態，支援 CLI 技能修復塔羅與易經的失敗紀錄。
 - ⚙️ **Hydra 動態設定管理**：透過 YAML 設定檔 (Customer1, Customer2) 隨時切換 AI 模型、修改提示詞範本並還原出廠預設值。
+- 🎵 **背景音樂 (BGM)**：可於設定檔或管理介面無縫切換多種冥想背景音樂，增添占卜氛圍。
 - 🎨 **自訂圖片格式**：支援 JPG/PNG 精美 AI 生成圖無縫切換。
+- 🚀 **FastAPI 與 AI Agent Skill**：獨立的後端 API 端點 (`/api/tarot/draw` 等) 與 AI 技能說明文檔，讓未來的 AI Agent 也能自由幫你呼叫占卜服務。
 
 ## 快速開始
 
@@ -63,6 +65,13 @@ python run.py
 ```
 瀏覽器會自動開啟 `http://localhost:8501`。相同區域網路下的設備可以透過您的區域 IP 存取 (例如 `http://192.168.1.xxx:8501`)。
 
+#### API 伺服器啟動 (供 AI Agent / 擴充使用)
+若要啟動 FastAPI 背景服務，請另外開啟終端機執行：
+```bash
+python run_api.py
+```
+API 將預設運行於 `http://localhost:8000`。您可以透過 `http://localhost:8000/docs` 測試 Swagger UI。
+
 #### Ngrok 外網遠端分享啟動
 若需要將 Tarot App 分享給外網使用者，專案內建整合了 Ngrok：
 1. 前往 Ngrok 註冊並獲取 [Auth Token](https://dashboard.ngrok.com/get-started/your-authtoken)
@@ -112,6 +121,13 @@ ai-tarot/
 ## 圖片資源
 
 牌面圖片放在 `assets/images/` 目錄下。詳見 [IMAGE_GUIDE.md](ai_notice/IMAGE_GUIDE.md) 了解檔名格式與生成提示詞。
+
+## 致謝 (Credits)
+
+本專案的完滿落成，特別感謝以下工具與團隊的強大支援：
+- 🎵 **背景音樂 (Music)**：由 [Suno](https://suno.com/) AI 音樂平台生成。Suno 讓創作專屬氛圍的冥想音樂變得無比簡單，為占卜過程帶來絕佳的沉浸體驗。
+- 🎨 **視覺圖像 (Images)**：牌面與卦象圖片是由強大的 [Nano Banana2](https://civitai.com/models/25995?modelVersionId=32988) 視覺基準模型生成，完美呈現了精妙的東方禪意與神祕學色彩。
+- 💻 **協作工程師 (Programming)**：專案核心架構、API 整合與程式碼重構打磨，由 Google DeepMind 打造的 agentic AI 軟體工程師 **Antigravity** 共同協助開發完成。
 
 ## License
 
