@@ -2,6 +2,11 @@
 
 AI 驅動的塔羅牌與易經卜卦 Web 應用，使用 Streamlit 打造。
 
+<p align="center">
+  <img src="sample/demo.png" alt="AI Tarot Demo" width="800">
+</p>
+
+
 ## 功能特色
 
 - 🔮 **塔羅占卜**：完整 78 張塔羅牌、6 種經典牌陣、正逆位支援、詳細牌意。
