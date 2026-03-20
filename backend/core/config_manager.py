@@ -10,7 +10,7 @@ class ConfigManager:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance.active_profile = "customer1"
+            cls._instance.active_profile = os.environ.get("ACTIVE_CUSTOM_CONFIG", "customer1")
             cls._instance.config = cls._instance.load_config()
         return cls._instance
         

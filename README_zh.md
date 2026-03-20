@@ -1,12 +1,18 @@
 # 🔮 AI Tarot & ☯️ I-Ching
 
-AI 驅動的塔羅牌與易經卜卦 Web 應用，使用 Streamlit 打造。
+[English](README.md) | [繁體中文](README_zh.md)
 
+AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與專業的管理後台。
+
+### 🌟 一般使用者占卜介面 (Vite 前端)
 <p align="center">
-  <img src="sample/demo.png" alt="AI Tarot Demo" width="800">
+  <img src="sample/demo2.jpg" alt="AI Tarot & I-Ching UI" width="800">
 </p>
 
-
+### ⚙️ 專業解讀與測試管理 (Streamlit 介面)
+<p align="center">
+  <img src="sample/demo1.jpg" alt="AI Tarot & I-Ching Backend" width="800">
+</p>
 ## 功能特色
 
 - 🔮 **塔羅占卜**：完整 78 張塔羅牌、6 種經典牌陣、正逆位支援、詳細牌意。
@@ -22,17 +28,37 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，使用 Streamlit 打造。
 
 ## 快速開始
 
-### 1. 環境準備
+目前專案採用 **前後端分離 (Monorepo)** 架構：
+- `backend/` 包含 FastAPI 後端、AI 邏輯與 Streamlit 測試管理介面。
+- `frontend/` 包含 Vite 打包的極致客製化 HTML/CSS/JS 前端。
+
+### 1. 啟動後端 API 與管理介面
 
 ```bash
-# 使用 Conda 啟用 toby 環境
-conda activate toby
-
-# 安裝依賴
+cd backend
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
+
+# 啟動 FastAPI (預設 Port 8000)
+python run_api.py
+
+# (可選) 啟動 Streamlit 管理與測試介面 (預設 Port 8501)
+streamlit run app.py
 ```
 
-### 2. 下載圖片資源
+### 2. 啟動華麗的 Vite 前端
+
+請另外開一個終端機：
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+接著在瀏覽器打開 `http://localhost:5173` 即可體驗極致的占卜 UI。
+
+### 3. 下載圖片資源
 
 由於圖片檔案過大，請從以下來源下載圖片壓縮檔 `ai-tarot-images.zip`：
 [👉 點此下載圖片資源 (Google Drive)](https://drive.google.com/file/d/1e0_HGeluSyamB-rykJzBZsJj6w8Nln09/view?usp=sharing)
@@ -89,38 +115,29 @@ API 將預設運行於 `http://localhost:8000`。您可以透過 `http://localho
 
 ## 專案結構
 
-```
+```text
 ai-tarot/
-├── app.py                  # Streamlit 主程式
-├── config.py               # 全域設定
-├── requirements.txt        # 依賴套件
-├── data/                     # 靜態資料 (JSON)
-│   ├── tarot/                # 塔羅牌資料
-│   └── iching/               # 易經 64 卦資料
-├── assets/images/            # 圖片資源
-│   ├── tarot/                # 塔羅牌圖片
-│   └── iching/hexagrams/     # 易經意境圖片
-├── core/                     # 核心邏輯
-│   ├── tarot/                # 塔羅相關邏輯 (引擎、牌陣、解析)
-│   ├── iching/               # 易經相關邏輯 (引擎、解析)
-│   ├── search.py             # Tavily 搜尋與 Gemma 摘要
-│   ├── history.py            # 歷史紀錄管理 (統一 Tarot & I-Ching)
-│   ├── tts.py                # 語音合成生成
-│   └── audio_input.py        # 語音輸入與轉換處理
-├── tools/                  # 工具腳本
-│   ├── repair_readings.py  # 補件與修復程式
-│   └── migrate_history_status.py # 狀態格式轉換程式
-├── ui/                     # UI 元件
-│   ├── tarot_ui.py         # 塔羅專用元件
-│   └── iching_ui.py        # 易經專用元件
-├── config/                 # Hydra YAML 設定檔目錄
-│   ├── default.yaml        # 出廠預設值設定檔
-│   ├── customer1.yaml      # 客戶 1 動態設定
-│   └── customer2.yaml      # 客戶 2 動態設定
-└── ai_notice/              # 開發指南
-    ├── GUIDELINES.md       # 專案規範 (整合版)
-    ├── IMAGE_GUIDE.md      # 圖片生成指南 (整合版)
-    └── ToDo.md             # 待辦事項
+├── frontend/               # Vite 前端專案 (使用者介面)
+│   ├── index.html          # 主頁面與多語系標籤
+│   ├── src/main.js         # 前端核心邏輯與動態 UI
+│   ├── public/             # 靜態公共資源
+│   └── vite.config.js      # Vite 開發伺服器與 API 代理設定
+├── backend/                # FastAPI / Streamlit 後端專案
+│   ├── run_api.py          # FastAPI 啟動入口 (8000)
+│   ├── app.py              # Streamlit 測試與管理後台 (8501)
+│   ├── run.py              # 整合啟動程式
+│   ├── api/                # FastAPI 路由與 schemas 定義
+│   ├── core/               # 核心推演引擎 (塔羅、易經、AI解析、語音)
+│   ├── config/             # Hydra 設定檔目錄 (default/customer YAML)
+│   ├── assets/             # 塔羅/易經圖片資源與背景音樂
+│   ├── data/               # 靜態定義庫 (JSON)
+│   ├── history/            # 使用者占卜紀錄存放區
+│   ├── tools/              # 錯誤修復與紀錄移轉腳本
+│   └── ui/                 # Streamlit UI 專用元件
+├── ai_notice/              # 開發指南與規範文檔
+├── share_ngrok.py          # Ngrok 自動化外網分享腳本
+├── .env.example            # 環境變數範例檔
+└── README.md               # 專案總說明文件
 ```
 
 ## 圖片資源

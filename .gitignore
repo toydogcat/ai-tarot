@@ -212,5 +212,8 @@ logs/
 history/
 
 # 忽略大型圖檔與壓縮檔
-assets/images/
-assets/*.zip
+**/assets/images/
+**/assets/audio/
+**/assets/tarot/*.jpg
+**/assets/tarot/*.png
+**/assets/*.zip

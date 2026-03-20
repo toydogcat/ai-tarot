@@ -17,7 +17,7 @@ def get_gemini_client() -> genai.Client | None:
     return genai.Client(api_key=api_key)
 
 
-def build_interpretation_prompt(question: str, result: SpreadResult, search_context: str = "") -> str:
+def build_interpretation_prompt(question: str, result: SpreadResult, search_context: str = "", language: str = "繁體中文") -> str:
     """
     根據使用者問題、牌陣與抽牌結果，建構 Gemini 提示詞
 
@@ -52,12 +52,13 @@ def build_interpretation_prompt(question: str, result: SpreadResult, search_cont
         prompt += f"{search_context}\n\n"
     prompt += f"## 使用的牌陣\n{spread.name}（共 {spread.card_count} 張牌）\n說明：{spread.description}\n\n"
     prompt += f"## 抽牌結果\n{cards_text}\n\n"
-    prompt += f"## 解讀要求\n{conf.prompts.tarot_requirements}\n"
+    prompt += f"## 解讀要求\n{conf.prompts.tarot_requirements}\n\n"
+    prompt += f"## 回覆語言\n請務必使用【{language}】身分與語言進行解讀與回覆。\n"
 
     return prompt
 
 
-def get_ai_interpretation(question: str, result: SpreadResult, search_context: str = "", max_retries: int = 3) -> str:
+def get_ai_interpretation(question: str, result: SpreadResult, search_context: str = "", max_retries: int = 3, language: str = "繁體中文") -> str:
     """
     呼叫 Gemini API 取得 AI 解牌
 
@@ -76,7 +77,7 @@ def get_ai_interpretation(question: str, result: SpreadResult, search_context: s
     conf = config_manager.get()
     MODEL_ID = conf.ai_models.divination_model
     
-    prompt = build_interpretation_prompt(question, result, search_context)
+    prompt = build_interpretation_prompt(question, result, search_context, language)
 
     for attempt in range(max_retries):
         try:

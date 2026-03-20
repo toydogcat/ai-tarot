@@ -14,7 +14,7 @@ def get_gemini_client() -> genai.Client | None:
         return None
     return genai.Client(api_key=api_key)
 
-def build_interpretation_prompt(question: str, result: dict, search_context: str = "") -> str:
+def build_interpretation_prompt(question: str, result: dict, search_context: str = "", language: str = "繁體中文") -> str:
     """
     根據使用者問題、本卦與變卦，建構 Gemini 提示詞
     """
@@ -43,10 +43,11 @@ def build_interpretation_prompt(question: str, result: dict, search_context: str
     conf = config_manager.get()
     final_prompt = f"{conf.prompts.iching_system}\n\n"
     final_prompt += prompt
-    final_prompt += f"\n## 解讀要求\n{conf.prompts.iching_requirements}\n"
+    final_prompt += f"\n## 解讀要求\n{conf.prompts.iching_requirements}\n\n"
+    final_prompt += f"## 回覆語言\n請務必使用【{language}】身分與語言進行解讀與回覆。\n"
     return final_prompt
 
-def get_ai_interpretation(question: str, result: dict, search_context: str = "") -> str:
+def get_ai_interpretation(question: str, result: dict, search_context: str = "", language: str = "繁體中文") -> str:
     """
     呼叫 Gemini API 取得 AI 解卦
     """
@@ -56,7 +57,7 @@ def get_ai_interpretation(question: str, result: dict, search_context: str = "")
 
     conf = config_manager.get()
     MODEL_ID = conf.ai_models.divination_model
-    prompt = build_interpretation_prompt(question, result, search_context)
+    prompt = build_interpretation_prompt(question, result, search_context, language)
 
     max_retries = 3
     for attempt in range(max_retries):

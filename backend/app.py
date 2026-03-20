@@ -501,6 +501,7 @@ elif page == "⚙️ 設定管理":
     
     # 選擇目前使用的設定檔
     st.markdown("### 👤 選擇設定檔 (Profile)")
+    st.caption("📝 **提示**：目前 `customer1` 為 Streamlit 後台管理的預設設定，而 `customer2` 為一般前端 (Vite/FastAPI) 預設使用的設定。")
     profiles = ["customer1", "customer2"]
     current_index = profiles.index(config_manager.active_profile) if config_manager.active_profile in profiles else 0
     

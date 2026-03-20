@@ -1,4 +1,6 @@
 import uvicorn
+import os
+os.environ.setdefault("ACTIVE_CUSTOM_CONFIG", "customer2")
 from config import conf
 
 if __name__ == "__main__":

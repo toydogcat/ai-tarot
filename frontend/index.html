@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Tarot & I-Ching</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+  </head>
+  <body>
+    <!-- 影片或動態漸層背景 -->
+    <div class="bg-gradient"></div>
+
+    <div class="container">
+      <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+           <h1 class="title" data-i18n="title">AI Tarot <span class="divider">&</span> I-Ching</h1>
+           <p class="subtitle" data-i18n="subtitle">探索潛意識的古老智慧引導</p>
+        </div>
+        <div class="lang-selector" style="margin-top: 1rem;">
+           <select id="langSelect" class="secondary-btn" style="padding: 0.5rem; border-radius: 8px; font-family: inherit; cursor: pointer; background: rgba(255,255,255,0.1); color: var(--text-light); border: 1px solid rgba(255,255,255,0.2);">
+               <option value="繁體中文" style="color: black;">繁體中文</option>
+               <option value="简体中文" style="color: black;">简体中文</option>
+               <option value="English" style="color: black;">English</option>
+               <option value="日本語" style="color: black;">日本語</option>
+               <option value="Español" style="color: black;">Español</option>
+           </select>
+        </div>
+      </header>
+
+      <div class="tabs">
+        <button id="tabTarot" class="tab-btn active" data-i18n="tab_tarot">🔮 塔羅占卜</button>
+        <button id="tabIChing" class="tab-btn" data-i18n="tab_iching">☯️ 易經卜卦</button>
+        <button id="tabHistory" class="tab-btn" data-i18n="tab_history">📜 歷史紀錄</button>
+      </div>
+
+      <main>
+        <!-- 塔羅控制面板 -->
+        <section id="tarotPanel" class="glass-panel controls">
+          <h2 data-i18n="tarot_heading">塔羅占卜</h2>
+          
+          <div class="form-group">
+            <label for="spreadSelect" data-i18n="label_spread">選擇牌陣</label>
+            <select id="spreadSelect">
+              <option value="single" data-i18n="loading_spreads">載入中...</option>
+            </select>
+            <p id="spreadDescription" style="font-size: 0.85rem; color: #a78bfa; margin-top: 0.5rem;"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="questionInput" data-i18n="label_question">你的問題（選填）</label>
+            <div style="display:flex; gap:0.5rem;">
+               <textarea id="questionInput" rows="3" placeholder="請在心中默念問題，或寫下來由 AI 幫您解讀..." data-i18n-placeholder="placeholder_question" style="flex:1;"></textarea>
+               <button id="micTarot" class="secondary-btn" style="padding:0.5rem; border-radius:8px; display:none;" title="語音輸入">🎤</button>
+            </div>
+          </div>
+
+          <button id="drawBtn" class="primary-btn" data-i18n="btn_draw">抽取塔羅牌</button>
+        </section>
+
+        <!-- 易經控制面板 -->
+        <section id="ichingPanel" class="glass-panel controls hidden">
+          <h2 data-i18n="iching_heading">易經卜卦</h2>
+          
+          <div class="form-group">
+            <label for="ichingQuestionInput" data-i18n="label_question_req">你的問題（必填）</label>
+            <div style="display:flex; gap:0.5rem;">
+               <textarea id="ichingQuestionInput" rows="3" placeholder="請在心中默念問題，或寫下來由 AI 幫您解讀..." data-i18n-placeholder="placeholder_question" style="flex:1;"></textarea>
+               <button id="micIChing" class="secondary-btn" style="padding:0.5rem; border-radius:8px; display:none;" title="語音輸入">🎤</button>
+            </div>
+          </div>
+
+          <button id="castBtn" class="primary-btn" data-i18n="btn_cast">擲筊卜卦</button>
+        </section>
+
+        <!-- 載入動畫 -->
+        <div id="loader" class="loader-container hidden">
+          <div class="spinner"></div>
+          <p data-i18n="loader_text">神祕力量正在運作中...</p>
+        </div>
+
+        <!-- 占卜結果區塊 -->
+        <section id="resultArea" class="hidden">
+          <h2 id="resultTitle" class="result-title" data-i18n="result_title">結果</h2>
+          <div id="cardsGrid" class="cards-grid">
+            <!-- 卡片會被 JavaScript 動態插入在這裡 -->
+          </div>
+          
+          <div id="hexagramContainer" class="hexagram-container hidden">
+            <!-- 卦象動態生成處 -->
+          </div>
+
+          <div id="interpretationPanel" class="glass-panel interpretation hidden">
+            <h3 data-i18n="ai_interpret_title">AI 專屬解讀</h3>
+            <div id="interpretationText"></div>
+            
+            <div id="audioPlayerContainer" class="audio-container hidden">
+              <p class="audio-label" data-i18n="audio_label">語音解讀：</p>
+              <audio id="audioPlayer" controls></audio>
+            </div>
+          </div>
+        </section>
+
+        <!-- 歷史紀錄區塊 -->
+        <section id="historyPanel" class="hidden">
+          <div id="historyGrid" class="history-grid"></div>
+        </section>
+      </main>
+
+      <footer>
+        <p data-i18n="footer_text">&copy; 2026 AI Tarot & I-Ching. Powered by FastAPI & Vite.</p>
+      </footer>
+    </div>
+
+    <!-- 歷史紀錄詳細 Modal -->
+    <div id="historyModal" class="modal-backdrop hidden">
+      <div class="modal-content glass-panel">
+        <button id="closeModalBtn" class="close-btn">&times;</button>
+        <div id="modalBody">
+           <!-- 將動態插入內容 -->
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
