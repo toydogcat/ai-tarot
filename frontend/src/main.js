@@ -385,7 +385,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const cardHTML = `
           <div class="card-item" style="animation-delay: ${delay}s">
             <div class="card-image-wrapper">
-              <img class="card-image ${cardOrientation}" src="${ASSETS_BASE}${card.image_path}" alt="${card.name_zh}" onerror="this.src='/vite.svg'">
+              <img class="card-image ${cardOrientation}" src="${ASSETS_BASE}${card.image_path.replace('.png', '.jpg')}" alt="${card.name_zh}" onerror="this.src='/vite.svg'">
             </div>
             <div class="card-info glass-panel">
                 <div class="card-position">${card.position_name || `Card ${index + 1}`}</div>
@@ -604,7 +604,7 @@ document.addEventListener("DOMContentLoaded", () => {
            detailHtml += `
              <div class="card-item">
                <div class="card-image-wrapper">
-                 <img class="card-image ${cardOrientation}" src="${ASSETS_BASE}${imgPath}" alt="${card.card_name_zh||card.name_zh}" onerror="this.src='/vite.svg'">
+                 <img class="card-image ${cardOrientation}" src="${ASSETS_BASE}${imgPath.replace('.png', '.jpg')}" alt="${card.card_name_zh||card.name_zh}" onerror="this.src='/vite.svg'">
                </div>
                <div class="card-info glass-panel" style="background: rgba(0,0,0,0.5);">
                    <div class="card-position">${card.position_name || card.position || `Card ${index + 1}`}</div>
@@ -619,8 +619,8 @@ document.addEventListener("DOMContentLoaded", () => {
        const res = r.result || {};
        const origHex = res.original_hexagram || r.original_hexagram;
        const changedHex = res.changed_hexagram || r.changed_hexagram;
-       const origImg = res.original_image_path ? `${ASSETS_BASE}${res.original_image_path}` : null;
-       const changedImg = res.changed_image_path ? `${ASSETS_BASE}${res.changed_image_path}` : null;
+       const origImg = res.original_image_path ? `${ASSETS_BASE}${res.original_image_path.replace('.png', '.jpg')}` : null;
+       const changedImg = res.changed_image_path ? `${ASSETS_BASE}${res.changed_image_path.replace('.png', '.jpg')}` : null;
        
        detailHtml += `<div class="iching-history-cards" style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; margin-bottom:2rem;">`;
        if (origImg) {
