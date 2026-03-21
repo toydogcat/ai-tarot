@@ -23,8 +23,9 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與
 - 🗣️ **語音輸入提問**：支援麥克風語音轉文字辨識，並可於輸入框手動微調。
 - 🔍 **Tavily 外部時事搜尋**：自動從網路搜尋最新話題/時事背景（由 Gemma 3 整理摘要）。
 - 🤖 **Gemini AI 深度解析**：結合牌陣/卦象與外部時事，透過最新 Gemini 3.1 Flash/Pro 引擎做深入推演。
-- 💾 **統一歷史紀錄與修復**：完整紀錄解讀與語音狀態，支援 CLI 技能修復塔羅與易經的失敗紀錄。
-- ⚙️ **Hydra 動態設定管理**：透過 YAML 設定檔 (Customer1, Customer2) 隨時切換 AI 模型、修改提示詞範本並還原出廠預設值。
+- 💾 **統一歷史紀錄與專屬過濾**：完整紀錄解讀與語音狀態，支援依「客戶名稱」在 Streamlit 後台直接下拉篩選歷史，並具備 CLI 技能修復失敗紀錄。
+- ⚡ **WebSocket 即時多用戶通訊**：導入 WebSocket 雙向即時連線，完美隔離並同步「導師 (Toby)」與「客戶端」的即時抽牌體驗，確保畫面零時差且不互相干擾。
+- ⚙️ **Hydra 動態設定管理**：透過 YAML 設定檔 (Customer1, Customer2) 隨時切換 AI 模型，並可由 Streamlit 後台一鍵自訂所有占卜系統（塔羅、易經、諸葛、大六壬）的專屬提示詞。
 - 🎵 **背景音樂 (BGM)**：可於設定檔或管理介面無縫切換多種冥想背景音樂，增添占卜氛圍。
 - 🎨 **自訂圖片格式**：支援 JPG/PNG 精美 AI 生成圖無縫切換。
 - 🚀 **FastAPI 與 AI Agent Skill**：獨立的後端 API 端點 (`/api/tarot/draw` 等) 與 AI 技能說明文檔，讓未來的 AI Agent 也能自由幫你呼叫占卜服務。
@@ -115,6 +116,24 @@ API 將預設運行於 `http://localhost:8000`。您可以透過 `http://localho
    python run.py
    ```
 4. 終端機會印出類似 `Ngrok 隧道開啟成功！遠端存取請前往: https://1234abcd.ngrok-free.app` 的網址，將該隨機網址分享給他人即可。
+
+## 🧪 自動化測試 (Unit Testing)
+
+本專案於 `backend/tests/` 提供了基於 `pytest` 的完整單元測試。涵蓋了以下核心模組：
+- **WebSocket 通訊**：測試多連線隔離與「導師 (Toby) / 客戶」的獨立廣播機制。
+- **動態設定 (ConfigManager)**：驗證 YAML 設定檔的讀寫與預設值備援。
+- **歷史紀錄 (History API)**：驗證依據「客戶名稱」建立的歷史紀錄篩選機制。
+- **AI 占卜解析引擎 (Interpreters)**：模擬並驗證即將傳入 Gemini 模型的推演 Prompt 架構是否正確載入系統設定。
+
+**執行測試：**
+
+```bash
+cd backend
+# 啟動虛擬環境 (或者您的 conda 環境)
+source venv/bin/activate
+pip install pytest pytest-asyncio httpx
+PYTHONPATH=. pytest -v tests/
+```
 
 ## 專案結構
 

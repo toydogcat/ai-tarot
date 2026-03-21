@@ -24,8 +24,9 @@ An AI-driven Tarot card and I-Ching (Hexagram) divination web application, featu
 - 🗣️ **Voice Input**: Supports microphone speech-to-text recognition, with manual text editing capabilities.
 - 🔍 **Tavily Web Search**: Automatically searches the web for the latest background topics/news (summarized via Gemma 3) to contextually enhance readings.
 - 🤖 **Gemini AI Deep Analysis**: Combines spread/hexagram symbols with external context using the latest Gemini engines for profound readings.
-- 💾 **Unified History & Error Recovery**: Comprehensively logs readings and audio data; includes CLI skills for recovering failed Tarot/I-Ching generations.
-- ⚙️ **Hydra Dynamic Configuration**: Switch AI models, prompt templates, and settings easily using YAML profiles (Customer1, Customer2).
+- 💾 **Unified History & Client Filtering**: Comprehensively logs all readings and audio data. Supports exclusive dropdown filtering by "Client Name" in the backend, plus detailed CLI skills for recovering failed predictions.
+- ⚡ **WebSocket Real-Time Multi-User Communication**: Ensures a truly live connection bridging the "Toby" supervisor and active "Clients" seamlessly, eliminating overlaps and syncing readings continuously.
+- ⚙️ **Hydra Dynamic Configuration**: Switch AI models natively via YAML (Customer1, Customer2), and instantly edit context-specific system prompts (Tarot, I-Ching, Zhuge, Da Liu Ren) directly from the Streamlit UI.
 - 🎵 **Background Music (BGM)**: Seamlessly toggle different meditation tracks via config to enhance the divination atmosphere.
 - 🎨 **Custom Image Format**: Supports flawless switching between high-quality AI-generated `.jpg` and `.png` image formats.
 - 🚀 **FastAPI & AI Agent Skills**: Exposes independent backend API endpoints (e.g. `/api/tarot/draw`) and AI skill documentation, allowing future AI agents to call the services directly.
@@ -119,6 +120,24 @@ To share your application publicly online, the project integrates an automated N
    python share_ngrok.py
    ```
 5. The terminal will output a public URL such as `https://1234abcd.ngrok-free.app`. Share this link with anyone!
+
+## 🧪 Automated Testing (Unit Testing)
+
+The project includes a comprehensive `pytest` test suite located in `backend/tests/`. It covers:
+- **WebSocket Communication**: Ensures isolated "Toby" and "Client" connection channels and correct broadcasting.
+- **Dynamic Configuration (ConfigManager)**: Validates reading/writing of YAML templates and fallback logic.
+- **History API**: Verifies client-name-based data filtering and prediction deduplication logic.
+- **AI Interpreters**: Mocks Gemini LLM APIs to validate dynamic prompt payload generation.
+
+**Executing the tests:**
+
+```bash
+cd backend
+# Activate virtual environment (or your conda env)
+source venv/bin/activate
+pip install pytest pytest-asyncio httpx
+PYTHONPATH=. pytest -v tests/
+```
 
 ## Project Structure
 
