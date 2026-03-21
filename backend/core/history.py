@@ -94,6 +94,19 @@ def save_reading(
             "has_moving_lines": result["has_moving_lines"],
             "lines_info": [{"moving": l["moving"], "symbol": l["symbol"], "value": l["value"]} for l in result["lines_info"]]
         }
+    elif record_type == "zhuge":
+        result_data = {
+            "id": result.get("id"),
+            "poem": result.get("poem")
+        }
+    elif record_type == "daliuren":
+        result_data = {
+            "jieqi": result.get("jieqi"),
+            "date": result.get("date"),
+            "pattern": result.get("pattern"),
+            "san_chuan": result.get("san_chuan"),
+            "si_ke": result.get("si_ke")
+        }
 
     # 判斷 AI 狀態
     ai_status = {

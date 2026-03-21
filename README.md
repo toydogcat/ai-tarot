@@ -6,7 +6,8 @@ An AI-driven Tarot card and I-Ching (Hexagram) divination web application, featu
 
 ### 🌟 General User Interface (Vite Frontend)
 <p align="center">
-  <img src="sample/demo2.jpg" alt="AI Tarot & I-Ching UI" width="800">
+  <img src="sample/demo2.jpg" alt="AI Tarot & I-Ching UI" width="600">
+  <img src="sample/demo2_android.jpg" alt="Mobile UI" height="340">
 </p>
 
 ### ⚙️ Professional Reading & Management (Streamlit Backend)
@@ -18,6 +19,8 @@ An AI-driven Tarot card and I-Ching (Hexagram) divination web application, featu
 
 - 🔮 **Tarot Reading**: Full 78 cards, 6 classic spreads, upright/reversed meanings, and detailed interpretations.
 - ☯️ **I-Ching Divination**: Simulates traditional coin tossing to generate hexagrams, displaying original/changed hexagrams and moving lines.
+- 🎋 **Zhuge Shensuan**: Provides 384 traditional lots with poetic explanations and AI analysis.
+- 🌌 **Da Liu Ren**: Generates a simplified time-based pattern with San Chuan (Three Transmissions) and Si Ke (Four Hexagrams) for deep AI divination.
 - 🗣️ **Voice Input**: Supports microphone speech-to-text recognition, with manual text editing capabilities.
 - 🔍 **Tavily Web Search**: Automatically searches the web for the latest background topics/news (summarized via Gemma 3) to contextually enhance readings.
 - 🤖 **Gemini AI Deep Analysis**: Combines spread/hexagram symbols with external context using the latest Gemini engines for profound readings.

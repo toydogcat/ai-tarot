@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-from api.routes import tarot, iching, history
+from api.routes import tarot, iching, history, zhuge, daliuren
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,9 +19,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from api.routes import tarot, iching, history, zhuge, daliuren
+
 app.include_router(tarot.router)
 app.include_router(iching.router)
 app.include_router(history.router)
+app.include_router(zhuge.router)
+app.include_router(daliuren.router)
 
 assets_dir = BASE_DIR / "assets"
 if assets_dir.exists():

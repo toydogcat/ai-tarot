@@ -7,6 +7,8 @@ const translations = {
     "subtitle": "探索潛意識的古老智慧引導",
     "tab_tarot": "🔮 塔羅占卜",
     "tab_iching": "☯️ 易經卜卦",
+    "tab_zhuge": "🎋 諸葛神算",
+    "tab_daliuren": "🌌 大六壬",
     "tab_history": "📜 歷史紀錄",
     "tarot_heading": "塔羅占卜",
     "label_spread": "選擇牌陣",
@@ -17,6 +19,10 @@ const translations = {
     "iching_heading": "易經卜卦",
     "label_question_req": "你的問題（必填）",
     "btn_cast": "擲筊卜卦",
+    "zhuge_heading": "諸葛神算",
+    "btn_draw_zhuge": "抽籤",
+    "daliuren_heading": "大六壬",
+    "btn_cast_daliuren": "起課",
     "loader_text": "神祕力量正在運作中...",
     "result_title": "結果",
     "ai_interpret_title": "AI 專屬解讀",
@@ -28,6 +34,8 @@ const translations = {
     "subtitle": "探索潜意识的古老智慧引导",
     "tab_tarot": "🔮 塔罗占卜",
     "tab_iching": "☯️ 易经卜卦",
+    "tab_zhuge": "🎋 诸葛神算",
+    "tab_daliuren": "🌌 大六壬",
     "tab_history": "📜 历史纪录",
     "tarot_heading": "塔罗占卜",
     "label_spread": "选择牌阵",
@@ -38,6 +46,10 @@ const translations = {
     "iching_heading": "易经卜卦",
     "label_question_req": "你的问题（必填）",
     "btn_cast": "掷筊卜卦",
+    "zhuge_heading": "诸葛神算",
+    "btn_draw_zhuge": "抽签",
+    "daliuren_heading": "大六壬",
+    "btn_cast_daliuren": "起课",
     "loader_text": "神祕力量正在运作中...",
     "result_title": "结果",
     "ai_interpret_title": "AI 专属解读",
@@ -49,6 +61,8 @@ const translations = {
     "subtitle": "Explore the ancient wisdom of your subconscious",
     "tab_tarot": "🔮 Tarot Reading",
     "tab_iching": "☯️ I-Ching Divination",
+    "tab_zhuge": "🎋 Zhuge Shensuan",
+    "tab_daliuren": "🌌 Da Liu Ren",
     "tab_history": "📜 History Logs",
     "tarot_heading": "Tarot Reading",
     "label_spread": "Select Spread",
@@ -59,6 +73,10 @@ const translations = {
     "iching_heading": "I-Ching Divination",
     "label_question_req": "Your Question (Required)",
     "btn_cast": "Cast Hexagram",
+    "zhuge_heading": "Zhuge Shensuan",
+    "btn_draw_zhuge": "Draw Lot",
+    "daliuren_heading": "Da Liu Ren",
+    "btn_cast_daliuren": "Cast Divination",
     "loader_text": "Mystical forces at work...",
     "result_title": "Results",
     "ai_interpret_title": "AI Interpretation",
@@ -70,6 +88,8 @@ const translations = {
     "subtitle": "潜在意識の古の知恵を導く",
     "tab_tarot": "🔮 タロット占い",
     "tab_iching": "☯️ 易占い",
+    "tab_zhuge": "🎋 諸葛神算",
+    "tab_daliuren": "🌌 大六壬",
     "tab_history": "📜 占い履歴",
     "tarot_heading": "タロット占い",
     "label_spread": "スプレッドの選択",
@@ -80,6 +100,10 @@ const translations = {
     "iching_heading": "易占い",
     "label_question_req": "あなたの質問（必須）",
     "btn_cast": "筮竹を振る",
+    "zhuge_heading": "諸葛神算",
+    "btn_draw_zhuge": "おみくじを引く",
+    "daliuren_heading": "大六壬",
+    "btn_cast_daliuren": "占う",
     "loader_text": "神秘の力が働いています...",
     "result_title": "結果",
     "ai_interpret_title": "AI 専用リーディング",
@@ -91,6 +115,8 @@ const translations = {
     "subtitle": "Explora la antigua sabiduría de tu subconsciente",
     "tab_tarot": "🔮 Lectura de Tarot",
     "tab_iching": "☯️ Adivinación I-Ching",
+    "tab_zhuge": "🎋 Shensuan de Zhuge",
+    "tab_daliuren": "🌌 Da Liu Ren",
     "tab_history": "📜 Historial",
     "tarot_heading": "Lectura de Tarot",
     "label_spread": "Selecciona Tirada",
@@ -101,6 +127,10 @@ const translations = {
     "iching_heading": "Adivinación I-Ching",
     "label_question_req": "Tu Pregunta (Obligatoria)",
     "btn_cast": "Lanzar Hexagrama",
+    "zhuge_heading": "Shensuan de Zhuge",
+    "btn_draw_zhuge": "Sacar Suerte",
+    "daliuren_heading": "Da Liu Ren",
+    "btn_cast_daliuren": "Lanzar Adivinación",
     "loader_text": "Fuerzas místicas en acción...",
     "result_title": "Resultados",
     "ai_interpret_title": "Interpretación de IA",
@@ -134,20 +164,33 @@ document.addEventListener("DOMContentLoaded", () => {
   // Tabs
   const tabTarot = document.getElementById("tabTarot");
   const tabIChing = document.getElementById("tabIChing");
+  const tabZhuge = document.getElementById("tabZhuge");
+  const tabDaliuren = document.getElementById("tabDaliuren");
   const tabHistory = document.getElementById("tabHistory");
+  
   const tarotPanel = document.getElementById("tarotPanel");
   const ichingPanel = document.getElementById("ichingPanel");
+  const zhugePanel = document.getElementById("zhugePanel");
+  const daliurenPanel = document.getElementById("daliurenPanel");
   const historyPanel = document.getElementById("historyPanel");
 
   // Input & Buttons
   const drawBtn = document.getElementById("drawBtn");
   const castBtn = document.getElementById("castBtn");
+  const drawZhugeBtn = document.getElementById("drawZhugeBtn");
+  const castDaliurenBtn = document.getElementById("castDaliurenBtn");
+  
   const spreadSelect = document.getElementById("spreadSelect");
   const spreadDescription = document.getElementById("spreadDescription");
   const questionInput = document.getElementById("questionInput");
   const ichingQuestionInput = document.getElementById("ichingQuestionInput");
+  const zhugeQuestionInput = document.getElementById("zhugeQuestionInput");
+  const daliurenQuestionInput = document.getElementById("daliurenQuestionInput");
+  
   const micTarot = document.getElementById("micTarot");
   const micIChing = document.getElementById("micIChing");
+  const micZhuge = document.getElementById("micZhuge");
+  const micDaliuren = document.getElementById("micDaliuren");
   const langSelect = document.getElementById("langSelect");
 
   // Initial UI logic
@@ -163,6 +206,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultArea = document.getElementById("resultArea");
   const cardsGrid = document.getElementById("cardsGrid");
   const hexagramContainer = document.getElementById("hexagramContainer");
+  const zhugeContainer = document.getElementById("zhugeContainer");
+  const daliurenContainer = document.getElementById("daliurenContainer");
   const resultTitle = document.getElementById("resultTitle");
   const interpretationPanel = document.getElementById("interpretationPanel");
   const interpretationText = document.getElementById("interpretationText");
@@ -261,6 +306,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (SpeechRecognition) {
       micTarot.style.display = "block";
       micIChing.style.display = "block";
+      micZhuge.style.display = "block";
+      micDaliuren.style.display = "block";
       
       function setupMic(btn, inputEl) {
           let recognizing = false;
@@ -301,40 +348,77 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       setupMic(micTarot, questionInput);
       setupMic(micIChing, ichingQuestionInput);
+      setupMic(micZhuge, zhugeQuestionInput);
+      setupMic(micDaliuren, daliurenQuestionInput);
+  }
+
+  function hideAllPanels() {
+    tarotPanel.classList.add("hidden");
+    ichingPanel.classList.add("hidden");
+    zhugePanel.classList.add("hidden");
+    daliurenPanel.classList.add("hidden");
+    historyPanel.classList.add("hidden");
+    resultArea.classList.add("hidden");
+  }
+
+  function clearResultContainers() {
+    if(cardsGrid) { cardsGrid.innerHTML = ""; cardsGrid.classList.add("hidden"); }
+    if(hexagramContainer) { hexagramContainer.innerHTML = ""; hexagramContainer.classList.add("hidden"); }
+    if(zhugeContainer) { zhugeContainer.innerHTML = ""; zhugeContainer.classList.add("hidden"); }
+    if(daliurenContainer) { daliurenContainer.innerHTML = ""; daliurenContainer.classList.add("hidden"); }
+    interpretationPanel.classList.add("hidden");
+    audioPlayerContainer.classList.add("hidden");
+    resultArea.classList.add("hidden");
+    resultTitle.innerText = "";
+  }
+
+  function removeAllTabActive() {
+    tabTarot.classList.remove("active");
+    tabIChing.classList.remove("active");
+    tabZhuge.classList.remove("active");
+    tabDaliuren.classList.remove("active");
+    tabHistory.classList.remove("active");
   }
 
   // Tab Switch Logic
   tabTarot.addEventListener("click", () => {
     currentMode = "tarot";
+    removeAllTabActive();
     tabTarot.classList.add("active");
-    tabIChing.classList.remove("active");
-    tabHistory.classList.remove("active");
+    hideAllPanels();
     tarotPanel.classList.remove("hidden");
-    ichingPanel.classList.add("hidden");
-    historyPanel.classList.add("hidden");
-    resultArea.classList.add("hidden");
   });
 
   tabIChing.addEventListener("click", () => {
     currentMode = "iching";
+    removeAllTabActive();
     tabIChing.classList.add("active");
-    tabTarot.classList.remove("active");
-    tabHistory.classList.remove("active");
+    hideAllPanels();
     ichingPanel.classList.remove("hidden");
-    tarotPanel.classList.add("hidden");
-    historyPanel.classList.add("hidden");
-    resultArea.classList.add("hidden");
+  });
+
+  tabZhuge.addEventListener("click", () => {
+    currentMode = "zhuge";
+    removeAllTabActive();
+    tabZhuge.classList.add("active");
+    hideAllPanels();
+    zhugePanel.classList.remove("hidden");
+  });
+
+  tabDaliuren.addEventListener("click", () => {
+    currentMode = "daliuren";
+    removeAllTabActive();
+    tabDaliuren.classList.add("active");
+    hideAllPanels();
+    daliurenPanel.classList.remove("hidden");
   });
 
   tabHistory.addEventListener("click", () => {
     currentMode = "history";
+    removeAllTabActive();
     tabHistory.classList.add("active");
-    tabTarot.classList.remove("active");
-    tabIChing.classList.remove("active");
+    hideAllPanels();
     historyPanel.classList.remove("hidden");
-    tarotPanel.classList.add("hidden");
-    ichingPanel.classList.add("hidden");
-    resultArea.classList.add("hidden");
     loadHistory();
   });
 
@@ -343,13 +427,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const question = questionInput.value.trim();
 
     // Reset UI
-    resultArea.classList.add("hidden");
-    interpretationPanel.classList.add("hidden");
-    audioPlayerContainer.classList.add("hidden");
-    cardsGrid.innerHTML = "";
+    clearResultContainers();
     cardsGrid.classList.remove("hidden");
-    hexagramContainer.innerHTML = "";
-    hexagramContainer.classList.add("hidden");
+    resultArea.classList.remove("hidden");
     loader.classList.remove("hidden");
     drawBtn.disabled = true;
     drawBtn.innerText = "靈能抽牌中...";
@@ -433,13 +513,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const question = ichingQuestionInput.value.trim();
 
     // Reset UI
-    resultArea.classList.add("hidden");
-    interpretationPanel.classList.add("hidden");
-    audioPlayerContainer.classList.add("hidden");
-    cardsGrid.innerHTML = "";
-    cardsGrid.classList.add("hidden");
-    hexagramContainer.innerHTML = "";
+    clearResultContainers();
     hexagramContainer.classList.remove("hidden");
+    resultArea.classList.remove("hidden");
     loader.classList.remove("hidden");
     castBtn.disabled = true;
     castBtn.innerText = "六爻推演中...";
@@ -519,7 +595,184 @@ document.addEventListener("DOMContentLoaded", () => {
       loader.classList.add("hidden");
     } finally {
       castBtn.disabled = false;
-      castBtn.innerText = "重新卜卦";
+      const dict = translations[langSelect.value] || translations["繁體中文"];
+      castBtn.innerText = dict["btn_cast"] || "擲筊卜卦";
+    }
+  });
+
+  drawZhugeBtn.addEventListener("click", async () => {
+    const question = zhugeQuestionInput.value.trim();
+
+    // Reset UI
+    hideAllPanels(); // Hides the main panels if somehow shown
+    clearResultContainers();
+    zhugeContainer.classList.remove("hidden");
+    resultArea.classList.remove("hidden");
+    loader.classList.remove("hidden");
+    drawZhugeBtn.disabled = true;
+    drawZhugeBtn.innerText = "神算啟動中...";
+
+    try {
+      const response = await fetch(`${API_BASE}/zhuge/draw`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          question: question ? question : null,
+          language: langSelect.value
+        })
+      });
+
+      if (!response.ok) throw new Error("伺服器無回應，請確認 FastAPI 已啟動。");
+
+      const data = await response.json();
+      
+      resultTitle.innerText = `🎋 諸葛神算 🎋`;
+      
+      zhugeContainer.innerHTML = `
+        <div class="zg-container glass-panel" style="max-width:600px; margin: 0 auto; text-align: center; padding: 2rem;">
+            <div class="zg-header" style="color: #FFD700; font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: bold;">
+                🎋 諸葛神算 第 ${data.id} 籤
+            </div>
+            <div class="zg-poem" style="font-family: 'Noto Serif TC', serif; font-size: 1.25rem; white-space: pre-wrap; line-height: 2; color: #fff; margin-bottom: 2rem;">${data.poem}</div>
+            ${data.explanation ? `
+            <div class="zg-explanation-title" style="color: #FFD700; margin-bottom: 0.8rem; font-weight: bold;">籤意解說</div>
+            <div class="zg-explanation" style="font-size: 0.95rem; color: #ddd; line-height: 1.6; text-align: left; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px;">${data.explanation}</div>
+            ` : ''}
+        </div>
+      `;
+
+      if (data.interpretation) {
+        interpretationPanel.classList.remove("hidden");
+        const formatText = data.interpretation.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        interpretationText.innerHTML = formatText;
+
+        if (data.audio_path) {
+          let relPath = data.audio_path;
+          if (relPath.includes("history/audio/")) {
+              relPath = "/history/audio/" + relPath.split("history/audio/")[1];
+          } else if (!relPath.startsWith("/")) {
+              relPath = "/" + relPath;
+          }
+          audioPlayer.src = `${ASSETS_BASE}${relPath}`;
+          audioPlayerContainer.classList.remove("hidden");
+        }
+      }
+
+    } catch (err) {
+      alert("抽籤失敗: " + err.message);
+    } finally {
+      loader.classList.add("hidden");
+      drawZhugeBtn.disabled = false;
+      const dict = translations[langSelect.value] || translations["繁體中文"];
+      drawZhugeBtn.innerText = dict["btn_draw_zhuge"] || "抽籤";
+    }
+  });
+
+  castDaliurenBtn.addEventListener("click", async () => {
+    const question = daliurenQuestionInput.value.trim();
+
+    // Reset UI
+    hideAllPanels();
+    clearResultContainers();
+    daliurenContainer.classList.remove("hidden");
+    resultArea.classList.remove("hidden");
+    loader.classList.remove("hidden");
+    castDaliurenBtn.disabled = true;
+    castDaliurenBtn.innerText = "起課中...";
+
+    try {
+      const response = await fetch(`${API_BASE}/daliuren/cast`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          question: question ? question : null,
+          language: langSelect.value
+        })
+      });
+
+      if (!response.ok) throw new Error("伺服器無回應，請確認 FastAPI 已啟動。");
+
+      const data = await response.json();
+      
+      resultTitle.innerText = `🌌 大六壬 🌌`;
+      
+      let patternStr = Array.isArray(data.pattern) && data.pattern.length > 0 ? data.pattern.join('、') : '無特殊格局';
+      let daliurenHtml = `
+      <div class="dlr-container glass-panel" style="max-width:800px; margin: 0 auto; padding: 1.5rem; text-align: center;">
+          <div class="dlr-header" style="color: #FFD700; font-size: 1.2rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,215,0,0.3); padding-bottom: 1rem;">
+              🌌 <b>時局</b>：${data.date} (${data.jieqi}) &nbsp;|&nbsp; <b>格局</b>：${patternStr}
+          </div>
+          
+          <div class="dlr-title" style="color: #a78bfa; margin-bottom: 1rem; font-weight: bold; font-size: 1.1rem;">三傳</div>
+          <div class="dlr-row">
+      `;
+      const scKeys = {"初傳": "初傳", "中傳": "中傳", "末傳": "末傳"};
+      for (let k in scKeys) {
+          let val = data.san_chuan[k];
+          if(val) {
+              let display_val = Array.isArray(val) && val.length > 0 ? val[0] : String(val);
+              let sub_val = Array.isArray(val) && val.length > 1 ? val[1] : "";
+              daliurenHtml += `
+                <div class="dlr-item">
+                    <span class="dlr-label" style="font-size: 0.85rem; color: #aaa; margin-bottom: 0.5rem;">${scKeys[k]}</span>
+                    <span class="dlr-val" style="font-size: 1.5rem; font-weight: bold; color: #fff; font-family: 'Noto Serif TC', serif;">${display_val}</span>
+                    <span class="dlr-label" style="font-size: 0.85rem; color: #aaa; margin-top: 0.5rem;">${sub_val}</span>
+                </div>
+              `;
+          }
+      }
+      daliurenHtml += `</div>
+          <div class="dlr-title" style="color: #a78bfa; margin-bottom: 1rem; font-weight: bold; font-size: 1.1rem;">四課</div>
+          <div class="dlr-row">
+      `;
+      const skKeys = {"一課": "第一課", "二課": "第二課", "三課": "第三課", "四課": "第四課"};
+      for (let k in skKeys) {
+          let val = data.si_ke[k];
+          if(val && val.length >= 2) {
+              daliurenHtml += `
+                <div class="dlr-item">
+                    <span class="dlr-label" style="font-size: 0.85rem; color: #aaa; margin-bottom: 0.5rem;">${skKeys[k]}</span>
+                    <span class="dlr-val" style="font-size: 1.5rem; font-weight: bold; color: #fff; font-family: 'Noto Serif TC', serif; margin-bottom: 0.2rem;">${val[0]}</span>
+                    <span class="dlr-val" style="font-size: 1.5rem; font-weight: bold; color: #fff; font-family: 'Noto Serif TC', serif;">${val[1]}</span>
+                </div>
+              `;
+          } else if (val) {
+              daliurenHtml += `
+                <div class="dlr-item">
+                    <span class="dlr-label" style="font-size: 0.85rem; color: #aaa; margin-bottom: 0.5rem;">${skKeys[k]}</span>
+                    <span class="dlr-val" style="font-size: 1.5rem; font-weight: bold; color: #fff; font-family: 'Noto Serif TC', serif;">${val}</span>
+                </div>
+              `;
+          }
+      }
+      daliurenHtml += `</div></div>`;
+      
+      daliurenContainer.innerHTML = daliurenHtml;
+
+      if (data.interpretation) {
+        interpretationPanel.classList.remove("hidden");
+        const formatText = data.interpretation.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        interpretationText.innerHTML = formatText;
+
+        if (data.audio_path) {
+          let relPath = data.audio_path;
+          if (relPath.includes("history/audio/")) {
+              relPath = "/history/audio/" + relPath.split("history/audio/")[1];
+          } else if (!relPath.startsWith("/")) {
+              relPath = "/" + relPath;
+          }
+          audioPlayer.src = `${ASSETS_BASE}${relPath}`;
+          audioPlayerContainer.classList.remove("hidden");
+        }
+      }
+
+    } catch (err) {
+      alert("起課失敗: " + err.message);
+    } finally {
+      loader.classList.add("hidden");
+      castDaliurenBtn.disabled = false;
+      const dict = translations[langSelect.value] || translations["繁體中文"];
+      castDaliurenBtn.innerText = dict["btn_cast_daliuren"] || "起課";
     }
   });
 
@@ -536,7 +789,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       records.forEach(r => {
-        let title = r.type === "tarot" ? "🔮 塔羅" : "☯️ 易經";
+        let title = "📜 紀錄";
+        if (r.type === "tarot") title = "🔮 塔羅";
+        else if (r.type === "iching") title = "☯️ 易經";
+        else if (r.type === "zhuge") title = "🎋 諸葛神算";
+        else if (r.type === "daliuren") title = "🌌 大六壬";
+        
         let summary = "";
         
         if (r.type === "tarot") {
@@ -551,6 +809,12 @@ document.addEventListener("DOMContentLoaded", () => {
           if (orig) {
             summary = `本卦：${orig}` + (changed ? ` ➔ 之卦：${changed}` : '');
           }
+        } else if (r.type === "zhuge") {
+          const id = r.result?.id;
+          if (id) summary = `第 ${id} 籤`;
+        } else if (r.type === "daliuren") {
+          const date = r.result?.date;
+          if (date) summary = `時局：${date}`;
         }
 
         const isSuccess = r.ai_interpretation && typeof r.ai_interpretation === 'string' && !r.ai_interpretation.includes("error");
@@ -582,9 +846,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showHistoryDetail(r) {
+    let titleText = "📜 紀錄";
+    if (r.type === 'tarot') titleText = '🔮 塔羅紀錄';
+    else if (r.type === 'iching') titleText = '☯️ 易經紀錄';
+    else if (r.type === 'zhuge') titleText = '🎋 諸葛神算紀錄';
+    else if (r.type === 'daliuren') titleText = '🌌 大六壬紀錄';
+
     let detailHtml = `
       <h2 style="color: var(--primary-color); margin-bottom: 1rem; font-family: var(--font-title); text-align: center;">
-        ${r.type === 'tarot' ? '🔮 塔羅紀錄' : '☯️ 易經紀錄'}
+        ${titleText}
       </h2>
       <p style="font-style: italic; margin-bottom: 2rem; color: #a78bfa; text-align: center; font-size: 1.2rem;">Q: ${r.question || '無'}</p>
     `;
@@ -636,6 +906,35 @@ document.addEventListener("DOMContentLoaded", () => {
            }
        }
        detailHtml += `</div>`;
+    } else if (r.type === 'zhuge') {
+         const res = r.result || {};
+         detailHtml += `
+            <div class="zg-container glass-panel" style="max-width:100%; text-align: center; margin-bottom: 2rem;">
+                <div class="zg-header" style="color: #FFD700; font-size: 1.2rem; margin-bottom: 1rem;">
+                    🎋 諸葛神算 第 ${res.id || ''} 籤
+                </div>
+                <div class="zg-poem" style="font-family: 'Noto Serif TC', serif; font-size: 1.1rem; white-space: pre-wrap; line-height: 2; color: #fff; margin-bottom: 1rem;">${res.poem || ''}</div>
+            </div>
+         `;
+    } else if (r.type === 'daliuren') {
+         const res = r.result || {};
+         let patternStr = Array.isArray(res.pattern) && res.pattern.length > 0 ? res.pattern.join('、') : '無特殊格局';
+         detailHtml += `
+            <div class="dlr-container glass-panel" style="max-width:100%; text-align: center; margin-bottom: 2rem;">
+                <div class="dlr-header" style="color: #FFD700; font-size: 1rem; margin-bottom: 1rem;">
+                    🌌 <b>時局</b>：${res.date || ''} (${res.jieqi || ''}) &nbsp;|&nbsp; <b>格局</b>：${patternStr}
+                </div>
+                <div class="dlr-row" style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+         `;
+         const scKeys = {"chu": "初傳", "zhong": "中傳", "mo": "末傳"};
+         for (let k in scKeys) {
+             let val = (res.san_chuan || {})[k];
+             if(val) {
+                 let display_val = Array.isArray(val) && val.length > 0 ? val[0] : String(val);
+                 detailHtml += `<div style="padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px;"><span style="color:#aaa;font-size:0.8rem;">${scKeys[k]}</span><br><span style="font-size:1.2rem;color:#fff;">${display_val}</span></div>`;
+             }
+         }
+         detailHtml += `</div></div>`;
     }
 
     if (r.ai_interpretation) {

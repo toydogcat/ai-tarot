@@ -1,12 +1,12 @@
 ---
 name: ai-divination-api
-description: 教導 AI 助理如何透過本機啟動的 FastAPI 提供占卜服務，包括塔羅與易經。
+description: 教導 AI 助理如何透過本機啟動的 FastAPI 提供占卜服務，包括塔羅、易經、諸葛神算與大六壬。
 ---
 
 # AI Divination API Integration Skill
 
-這份文件教導身為 AI 助理的你，如何透過本機的 FastAPI 伺服器，直接呼叫塔羅與易經的占卜核心功能，而無需強制依賴 Streamlit 前端 UI。
-這非常適合當人類要求你「幫我算塔羅」或是「幫我卜筮」時，你可以直接在背景使用 API 取得結果並回答人類！
+這份文件教導身為 AI 助理的你，如何透過本機的 FastAPI 伺服器，直接呼叫各種占卜核心功能，而無需強制依賴 Streamlit 前端 UI。
+這非常適合當人類要求你「幫我算」的時候，你可以直接在背景使用 API 取得結果並回答人類！
 
 ## Prerequisites (前置作業)
 
@@ -62,6 +62,48 @@ curl -X POST "http://127.0.0.1:8000/api/iching/cast" \
 API 會自動幫你模擬六次擲骰，並回傳卦象 `hexagram_name`、`lines` 等。若你帶上了 `question`，回傳的 JSON 裡會有 `interpretation`。
 你只需要把 `interpretation` 的內容整理後回報給使用者即可。
 
+## 🎋 諸葛神算 (Zhuge Shensuan) 流程
+
+**Endpoint:** `POST /api/zhuge/draw`
+**Request JSON Body:**
+```json
+{
+  "question": "（可選）使用者的問題",
+  "language": "（可選）指定輸出語言"
+}
+```
+
+**範例呼叫:**
+```bash
+curl -X POST "http://127.0.0.1:8000/api/zhuge/draw" \
+     -H "Content-Type: application/json" \
+     -d '{"question": "我該接下這份工作嗎？", "language": "繁體中文"}'
+```
+**回傳重點:**
+API 會回傳籤詩 `poem` 與 `explanation`。若你帶上了 `question`，回傳的 JSON 裡會有 `interpretation`。
+請將 `interpretation` 解讀結果展示給使用者看。
+
+## 🌌 大六壬 (Da Liu Ren) 流程
+
+**Endpoint:** `POST /api/daliuren/cast`
+**Request JSON Body:**
+```json
+{
+  "question": "（可選）使用者的問題",
+  "language": "（可選）指定輸出語言"
+}
+```
+
+**範例呼叫:**
+```bash
+curl -X POST "http://127.0.0.1:8000/api/daliuren/cast" \
+     -H "Content-Type: application/json" \
+     -d '{"question": "這場糾紛會如何收場？", "language": "繁體中文"}'
+```
+**回傳重點:**
+API 會回傳隨機起出的時空格局、三傳、四課等。若帶上 `question` 會包含 `interpretation`。
+請把 `interpretation` 的內容整理後回報給使用者。
+
 ## 給 AI Agent 的重要原則
-1. **先確認再執行**：如果你收到人類的模糊指令 (例如：「幫我占卜」)，請先問他想算塔羅還是易經，以及具體的問題。
+1. **先確認再執行**：如果你收到人類的模糊指令 (例如：「幫我占卜」)，請先問他想算哪一種占卜 (塔羅、易經、諸葛神算或大六壬)，以及具體的問題。
 2. **自己消化詮釋**：API 回傳的 `interpretation` 已經是我們這個系統的 AI 核心解讀結果。你不需要重新解讀，只需要直接展示或稍作整理回答人類即可。

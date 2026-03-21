@@ -20,6 +20,12 @@ from streamlit_mic_recorder import mic_recorder
 from ui.tarot_ui import inject_custom_css, render_spread_result, render_ai_interpretation
 from core.config_manager import config_manager
 
+from core.zhuge.engine import ZhugeEngine
+from core.zhuge.interpreter import interpret_zhuge
+from core.daliuren.engine import DaliurenEngine
+from core.daliuren.interpreter import interpret_daliuren
+
+
 # 載入 .env
 load_dotenv()
 
@@ -51,7 +57,7 @@ with st.sidebar:
     # 頁面切換
     page = st.radio(
         "📄 頁面",
-        ["🔮 塔羅占卜", "☯️ 易經卜卦", "📜 歷史紀錄", "⚙️ 設定管理"],
+        ["🔮 塔羅占卜", "☯️ 易經卜卦", "🎋 諸葛神算", "🌌 大六壬", "📜 歷史紀錄", "⚙️ 設定管理"],
         label_visibility="collapsed",
     )
 
@@ -105,6 +111,18 @@ with st.sidebar:
             unsafe_allow_html=True,
         )
         
+    elif page == "🎋 諸葛神算":
+        st.markdown("### 🎋 抽籤方式")
+        st.info("系統將為您隨機抽取三八四籤之一，並由 AI 進行解籤。")
+        st.markdown("---")
+        zhuge_draw_button = st.button("🎋 開始抽籤", use_container_width=True, type="primary")
+
+    elif page == "🌌 大六壬":
+        st.markdown("### 🌌 起課方式")
+        st.info("系統將為您隨機產生大六壬課象（四課三傳），並由 AI 解讀吉凶。")
+        st.markdown("---")
+        dlr_draw_button = st.button("🌌 開始起課", use_container_width=True, type="primary")
+
     elif page == "☯️ 易經卜卦":
         st.markdown("### 🎲 卜卦方式")
         st.info("系統將為您模擬六次金錢卦擲爻，由下而上產生本卦與變卦。")
@@ -393,6 +411,121 @@ elif page == "☯️ 易經卜卦":
             </p>
         </div>
         """, unsafe_allow_html=True)
+# === 諸葛神算頁面 ===
+elif page == "🎋 諸葛神算":
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown("🗣️ **語音輸入問題**")
+        audio_record = mic_recorder(
+            start_prompt="點擊開始錄音 🎤", stop_prompt="停止並辨識 ⏹️", key='zhuge_recorder'
+        )
+        if audio_record:
+            audio_bytes = audio_record['bytes']
+            audio_hash = hash(audio_bytes)
+            if st.session_state.get("last_zg_audio_hash") != audio_hash:
+                result = process_transcription(audio_bytes, format_hint="webm")
+                if result and not result.startswith(("⚠️", "❌")):
+                    st.session_state["zg_user_question_input"] = result
+                    st.success("✅ 辨識成功！")
+                st.session_state["last_zg_audio_hash"] = audio_hash
+
+    user_question = st.text_area(
+        "🎋 請輸入你想問神明的問題：",
+        placeholder="例如：我該換工作嗎？/ 感情發展如何？",
+        height=80, key="zg_user_question_input"
+    )
+
+    if "zhuge_draw_button" in locals() and zhuge_draw_button:
+        if not user_question.strip():
+            st.warning("請先輸入祈問的問題 🙏")
+        else:
+            engine_zg = ZhugeEngine()
+            result = engine_zg.draw_lot()
+            if result:
+                st.session_state["last_zg_result"] = result
+                st.session_state["last_zg_question"] = user_question.strip()
+                
+                with st.spinner("🎋 正在解籤..."):
+                    interp = interpret_zhuge(user_question.strip(), result)
+                    st.session_state["last_zg_interpretation"] = interp
+                
+                record_id = save_reading("zhuge", user_question.strip(), result, interp)
+                
+                if interp and not interp.startswith("⚠️"):
+                    audio_path = generate_audio(interp, record_id)
+                    update_record_interpretation(datetime.now().strftime("%Y-%m-%d"), record_id, interp, audio_path)
+                    st.session_state["last_zg_audio"] = audio_path
+
+    if "last_zg_result" in st.session_state:
+        res = st.session_state["last_zg_result"]
+        st.markdown("---")
+        from ui.zhuge_ui import render_zhuge
+        render_zhuge(res)
+        
+        interp = st.session_state.get("last_zg_interpretation")
+        if interp:
+            if st.session_state.get("last_zg_audio"):
+                st.audio(st.session_state["last_zg_audio"])
+            render_ai_interpretation(interp, title="🎋 AI 諸葛神算解讀")
+    else:
+        st.markdown("<div style='text-align: center; padding: 60px;'><h1>🎋 諸葛神算</h1></div>", unsafe_allow_html=True)
+
+# === 大六壬頁面 ===
+elif page == "🌌 大六壬":
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown("🗣️ **語音輸入問題**")
+        audio_record = mic_recorder(
+            start_prompt="點擊開始錄音 🎤", stop_prompt="停止並辨識 ⏹️", key='dlr_recorder'
+        )
+        if audio_record:
+            audio_bytes = audio_record['bytes']
+            audio_hash = hash(audio_bytes)
+            if st.session_state.get("last_dlr_audio_hash") != audio_hash:
+                result = process_transcription(audio_bytes, format_hint="webm")
+                if result and not result.startswith(("⚠️", "❌")):
+                    st.session_state["dlr_user_question_input"] = result
+                    st.success("✅ 辨識成功！")
+                st.session_state["last_dlr_audio_hash"] = audio_hash
+
+    user_question = st.text_area(
+        "🌌 請輸入你想測算的問題：", placeholder="例如：尋物 / 謀事結果如何？", height=80, key="dlr_user_question_input"
+    )
+
+    if "dlr_draw_button" in locals() and dlr_draw_button:
+        if not user_question.strip():
+            st.warning("請先輸入祈問的問題 🙏")
+        else:
+            with st.spinner("🌌 正在起課與推演天機..."):
+                engine_dlr = DaliurenEngine()
+                result = engine_dlr.draw_lesson()
+                st.session_state["last_dlr_result"] = result
+                st.session_state["last_dlr_question"] = user_question.strip()
+                
+                interp = interpret_daliuren(user_question.strip(), result)
+                st.session_state["last_dlr_interpretation"] = interp
+                
+                record_id = save_reading("daliuren", user_question.strip(), result, interp)
+                if interp and not interp.startswith("⚠️"):
+                    audio_path = generate_audio(interp, record_id)
+                    update_record_interpretation(datetime.now().strftime("%Y-%m-%d"), record_id, interp, audio_path)
+                    st.session_state["last_dlr_audio"] = audio_path
+
+    if "last_dlr_result" in st.session_state:
+        res = st.session_state["last_dlr_result"]
+        st.markdown("---")
+        st.markdown(f"### 取得大六壬神課：")
+        from ui.daliuren_ui import render_daliuren
+        render_daliuren(res)
+        
+        interp = st.session_state.get("last_dlr_interpretation")
+        if interp:
+            if st.session_state.get("last_dlr_audio"):
+                st.audio(st.session_state["last_dlr_audio"])
+            render_ai_interpretation(interp, title="🌌 AI 大六壬解讀")
+    else:
+        st.markdown("<div style='text-align: center; padding: 60px;'><h1>🌌 大六壬神課</h1></div>", unsafe_allow_html=True)
+
 elif page == "📜 歷史紀錄":
     from core.history import get_history_dates, load_history
 
@@ -452,6 +585,16 @@ elif page == "📜 歷史紀錄":
                     st.markdown(f"- **之卦：** {res.get('changed_hexagram')}")
                     moving = [i+1 for i, v in enumerate(res.get('lines_info', [])) if v.get('moving')]
                     st.markdown(f"- **動爻：** 第 {', '.join(map(str, moving))} 爻")
+            elif record_type == "zhuge":
+                res = record.get("result", {})
+                st.markdown("**🎋 籤詩：**")
+                st.markdown(f"- **第 {res.get('id')} 籤**")
+                st.markdown(f"- {res.get('poem')}")
+            elif record_type == "daliuren":
+                res = record.get("result", {})
+                st.markdown("**🌌 課象：**")
+                st.markdown(f"- **日期：** {res.get('date')} ({res.get('jieqi')})")
+                st.markdown(f"- **格局：** {', '.join(res.get('pattern', []))}")
 
             st.markdown("---")
             if text_status == "error":
@@ -461,7 +604,12 @@ elif page == "📜 歷史紀錄":
                 if record.get("recovered_at"):
                     st.success(f"已於 {record['recovered_at']} 修復")
                 if record.get("ai_interpretation_audio_path"):
-                    st.audio(record.get("ai_interpretation_audio_path"))
+                    import os
+                    audio_file = record.get("ai_interpretation_audio_path")
+                    if os.path.exists(audio_file):
+                        st.audio(audio_file)
+                    else:
+                        st.warning("⚠️ 語音檔案遺失。")
                 else:
                     st.warning("⚠️ 此紀錄缺少語音解讀。可使用補件功能修復。")
                 st.markdown(f"**AI 解讀：**\n\n{record['ai_interpretation']}")

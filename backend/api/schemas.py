@@ -63,3 +63,27 @@ class HistoryRecordResponse(BaseModel):
     
     ai_interpretation: Optional[str] = None
     ai_interpretation_audio_path: Optional[str] = None
+
+class ZhugeDrawRequest(BaseModel):
+    question: Optional[str] = None
+    language: Optional[str] = "繁體中文"
+
+class ZhugeResponse(BaseModel):
+    id: str
+    poem: str
+    explanation: str
+    interpretation: Optional[str] = None
+    audio_path: Optional[str] = None
+
+class DaliurenCastRequest(BaseModel):
+    question: Optional[str] = None
+    language: Optional[str] = "繁體中文"
+
+class DaliurenResponse(BaseModel):
+    date: str
+    jieqi: str
+    pattern: List[str]
+    san_chuan: Dict[str, Any]
+    si_ke: Dict[str, Any]
+    interpretation: Optional[str] = None
+    audio_path: Optional[str] = None

@@ -18,27 +18,34 @@
 | `history/` | 使用者歷史紀錄 JSON 以及生成的音訊 mp3。 |
 | `ui/` | Streamlit UI 元件與管理介面。 |
 | `.agent/skills/` | 給 AI Agent 使用的專屬技能操作說明 (`SKILL.md`)。 |
+| `frontend/` | (位於專案根目錄) Vite + Vanilla JS 打造的高質感響應式前端使用者介面。 |
 
 ## 核心配置與背景音樂 (BGM)
 - **設定檔載入**：使用 `core/config_manager.py` (Singleton)，預設讀取 `customer1.yaml`，可於 Streamlit 左側「設定管理」選單動態修改模型、Prompt 與首頁背景音樂。
 - **音樂播放**：Streamlit 將自動播放 `config/` 所選的背景音樂 (BGM 1 或 2)。
 
-## 雙系統核心邏輯
-### 1. 塔羅占卜
+## 四大系統核心邏輯 (Quad-System Logic)
+### 1. 塔羅占卜 (Tarot)
 - 支援 6 種以上牌陣與正逆位。
 - 牌意資料存放於 `data/cards/`，抽牌引擎在 `core/tarot/engine.py`。
-### 2. 易經卜卦 (金錢卦)
+### 2. 易經卜卦 (I-Ching)
 - 模擬 6 次擲幣產生初爻至上爻，正面(陽)=3，反面(陰)=2。6(老陰)、9(老陽)為動爻，進一步產生變卦。
 - 卦象資料存放於 `data/hexagrams/64_hexagrams.json`。
+### 3. 諸葛神算 (Zhuge Shensuan)
+- 提供 384 籤，搭配傳統詩文與籤意解釋。
+- 籤詩庫位於 `data/zhuge/zhuge_data.json`，抽籤引擎在 `core/zhuge/engine.py`。
+### 4. 大六壬 (Da Liu Ren)
+- 基於時辰隨機起課，涵蓋節氣、時局、格局、三傳、四課等深度命理資訊。
+- 排盤引擎位於 `core/daliuren/engine.py` (整合 `kinliuren` 套件)。
 
 ## UI 與前端開發規範
-- 執行指令：`streamlit run app.py` (預設啟動於 8501 Port)。
-- 畫面包含四個主頁籤：塔羅占卜、易經卜卦、歷史紀錄、設定管理。
-- 圖片統一以 `assets/images/` 為準。
+- 後台管理端：`streamlit run app.py` (預設啟動於 8501 Port)。
+- 使用者前端：在 `frontend/` 下執行 `npm run dev`，畫面包含四個主頁籤：塔羅占卜、易經卜卦、諸葛神算、大六壬，並支援多國語系 (i18n) 以及手機版 RWD 響應式排版。
+- 圖片統一以 `backend/assets/images/` 為準。
 
 ## FastAPI 與 AI Skill 整合
-- 執行指令：`python run_api.py` (獨立於 Streamlit，預設啟動於 API Port，例如 8000)。
-- 作為外部介面，API 端點 (如 `/api/tarot/draw`, `/api/iching/cast`) 讓 AI Agent 能夠免寫爬蟲直接取用。
+- 執行指令：在 `backend/` 下執行 `python run_api.py` (獨立於 Streamlit，預設啟動於 8000)。
+- 作為外部介面，API 端點 (如 `/api/tarot/draw`, `/api/iching/cast`, `/api/zhuge/draw`, `/api/daliuren/cast`) 讓 AI Agent 能夠免寫爬蟲直接取用。
 - AI Agent 可直接閱讀 `.agent/skills/ai-divination-api/SKILL.md` 的說明文件了解操作方法，大幅提升專案的擴展性。
 
 ## 未來擴充

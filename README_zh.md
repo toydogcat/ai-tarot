@@ -6,7 +6,8 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與
 
 ### 🌟 一般使用者占卜介面 (Vite 前端)
 <p align="center">
-  <img src="sample/demo2.jpg" alt="AI Tarot & I-Ching UI" width="800">
+  <img src="sample/demo2.jpg" alt="AI Tarot & I-Ching UI" width="600">
+  <img src="sample/demo2_android.jpg" alt="Mobile UI" height="350">
 </p>
 
 ### ⚙️ 專業解讀與測試管理 (Streamlit 介面)
@@ -17,6 +18,8 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與
 
 - 🔮 **塔羅占卜**：完整 78 張塔羅牌、6 種經典牌陣、正逆位支援、詳細牌意。
 - ☯️ **易經卜卦**：模擬傳統金錢六爻卜卦，自動呈現本卦、變卦及動爻指示。
+- 🎋 **諸葛神算**：提供 384 籤傳統詩文與解意，結合 AI 進行白話精準解析。
+- 🌌 **大六壬**：基於時辰起課，提供三傳四課的簡易排盤與格局，讓 AI 根據時空能量為您解讀吉凶。
 - 🗣️ **語音輸入提問**：支援麥克風語音轉文字辨識，並可於輸入框手動微調。
 - 🔍 **Tavily 外部時事搜尋**：自動從網路搜尋最新話題/時事背景（由 Gemma 3 整理摘要）。
 - 🤖 **Gemini AI 深度解析**：結合牌陣/卦象與外部時事，透過最新 Gemini 3.1 Flash/Pro 引擎做深入推演。

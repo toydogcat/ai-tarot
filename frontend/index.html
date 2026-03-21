@@ -12,12 +12,12 @@
     <div class="bg-gradient"></div>
 
     <div class="container">
-      <header style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <div>
+      <header>
+        <div class="header-titles">
            <h1 class="title" data-i18n="title">AI Tarot <span class="divider">&</span> I-Ching</h1>
            <p class="subtitle" data-i18n="subtitle">探索潛意識的古老智慧引導</p>
         </div>
-        <div class="lang-selector" style="margin-top: 1rem;">
+        <div class="lang-selector">
            <select id="langSelect" class="secondary-btn" style="padding: 0.5rem; border-radius: 8px; font-family: inherit; cursor: pointer; background: rgba(255,255,255,0.1); color: var(--text-light); border: 1px solid rgba(255,255,255,0.2);">
                <option value="繁體中文" style="color: black;">繁體中文</option>
                <option value="简体中文" style="color: black;">简体中文</option>
@@ -31,6 +31,8 @@
       <div class="tabs">
         <button id="tabTarot" class="tab-btn active" data-i18n="tab_tarot">🔮 塔羅占卜</button>
         <button id="tabIChing" class="tab-btn" data-i18n="tab_iching">☯️ 易經卜卦</button>
+        <button id="tabZhuge" class="tab-btn" data-i18n="tab_zhuge">🎋 諸葛神算</button>
+        <button id="tabDaliuren" class="tab-btn" data-i18n="tab_daliuren">🌌 大六壬</button>
         <button id="tabHistory" class="tab-btn" data-i18n="tab_history">📜 歷史紀錄</button>
       </div>
 
@@ -73,6 +75,36 @@
           <button id="castBtn" class="primary-btn" data-i18n="btn_cast">擲筊卜卦</button>
         </section>
 
+        <!-- 諸葛神算控制面板 -->
+        <section id="zhugePanel" class="glass-panel controls hidden">
+          <h2 data-i18n="zhuge_heading">諸葛神算</h2>
+          
+          <div class="form-group">
+            <label for="zhugeQuestionInput" data-i18n="label_question">你的問題（選填）</label>
+            <div style="display:flex; gap:0.5rem;">
+               <textarea id="zhugeQuestionInput" rows="3" placeholder="請在心中默念問題，或寫下來由 AI 幫您解讀..." data-i18n-placeholder="placeholder_question" style="flex:1;"></textarea>
+               <button id="micZhuge" class="secondary-btn" style="padding:0.5rem; border-radius:8px; display:none;" title="語音輸入">🎤</button>
+            </div>
+          </div>
+
+          <button id="drawZhugeBtn" class="primary-btn" data-i18n="btn_draw_zhuge">抽籤</button>
+        </section>
+
+        <!-- 大六壬控制面板 -->
+        <section id="daliurenPanel" class="glass-panel controls hidden">
+          <h2 data-i18n="daliuren_heading">大六壬</h2>
+          
+          <div class="form-group">
+            <label for="daliurenQuestionInput" data-i18n="label_question">你的問題（選填）</label>
+            <div style="display:flex; gap:0.5rem;">
+               <textarea id="daliurenQuestionInput" rows="3" placeholder="請在心中默念問題，或寫下來由 AI 幫您解讀..." data-i18n-placeholder="placeholder_question" style="flex:1;"></textarea>
+               <button id="micDaliuren" class="secondary-btn" style="padding:0.5rem; border-radius:8px; display:none;" title="語音輸入">🎤</button>
+            </div>
+          </div>
+
+          <button id="castDaliurenBtn" class="primary-btn" data-i18n="btn_cast_daliuren">起課</button>
+        </section>
+
         <!-- 載入動畫 -->
         <div id="loader" class="loader-container hidden">
           <div class="spinner"></div>
@@ -88,6 +120,14 @@
           
           <div id="hexagramContainer" class="hexagram-container hidden">
             <!-- 卦象動態生成處 -->
+          </div>
+
+          <div id="zhugeContainer" class="hidden">
+            <!-- 籤詩動態生成處 -->
+          </div>
+
+          <div id="daliurenContainer" class="hidden">
+            <!-- 課象動態生成處 -->
           </div>
 
           <div id="interpretationPanel" class="glass-panel interpretation hidden">
