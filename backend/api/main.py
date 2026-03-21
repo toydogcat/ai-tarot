@@ -51,7 +51,7 @@ def get_system_config():
     conf = config_manager.get()
     lang = getattr(conf, "language", "繁體中文")
     return SystemConfig(
-        bgm_id=conf.bgm_id,
+        bgm_id=conf.app.get("bgm_id", 1),
         profile=config_manager.active_profile,
         language=lang
     )
