@@ -19,13 +19,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from api.routes import tarot, iching, history, zhuge, daliuren
+from api.routes import tarot, iching, history, zhuge, daliuren, ws, admin
 
 app.include_router(tarot.router)
 app.include_router(iching.router)
 app.include_router(history.router)
 app.include_router(zhuge.router)
 app.include_router(daliuren.router)
+app.include_router(ws.router)
+app.include_router(admin.router)
 
 assets_dir = BASE_DIR / "assets"
 if assets_dir.exists():
@@ -44,6 +46,7 @@ class SystemConfig(BaseModel):
     bgm_id: int
     profile: str
     language: str
+    guide_name: str
 
 @app.get("/api/system/config", response_model=SystemConfig)
 def get_system_config():
@@ -53,5 +56,6 @@ def get_system_config():
     return SystemConfig(
         bgm_id=conf.app.get("bgm_id", 1),
         profile=config_manager.active_profile,
-        language=lang
+        language=lang,
+        guide_name=conf.app.get("guide_name", "toby")
     )

@@ -4,6 +4,8 @@ from core.daliuren.engine import DaliurenEngine
 from core.daliuren.interpreter import interpret_daliuren
 from core.tts import generate_audio
 from core.history import save_reading, update_record_interpretation
+from core.config_manager import config_manager
+from api.websocket_manager import manager
 from datetime import datetime
 
 router = APIRouter(prefix="/api/daliuren", tags=["Daliuren"])
@@ -19,11 +21,16 @@ def cast_daliuren(req: DaliurenCastRequest):
     if req.question:
         interpretation_text = interpret_daliuren(req.question, result, language=req.language)
         
+        client_name = config_manager.get().app.get("guide_name", "toby")
+        if manager.active_client:
+            client_name = manager.active_client[1]
+            
         record_id = save_reading(
             record_type="daliuren",
             question=req.question,
             result=result,
-            interpretation=interpretation_text
+            interpretation=interpretation_text,
+            client_name=client_name
         )
 
         if interpretation_text and "error" not in interpretation_text.lower() and not interpretation_text.startswith("⚠️"):

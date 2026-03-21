@@ -9,14 +9,27 @@ router = APIRouter(prefix="/api/history", tags=["History"])
 # Initialize deck once in memory for history route
 deck = TarotDeck()
 
+@router.get("/clients", response_model=List[str])
+def get_history_clients():
+    """取得所有歷史紀錄中的唯一客戶名稱"""
+    dates = get_history_dates()
+    clients = set()
+    for d in dates:
+        records = load_history(d)
+        for r in records:
+            clients.add(r.get("client_name", "toby"))
+    return sorted(list(clients))
+
 @router.get("", response_model=List[HistoryRecordResponse])
-def get_all_history(limit: int = 50):
+def get_all_history(client_name: str = None, limit: int = 50):
     """取得最新的歷史紀錄"""
     dates = get_history_dates()
     all_records = []
     
     for d in dates:
         records = load_history(d)
+        if client_name:
+            records = [r for r in records if r.get("client_name", "toby") == client_name]
         
         # Inject missing image paths for older tarot records
         for r in records:

@@ -44,6 +44,7 @@ def save_reading(
     ai_prompt: str | None = None,
     ai_interpretation_audio_path: str | None = None,
     search_success: bool = True,
+    client_name: str = "toby",
 ) -> str:
     """
     儲存一次占卜/卜卦紀錄
@@ -126,6 +127,7 @@ def save_reading(
         "type": record_type,
         "timestamp": now.isoformat(),
         "time_display": now.strftime("%H:%M:%S"),
+        "client_name": client_name,
         "question": question,
         "result": result_data,
         "ai_prompt": ai_prompt or "",
