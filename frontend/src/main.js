@@ -246,11 +246,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const clientWaitText = document.getElementById("clientWaitText");
 
   function connectWebSocket(username) {
-      // 判斷當前環境來決定 WS URL 屬性 (http localhost:8000 -> ws localhost:8000)
+      // 判斷當前環境來決定 WS URL 屬性
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const host = window.location.host; 
-      // 這裡直接寫死 8000 給本地開發，若之後要上線可改寫動態
-      const wsUrl = `${protocol}//localhost:8000/ws/${encodeURIComponent(username)}`;
+      // 動態抓取當前網域，完整支援 Ngrok 等外部服務
+      const wsUrl = `${protocol}//${host}/ws/${encodeURIComponent(username)}`;
 
       ws = new WebSocket(wsUrl);
 
