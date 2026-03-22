@@ -23,6 +23,7 @@ class ConnectionManager:
         if self.active_client:
             _, client_name = self.active_client
             await self.send_to_toby({"type": "client_connected", "client_name": client_name})
+            await self.send_to_client({"type": "toby_status", "is_online": True})
         return True
 
     async def connect_client(self, websocket: WebSocket, client_name: str) -> bool:
@@ -40,11 +41,15 @@ class ConnectionManager:
         self.active_client = (websocket, client_name)
         # 通知 Toby 有新 Client 進來了
         await self.send_to_toby({"type": "client_connected", "client_name": client_name})
+        # 通知 Client 目前 Toby 的狀態
+        is_toby_online = self.active_toby is not None
+        await self.send_to_client({"type": "toby_status", "is_online": is_toby_online})
         return True
 
-    def disconnect_toby(self):
+    async def disconnect_toby(self):
         if self.active_toby:
             self.active_toby = None
+            await self.send_to_client({"type": "toby_status", "is_online": False})
             
     def disconnect_client(self):
         if self.active_client:
@@ -72,7 +77,8 @@ class ConnectionManager:
                 print("DEBUG: Message sent to Toby successfully")
             except Exception as e:
                 print(f"DEBUG: Error sending to Toby: {e}")
-                self.disconnect_toby()
+                import asyncio
+                asyncio.create_task(self.disconnect_toby())
 
     async def send_to_client(self, message: dict):
         """傳送訊息給目前的 Client"""

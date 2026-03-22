@@ -30,6 +30,11 @@ def get_spreads():
 
 @router.post("/draw", response_model=TarotResponse)
 def draw_tarot(req: TarotDrawRequest):
+    limit = config_manager.get_remaining_usage()
+    if limit <= 0:
+        raise HTTPException(status_code=403, detail="可用次數已用盡 (Limit Exceeded)")
+    config_manager.decrement_usage()
+
     spread = get_spread_by_id(req.spread_id)
     if not spread:
         spread = SINGLE_CARD

@@ -53,7 +53,8 @@ def render_zhuge(res: dict):
 
     lot_id = res.get("id", "")
     poem = res.get("poem", "")
-    explanation = res.get("explanation", "")
+    interp1 = res.get("interp1", res.get("explanation", ""))
+    interp2 = res.get("interp2", "")
 
     import textwrap
     
@@ -68,11 +69,19 @@ def render_zhuge(res: dict):
         </div>
     """)
     
-    if explanation:
+    if interp1:
         html += textwrap.dedent(f"""
-        <div class="zg-explanation-title">籤意解說</div>
+        <div class="zg-explanation-title">白話解讀</div>
         <div class="zg-explanation">
-            {explanation}
+            {interp1}
+        </div>
+        """)
+    
+    if interp2:
+        html += textwrap.dedent(f"""
+        <div class="zg-explanation-title">古典意象</div>
+        <div class="zg-explanation">
+            {interp2}
         </div>
         """)
         

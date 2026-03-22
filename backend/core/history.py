@@ -98,7 +98,9 @@ def save_reading(
     elif record_type == "zhuge":
         result_data = {
             "id": result.get("id"),
-            "poem": result.get("poem")
+            "poem": result.get("poem"),
+            "interp1": result.get("interp1"),
+            "interp2": result.get("interp2")
         }
     elif record_type == "daliuren":
         result_data = {

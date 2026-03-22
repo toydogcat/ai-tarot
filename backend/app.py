@@ -52,12 +52,16 @@ engine = get_engine()
 # === 側邊欄 ===
 with st.sidebar:
     st.markdown("# 🌟 AI 智慧占卜")
+    
+    remaining_usage = config_manager.get_remaining_usage()
+    st.metric("剩餘可用次數", remaining_usage)
+    
     st.markdown("---")
 
     # 頁面切換
     page = st.radio(
         "📄 頁面",
-        ["🔮 塔羅占卜", "☯️ 易經卜卦", "🎋 諸葛神算", "🌌 大六壬", "📜 歷史紀錄", "⚙️ 設定管理"],
+        ["🔮 塔羅占卜", "☯️ 易經卜卦", "🎋 諸葛神算", "🎲 小六壬", "🌌 大六壬", "📜 歷史紀錄", "⚙️ 設定管理", "🌐 即時觀測"],
         label_visibility="collapsed",
     )
 
@@ -116,6 +120,12 @@ with st.sidebar:
         st.info("系統將為您隨機抽取三八四籤之一，並由 AI 進行解籤。")
         st.markdown("---")
         zhuge_draw_button = st.button("🎋 開始抽籤", use_container_width=True, type="primary")
+
+    elif page == "🎲 小六壬":
+        st.markdown("### 🎲 起卦方式")
+        st.info("系統將為您隨機產生三個數字，推演小六壬初傳、中傳、終傳，定局吉凶。")
+        st.markdown("---")
+        xlr_draw_button = st.button("🎲 開始起卦", use_container_width=True, type="primary")
 
     elif page == "🌌 大六壬":
         st.markdown("### 🌌 起課方式")
@@ -470,6 +480,67 @@ elif page == "🎋 諸葛神算":
     else:
         st.markdown("<div style='text-align: center; padding: 60px;'><h1>🎋 諸葛神算</h1></div>", unsafe_allow_html=True)
 
+# === 小六壬頁面 ===
+elif page == "🎲 小六壬":
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown("🗣️ **語音輸入問題**")
+        audio_record = mic_recorder(
+            start_prompt="點擊開始錄音 🎤", stop_prompt="停止並辨識 ⏹️", key='xlr_recorder'
+        )
+        if audio_record:
+            audio_bytes = audio_record['bytes']
+            audio_hash = hash(audio_bytes)
+            if st.session_state.get("last_xlr_audio_hash") != audio_hash:
+                result = process_transcription(audio_bytes, format_hint="webm")
+                if result and not result.startswith(("⚠️", "❌")):
+                    st.session_state["xlr_user_question_input"] = result
+                    st.success("✅ 辨識成功！")
+                st.session_state["last_xlr_audio_hash"] = audio_hash
+
+    user_question = st.text_area(
+        "🎲 請輸入你想測算的問題：", placeholder="例如：尋物 / 謀事結果如何？", height=80, key="xlr_user_question_input"
+    )
+
+    if "xlr_draw_button" in locals() and xlr_draw_button:
+        if not user_question.strip():
+            st.warning("請先輸入祈問的問題 🙏")
+        else:
+            with st.spinner("🎲 正在推演小六壬..."):
+                from core.xiaoliuren.engine import XiaoliurenEngine
+                from core.xiaoliuren.interpreter import interpret_xiaoliuren
+                engine_xlr = XiaoliurenEngine()
+                res = engine_xlr.draw_lesson(None, None, None)
+                if res:
+                    st.session_state["last_xlr_result"] = res
+                    st.session_state["last_xlr_question"] = user_question.strip()
+                    
+                    interp = interpret_xiaoliuren(user_question.strip(), res)
+                    st.session_state["last_xlr_interpretation"] = interp
+                    
+                    record_id = save_reading("xiaoliuren", user_question.strip(), res, interp, client_name=config_manager.get().app.get("guide_name", "toby"))
+                    
+                    if interp and not interp.startswith("⚠️"):
+                        audio_path = generate_audio(interp, record_id)
+                        update_record_interpretation(datetime.now().strftime("%Y-%m-%d"), record_id, interp, audio_path)
+                        st.session_state["last_xlr_audio"] = audio_path
+
+    if "last_xlr_result" in st.session_state:
+        res = st.session_state["last_xlr_result"]
+        ques = st.session_state.get("last_xlr_question", "")
+        st.markdown("---")
+        from ui.xiaoliuren_ui import render_xiaoliuren
+        render_xiaoliuren(res, ques)
+        
+        interp = st.session_state.get("last_xlr_interpretation")
+        if interp:
+            if st.session_state.get("last_xlr_audio"):
+                st.audio(st.session_state["last_xlr_audio"])
+            render_ai_interpretation(interp, title="🎲 AI 小六壬解讀")
+    else:
+        st.markdown("<div style='text-align: center; padding: 60px;'><h1>🎲 小六壬</h1></div>", unsafe_allow_html=True)
+
+
 # === 大六壬頁面 ===
 elif page == "🌌 大六壬":
     col1, col2 = st.columns([1, 1])
@@ -709,6 +780,10 @@ elif page == "⚙️ 設定管理":
         zhuge_system = st.text_area("系統提示詞 (System Prompt)", value=conf.prompts.get('zhuge_system', ''), height=100, key='zg_sys')
         zhuge_requirements = st.text_area("解讀要求 (Requirements)", value=conf.prompts.get('zhuge_requirements', ''), height=200, key='zg_req')
 
+        st.markdown("### 🎲 小六壬提示詞設定 (Xiao Liu Ren Prompts)")
+        xiaoliuren_system = st.text_area("系統提示詞 (System Prompt)", value=conf.prompts.get('xiaoliuren_system', ''), height=100, key='xlr_sys')
+        xiaoliuren_requirements = st.text_area("解讀要求 (Requirements)", value=conf.prompts.get('xiaoliuren_requirements', ''), height=200, key='xlr_req')
+
         st.markdown("### 🌌 大六壬提示詞設定 (Da Liu Ren Prompts)")
         daliuren_system = st.text_area("系統提示詞 (System Prompt)", value=conf.prompts.get('daliuren_system', ''), height=100, key='dlr_sys')
         daliuren_requirements = st.text_area("解讀要求 (Requirements)", value=conf.prompts.get('daliuren_requirements', ''), height=200, key='dlr_req')
@@ -737,6 +812,9 @@ elif page == "⚙️ 設定管理":
             conf.prompts.zhuge_system = zhuge_system
             conf.prompts.zhuge_requirements = zhuge_requirements
             
+            conf.prompts.xiaoliuren_system = xiaoliuren_system
+            conf.prompts.xiaoliuren_requirements = xiaoliuren_requirements
+
             conf.prompts.daliuren_system = daliuren_system
             conf.prompts.daliuren_requirements = daliuren_requirements
             
@@ -777,3 +855,8 @@ elif page == "⚙️ 設定管理":
         config_manager.reset_to_default()
         st.success(f"已成功將 `{selected_profile}` 還原為出廠預設值！")
         st.rerun()
+
+# === 即時觀測頁面 ===
+elif page == "🌐 即時觀測":
+    from ui.observation_ui import render_observation_ui
+    render_observation_ui()

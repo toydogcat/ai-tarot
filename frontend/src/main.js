@@ -62,6 +62,7 @@ const translations = {
     "tab_tarot": "🔮 Tarot Reading",
     "tab_iching": "☯️ I-Ching Divination",
     "tab_zhuge": "🎋 Zhuge Shensuan",
+    "tab_xiaoliuren": "🎲 Xiao Liu Ren",
     "tab_daliuren": "🌌 Da Liu Ren",
     "tab_history": "📜 History Logs",
     "tarot_heading": "Tarot Reading",
@@ -75,6 +76,8 @@ const translations = {
     "btn_cast": "Cast Hexagram",
     "zhuge_heading": "Zhuge Shensuan",
     "btn_draw_zhuge": "Draw Lot",
+    "xiaoliuren_heading": "Xiao Liu Ren",
+    "btn_cast_xiaoliuren": "Cast Divination",
     "daliuren_heading": "Da Liu Ren",
     "btn_cast_daliuren": "Cast Divination",
     "loader_text": "Mystical forces at work...",
@@ -165,12 +168,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const tabTarot = document.getElementById("tabTarot");
   const tabIChing = document.getElementById("tabIChing");
   const tabZhuge = document.getElementById("tabZhuge");
+  const tabXiaoliuren = document.getElementById("tabXiaoliuren");
   const tabDaliuren = document.getElementById("tabDaliuren");
   const tabHistory = document.getElementById("tabHistory");
   
   const tarotPanel = document.getElementById("tarotPanel");
   const ichingPanel = document.getElementById("ichingPanel");
   const zhugePanel = document.getElementById("zhugePanel");
+  const xiaoliurenPanel = document.getElementById("xiaoliurenPanel");
   const daliurenPanel = document.getElementById("daliurenPanel");
   const historyPanel = document.getElementById("historyPanel");
 
@@ -178,6 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const drawBtn = document.getElementById("drawBtn");
   const castBtn = document.getElementById("castBtn");
   const drawZhugeBtn = document.getElementById("drawZhugeBtn");
+  const castXiaoliurenBtn = document.getElementById("castXiaoliurenBtn");
   const castDaliurenBtn = document.getElementById("castDaliurenBtn");
   
   const spreadSelect = document.getElementById("spreadSelect");
@@ -185,11 +191,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const questionInput = document.getElementById("questionInput");
   const ichingQuestionInput = document.getElementById("ichingQuestionInput");
   const zhugeQuestionInput = document.getElementById("zhugeQuestionInput");
+  const xiaoliurenQuestionInput = document.getElementById("xiaoliurenQuestionInput");
   const daliurenQuestionInput = document.getElementById("daliurenQuestionInput");
   
   const micTarot = document.getElementById("micTarot");
   const micIChing = document.getElementById("micIChing");
   const micZhuge = document.getElementById("micZhuge");
+  const micXiaoliuren = document.getElementById("micXiaoliuren");
   const micDaliuren = document.getElementById("micDaliuren");
   const langSelect = document.getElementById("langSelect");
 
@@ -201,12 +209,86 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
+  // Question Sync & Stash Elements
+  const questionStashPanel = document.getElementById("questionStashPanel");
+  const stashButtons = [0,1,2,3,4,5].map(i => document.getElementById(`stashBtn-${i}`));
+  const clearStashBtn = document.getElementById("clearStashBtn");
+  let questionStash = ["", "", "", "", "", ""];
+
+  function syncInputs(val) {
+      questionInput.value = val;
+      ichingQuestionInput.value = val;
+      zhugeQuestionInput.value = val;
+      xiaoliurenQuestionInput.value = val;
+      daliurenQuestionInput.value = val;
+  }
+
+  [questionInput, ichingQuestionInput, zhugeQuestionInput, xiaoliurenQuestionInput, daliurenQuestionInput].forEach(inp => {
+      inp.addEventListener('input', (e) => syncInputs(e.target.value));
+  });
+
+  function getCurrentActiveQuestion() {
+      return questionInput.value.trim();
+  }
+
+  function updateStashUI() {
+      if (currentUserRole === 'toby' && questionStashPanel) {
+          questionStashPanel.style.display = "block";
+      }
+      stashButtons.forEach((btn, i) => {
+          if (!btn) return;
+          const txt = questionStash[i];
+          btn.innerText = txt ? (txt.length > 5 ? txt.substring(0, 5) + "..." : txt) : "[空]";
+          btn.title = txt || "空位";
+      });
+  }
+
+  function addToStash(q) {
+      if (!q) return;
+      if (q === getCurrentActiveQuestion()) return;
+      if (questionStash.includes(q)) return; // 避免重複
+      
+      let emptyIdx = questionStash.findIndex(x => x === "");
+      if (emptyIdx !== -1) {
+          questionStash[emptyIdx] = q;
+      } else {
+          questionStash.shift();
+          questionStash.push(q);
+      }
+      updateStashUI();
+  }
+
+  stashButtons.forEach((btn, i) => {
+      if (!btn) return;
+      btn.addEventListener("click", () => {
+          const txt = questionStash[i];
+          if (txt) {
+              syncInputs(txt);
+          } else {
+              // 點擊空的暫存區，自動把從目前輸入框的文字存入
+              const currentQ = getCurrentActiveQuestion();
+              if (currentQ && !questionStash.includes(currentQ)) {
+                  questionStash[i] = currentQ;
+                  updateStashUI();
+              }
+          }
+      });
+  });
+
+  if (clearStashBtn) {
+      clearStashBtn.addEventListener("click", () => {
+          questionStash = ["", "", "", "", "", ""];
+          updateStashUI();
+      });
+  }
+
   // Output Elements
   const loader = document.getElementById("loader");
   const resultArea = document.getElementById("resultArea");
   const cardsGrid = document.getElementById("cardsGrid");
   const hexagramContainer = document.getElementById("hexagramContainer");
   const zhugeContainer = document.getElementById("zhugeContainer");
+  const xiaoliurenContainer = document.getElementById("xiaoliurenContainer");
   const daliurenContainer = document.getElementById("daliurenContainer");
   const resultTitle = document.getElementById("resultTitle");
   const interpretationPanel = document.getElementById("interpretationPanel");
@@ -235,6 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentMode = "tarot";
   let currentUserRole = null; // 'toby' or 'client'
+  let isTobyOnline = false;
   let currentUserName = null;
   let ws = null;
   let guideName = 'toby';
@@ -244,6 +327,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const enterMagicBtn = document.getElementById("enterMagicBtn");
   const clientWaitingOverlay = document.getElementById("clientWaitingOverlay");
   const clientWaitText = document.getElementById("clientWaitText");
+
+  // --- Usage Limit Update ---
+  async function updateUsageLimit() {
+      if (currentUserRole !== 'toby') return;
+      try {
+          const res = await fetch(`${API_BASE}/system/config`);
+          const data = await res.json();
+          const usageSpan = document.getElementById("usageLimitSpan");
+          const usageText = document.getElementById("usageStatusText");
+          if (usageSpan && data.usage_limit !== undefined) {
+              usageSpan.innerText = data.usage_limit;
+              usageText.style.display = "block";
+          }
+      } catch (e) {
+          console.error("Failed to fetch usage limit", e);
+      }
+  }
 
   function connectWebSocket(username) {
       // 判斷當前環境來決定 WS URL 屬性
@@ -259,7 +359,10 @@ document.addEventListener("DOMContentLoaded", () => {
           loginOverlay.style.display = "none";
           if (currentUserRole === 'client') {
              document.querySelector('.tabs').style.display = 'none'; // 客戶看不到 Tabs
-             clientWaitingOverlay.classList.remove("hidden");
+             // 客戶端立即獲得發問權限，無需等待導師
+             setupClientQuestionUI('tarot'); 
+          } else {
+             updateStashUI(); // 導師顯示問題暫存區
           }
       };
 
@@ -278,39 +381,36 @@ document.addEventListener("DOMContentLoaded", () => {
                   updateUIWithClient(data.client_name);
               }
           } else if (data.type === "divination_start") {
-              // Toby 開啟了某個占卜 (例如: tarot, iching)
-              if (currentUserRole === 'client') {
-                  clientWaitingOverlay.classList.add("hidden");
-                  // 切換到該占卜頁面
-                  const targetBtnId = "tab" + data.mode.charAt(0).toUpperCase() + data.mode.slice(1);
-                  document.getElementById(targetBtnId)?.click();
-                  
-                  // 設定介面給客戶發問用
-                  setupClientQuestionUI(data.mode);
-              }
+              // (已移除: 客戶端不再因為導師切換頁籤而跟著閃爍跳轉)
           } else if (data.type === "client_question") {
               // 客戶傳送問題給 Toby
               if (currentUserRole === 'toby') {
-                  if (data.mode === 'tarot') {
-                      questionInput.value = data.question;
-                      if (!tabTarot.classList.contains("active")) tabTarot.click();
-                  } else if (data.mode === 'iching') {
-                      ichingQuestionInput.value = data.question;
-                      if (!tabIChing.classList.contains("active")) tabIChing.click();
-                  } else if (data.mode === 'zhuge') {
-                      zhugeQuestionInput.value = data.question;
-                      if (!tabZhuge.classList.contains("active")) tabZhuge.click();
-                  } else if (data.mode === 'daliuren') {
-                      daliurenQuestionInput.value = data.question;
-                      if (!tabDaliuren.classList.contains("active")) tabDaliuren.click();
+                  const incoming = data.question;
+                  if (getCurrentActiveQuestion() === "") {
+                      syncInputs(incoming); // Auto populate
+                  } else if (getCurrentActiveQuestion() !== incoming) {
+                      addToStash(incoming); // Auto stash if different
                   }
-                  alert("獲得客戶傳送的靈能意念 (問題已載入)！");
+                  alert("獲得客戶傳送的靈能意念 (問題已送達)！");
               }
           } else if (data.type === "divination_result") {
               // Toby 占卜完成，傳結果給客戶
               if (currentUserRole === 'client') {
                   clientWaitingOverlay.classList.add("hidden");
                   renderSummaryResult(data);
+              } else if (currentUserRole === 'toby') {
+                  updateUsageLimit();
+              }
+          } else if (data.type === "toby_status") {
+              isTobyOnline = data.is_online;
+              if (currentUserRole === 'client') {
+                  if (isTobyOnline) {
+                      drawBtn.disabled = false; castBtn.disabled = false; drawZhugeBtn.disabled = false; castDaliurenBtn.disabled = false;
+                      alert("導師已經上線，您可以開始發送問題了！");
+                  } else {
+                      drawBtn.disabled = true; castBtn.disabled = true; drawZhugeBtn.disabled = true; castDaliurenBtn.disabled = true;
+                      alert("導師目前離線中，系統已暫停發問功能，請等待導師上線。");
+                  }
               }
           }
       };
@@ -412,14 +512,85 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (data.mode === 'zhuge') {
           zhugeContainer.classList.remove("hidden");
           const res = data.result;
+          // 資訊複雜度：streamlit(工程師) > Vite(導師) > Vite(客戶)
+          // Vite(客戶) 僅顯示籤詩，Vite(導師) 會額外顯示 interp1, interp2 以及 AI 解讀
           zhugeContainer.innerHTML = `
             <div class="zg-container glass-panel" style="max-width:600px; margin: 0 auto; text-align: center; padding: 2rem;">
                 <div class="zg-header" style="color: #FFD700; font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: bold;">
                     🎋 諸葛神算 第 ${res.id} 籤
                 </div>
                 <div class="zg-poem" style="font-family: 'Noto Serif TC', serif; font-size: 1.25rem; white-space: pre-wrap; line-height: 2; color: #fff; margin-bottom: 2rem;">${res.poem}</div>
+                ${currentUserRole === 'toby' ? `
+                    ${res.interp1 || res.explanation ? `
+                    <div class="zg-explanation-title" style="color: #FFD700; margin-bottom: 0.8rem; font-weight: bold;">白話解讀</div>
+                    <div class="zg-explanation" style="font-size: 0.95rem; color: #ddd; line-height: 1.6; text-align: left; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; margin-bottom: 1rem;">${res.interp1 || res.explanation}</div>
+                    ` : ''}
+                    ${res.interp2 ? `
+                    <div class="zg-explanation-title" style="color: #FFD700; margin-bottom: 0.8rem; font-weight: bold;">古典意象</div>
+                    <div class="zg-explanation" style="font-size: 0.95rem; color: #ddd; line-height: 1.6; text-align: left; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px;">${res.interp2}</div>
+                    ` : ''}
+                ` : ''}
             </div>
           `;
+          
+          if (currentUserRole === 'toby' && res.interpretation) {
+            interpretationPanel.classList.remove("hidden");
+            interpretationText.innerHTML = res.interpretation.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            if (res.audio_path) {
+              let relPath = res.audio_path.includes("history/audio/") ? "/history/audio/" + res.audio_path.split("history/audio/")[1] : (res.audio_path.startsWith("/") ? res.audio_path : "/" + res.audio_path);
+              audioPlayer.src = `${ASSETS_BASE}${relPath}`;
+              audioPlayerContainer.classList.remove("hidden");
+            }
+          }
+      } else if (data.mode === 'xiaoliuren') {
+          xiaoliurenContainer.classList.remove("hidden");
+          const xlrResult = data.result || {};
+          const states = xlrResult.small_six_states || data.states || ["", "", ""];
+          const numbers = xlrResult.numbers || data.numbers || [0, 0, 0];
+          const determination = xlrResult.final_state || data.determination || "";
+          const description = xlrResult.details?.description || data.details?.description_zh || "";
+          const poetry = xlrResult.details?.poem || data.details?.poetry_zh || "";
+          
+          xiaoliurenContainer.innerHTML = `
+          <div class="xlr-container glass-panel" style="max-width:800px; margin: 0 auto; padding: 1.5rem; text-align: center;">
+              <div class="xlr-header" style="color: #FFD700; font-size: 1.2rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,215,0,0.3); padding-bottom: 1rem;">
+                 🎲 <b>小六壬起卦完成</b>
+              </div>
+              
+              <div class="xlr-title" style="color: #a78bfa; margin-bottom: 1rem; font-weight: bold; font-size: 1.1rem;">三態解讀</div>
+              <div class="xlr-row" style="display:flex; justify-content:space-around; align-items:flex-start; margin-bottom:1rem;">
+                  <div class="xlr-item" style="flex:1;">
+                      <div style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">初傳</div>
+                      <div style="font-size:1.5rem; color:#fff; font-weight:bold;">${states[0]}</div>
+                      <div style="font-size:0.85rem; color:#aaa;">(${numbers[0]})</div>
+                  </div>
+                  <div class="xlr-item" style="flex:1;">
+                      <div style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">中傳</div>
+                      <div style="font-size:1.5rem; color:#fff; font-weight:bold;">${states[1]}</div>
+                      <div style="font-size:0.85rem; color:#aaa;">(${numbers[1]})</div>
+                  </div>
+                  <div class="xlr-item" style="flex:1;">
+                      <div style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">終傳</div>
+                      <div style="font-size:1.5rem; color:#fff; font-weight:bold;">${states[2]}</div>
+                      <div style="font-size:0.85rem; color:#aaa;">(${numbers[2]})</div>
+                  </div>
+              </div>
+              <div class="xlr-result" style="margin-top:2rem;">
+                  <h3 style="color:#FFD700; margin-bottom:1rem;">綜合判定: ${determination}</h3>
+                  ${currentUserRole === 'toby' ? `<p style="color:#ddd; margin-bottom:1rem; line-height:1.6;">${description}</p>` : ''}
+                  <div style="font-family:'Noto Serif TC', serif; color:#fff; font-size:1.1rem; border:1px solid rgba(255,255,255,0.2); padding:1rem; border-radius:8px; white-space:pre-wrap;">${poetry}</div>
+              </div>
+          </div>`;
+          
+          if (currentUserRole === 'toby' && data.interpretation) {
+              interpretationPanel.classList.remove("hidden");
+              interpretationText.innerHTML = data.interpretation.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+              if (data.audio_path) {
+                  let relPath = data.audio_path.includes("history/audio/") ? "/history/audio/" + data.audio_path.split("history/audio/")[1] : (data.audio_path.startsWith("/") ? data.audio_path : "/" + data.audio_path);
+                  audioPlayer.src = `${ASSETS_BASE}${relPath}`;
+                  audioPlayerContainer.classList.remove("hidden");
+              }
+          }
       } else if (data.mode === 'daliuren') {
           daliurenContainer.classList.remove("hidden");
           const res = data.result;
@@ -460,6 +631,7 @@ document.addEventListener("DOMContentLoaded", () => {
           currentUserRole = 'client';
       }
       connectWebSocket(currentUserName);
+      updateUsageLimit();
   });
 
   let availableSpreads = [];
@@ -508,6 +680,13 @@ document.addEventListener("DOMContentLoaded", () => {
           currentUserRole = 'toby';
           loginOverlay.style.display = "none";
           connectWebSocket(currentUserName);
+          
+          const usageSpan = document.getElementById("usageLimitSpan");
+          const usageText = document.getElementById("usageStatusText");
+          if (usageSpan && data.usage_limit !== undefined) {
+              usageSpan.innerText = data.usage_limit;
+              usageText.style.display = "block";
+          }
       }
       if (data.language) {
          const optionExists = Array.from(langSelect.options).some(opt => opt.value === data.language);
@@ -595,6 +774,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ichingPanel.classList.add("hidden");
     zhugePanel.classList.add("hidden");
     daliurenPanel.classList.add("hidden");
+    xiaoliurenPanel.classList.add("hidden");
     historyPanel.classList.add("hidden");
     resultArea.classList.add("hidden");
   }
@@ -603,6 +783,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(cardsGrid) { cardsGrid.innerHTML = ""; cardsGrid.classList.add("hidden"); }
     if(hexagramContainer) { hexagramContainer.innerHTML = ""; hexagramContainer.classList.add("hidden"); }
     if(zhugeContainer) { zhugeContainer.innerHTML = ""; zhugeContainer.classList.add("hidden"); }
+    if(xiaoliurenContainer) { xiaoliurenContainer.innerHTML = ""; xiaoliurenContainer.classList.add("hidden"); }
     if(daliurenContainer) { daliurenContainer.innerHTML = ""; daliurenContainer.classList.add("hidden"); }
     interpretationPanel.classList.add("hidden");
     audioPlayerContainer.classList.add("hidden");
@@ -614,6 +795,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tabTarot.classList.remove("active");
     tabIChing.classList.remove("active");
     tabZhuge.classList.remove("active");
+    tabXiaoliuren.classList.remove("active");
     tabDaliuren.classList.remove("active");
     tabHistory.classList.remove("active");
   }
@@ -625,9 +807,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tabTarot.classList.add("active");
     hideAllPanels();
     tarotPanel.classList.remove("hidden");
-    if (currentUserRole === 'toby' && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({type: "divination_start", mode: "tarot"}));
-    }
   });
 
   tabIChing.addEventListener("click", () => {
@@ -636,9 +815,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tabIChing.classList.add("active");
     hideAllPanels();
     ichingPanel.classList.remove("hidden");
-    if (currentUserRole === 'toby' && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({type: "divination_start", mode: "iching"}));
-    }
   });
 
   tabZhuge.addEventListener("click", () => {
@@ -647,9 +823,14 @@ document.addEventListener("DOMContentLoaded", () => {
     tabZhuge.classList.add("active");
     hideAllPanels();
     zhugePanel.classList.remove("hidden");
-    if (currentUserRole === 'toby' && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({type: "divination_start", mode: "zhuge"}));
-    }
+  });
+
+  tabXiaoliuren.addEventListener("click", () => {
+    currentMode = "xiaoliuren";
+    removeAllTabActive();
+    tabXiaoliuren.classList.add("active");
+    hideAllPanels();
+    xiaoliurenPanel.classList.remove("hidden");
   });
 
   tabDaliuren.addEventListener("click", () => {
@@ -658,9 +839,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tabDaliuren.classList.add("active");
     hideAllPanels();
     daliurenPanel.classList.remove("hidden");
-    if (currentUserRole === 'toby' && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({type: "divination_start", mode: "daliuren"}));
-    }
   });
 
   tabHistory.addEventListener("click", () => {
@@ -918,20 +1096,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
       resultTitle.innerText = `🎋 諸葛神算 🎋`;
       
+      // 資訊複雜度：streamlit(工程師) > Vite(導師) > Vite(客戶)
+      // Vite(客戶) 僅顯示籤詩，Vite(導師) 會額外顯示 interp1, interp2 以及 AI 解讀
       zhugeContainer.innerHTML = `
         <div class="zg-container glass-panel" style="max-width:600px; margin: 0 auto; text-align: center; padding: 2rem;">
             <div class="zg-header" style="color: #FFD700; font-size: 1.5rem; margin-bottom: 1.5rem; font-weight: bold;">
                 🎋 諸葛神算 第 ${data.id} 籤
             </div>
             <div class="zg-poem" style="font-family: 'Noto Serif TC', serif; font-size: 1.25rem; white-space: pre-wrap; line-height: 2; color: #fff; margin-bottom: 2rem;">${data.poem}</div>
-            ${data.explanation ? `
-            <div class="zg-explanation-title" style="color: #FFD700; margin-bottom: 0.8rem; font-weight: bold;">籤意解說</div>
-            <div class="zg-explanation" style="font-size: 0.95rem; color: #ddd; line-height: 1.6; text-align: left; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px;">${data.explanation}</div>
+            ${currentUserRole === 'toby' ? `
+                ${data.interp1 || data.explanation ? `
+                <div class="zg-explanation-title" style="color: #FFD700; margin-bottom: 0.8rem; font-weight: bold;">白話解讀</div>
+                <div class="zg-explanation" style="font-size: 0.95rem; color: #ddd; line-height: 1.6; text-align: left; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; margin-bottom: 1rem;">${data.interp1 || data.explanation}</div>
+                ` : ''}
+                ${data.interp2 ? `
+                <div class="zg-explanation-title" style="color: #FFD700; margin-bottom: 0.8rem; font-weight: bold;">古典意象</div>
+                <div class="zg-explanation" style="font-size: 0.95rem; color: #ddd; line-height: 1.6; text-align: left; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px;">${data.interp2}</div>
+                ` : ''}
             ` : ''}
         </div>
       `;
 
-      if (data.interpretation) {
+      if (currentUserRole === 'toby' && data.interpretation) {
         interpretationPanel.classList.remove("hidden");
         const formatText = data.interpretation.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
         interpretationText.innerHTML = formatText;
@@ -955,6 +1141,112 @@ document.addEventListener("DOMContentLoaded", () => {
       drawZhugeBtn.disabled = false;
       const dict = translations[langSelect.value] || translations["繁體中文"];
       drawZhugeBtn.innerText = dict["btn_draw_zhuge"] || "抽籤";
+    }
+  });
+
+  castXiaoliurenBtn.addEventListener("click", async () => {
+    const question = xiaoliurenQuestionInput.value.trim();
+
+    if (currentUserRole === 'client') {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({type: "client_question", mode: "xiaoliuren", question: question}));
+            clientWaitText.innerText = "問題已送出，導師正在為您解讀天意...";
+            clientWaitingOverlay.classList.remove("hidden");
+        }
+        return;
+    }
+
+    // Reset UI
+    hideAllPanels();
+    clearResultContainers();
+    xiaoliurenContainer.classList.remove("hidden");
+    resultArea.classList.remove("hidden");
+    loader.classList.remove("hidden");
+    castXiaoliurenBtn.disabled = true;
+    castXiaoliurenBtn.innerText = "起卦中...";
+
+    try {
+      const response = await fetch(`${API_BASE}/xiaoliuren/draw`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          question: question ? question : null,
+          language: langSelect.value
+        })
+      });
+
+      if (!response.ok) throw new Error("伺服器無回應，請確認 FastAPI 已啟動。");
+
+      const data = await response.json();
+      
+      if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({type: "divination_result", mode: "xiaoliuren", result: data}));
+      }
+
+      resultTitle.innerText = `🎲 小六壬 🎲`;
+      
+      const xlrResult = data.result || {};
+      const states = xlrResult.small_six_states || data.states || ["", "", ""];
+      const numbers = xlrResult.numbers || data.numbers || [0, 0, 0];
+      const determination = xlrResult.final_state || data.determination || "";
+      const description = xlrResult.details?.description || data.details?.description_zh || "";
+      const poetry = xlrResult.details?.poem || data.details?.poetry_zh || "";
+      
+      xiaoliurenContainer.innerHTML = `
+      <div class="xlr-container glass-panel" style="max-width:800px; margin: 0 auto; padding: 1.5rem; text-align: center;">
+          <div class="xlr-header" style="color: #FFD700; font-size: 1.2rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,215,0,0.3); padding-bottom: 1rem;">
+             🎲 <b>小六壬起卦完成</b>
+          </div>
+          
+          <div class="xlr-title" style="color: #a78bfa; margin-bottom: 1rem; font-weight: bold; font-size: 1.1rem;">三態解讀</div>
+          <div class="xlr-row" style="display:flex; justify-content:space-around; align-items:flex-start; margin-bottom:1rem;">
+              <div class="xlr-item" style="flex:1;">
+                  <div style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">初傳</div>
+                  <div style="font-size:1.5rem; color:#fff; font-weight:bold;">${states[0]}</div>
+                  <div style="font-size:0.85rem; color:#aaa;">(${numbers[0]})</div>
+              </div>
+              <div class="xlr-item" style="flex:1;">
+                  <div style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">中傳</div>
+                  <div style="font-size:1.5rem; color:#fff; font-weight:bold;">${states[1]}</div>
+                  <div style="font-size:0.85rem; color:#aaa;">(${numbers[1]})</div>
+              </div>
+              <div class="xlr-item" style="flex:1;">
+                  <div style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">終傳</div>
+                  <div style="font-size:1.5rem; color:#fff; font-weight:bold;">${states[2]}</div>
+                  <div style="font-size:0.85rem; color:#aaa;">(${numbers[2]})</div>
+              </div>
+          </div>
+          <div class="xlr-result" style="margin-top:2rem;">
+              <h3 style="color:#FFD700; margin-bottom:1rem;">綜合判定: ${determination}</h3>
+              <p style="color:#ddd; margin-bottom:1rem; line-height:1.6;">${description}</p>
+              <div style="font-family:'Noto Serif TC', serif; color:#fff; font-size:1.1rem; border:1px solid rgba(255,255,255,0.2); padding:1rem; border-radius:8px; white-space:pre-wrap;">${poetry}</div>
+          </div>
+      </div>`;
+
+      if (data.interpretation) {
+        interpretationPanel.classList.remove("hidden");
+        const formatText = data.interpretation.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        interpretationText.innerHTML = formatText;
+
+        if (data.audio_path) {
+          let relPath = data.audio_path;
+          if (relPath.includes("history/audio/")) {
+              relPath = "/history/audio/" + relPath.split("history/audio/")[1];
+          } else if (!relPath.startsWith("/")) {
+              relPath = "/" + relPath;
+          }
+          audioPlayer.src = `${ASSETS_BASE}${relPath}`;
+          audioPlayerContainer.classList.remove("hidden");
+        }
+      }
+
+    } catch (err) {
+      alert("起卦失敗: " + err.message);
+    } finally {
+      loader.classList.add("hidden");
+      castXiaoliurenBtn.disabled = false;
+      const dict = translations[langSelect.value] || translations["繁體中文"];
+      castXiaoliurenBtn.innerText = dict["btn_cast_xiaoliuren"] || "起卦";
     }
   });
 
@@ -1139,6 +1431,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (r.type === "tarot") title = "🔮 塔羅";
         else if (r.type === "iching") title = "☯️ 易經";
         else if (r.type === "zhuge") title = "🎋 諸葛神算";
+        else if (r.type === "xiaoliuren") title = "🎲 小六壬";
         else if (r.type === "daliuren") title = "🌌 大六壬";
         
         let summary = "";
@@ -1158,6 +1451,9 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (r.type === "zhuge") {
           const id = r.result?.id;
           if (id) summary = `第 ${id} 籤`;
+        } else if (r.type === "xiaoliuren") {
+          const determination = r.result?.final_state || r.result?.determination;
+          if (determination) summary = `判定：${determination}`;
         } else if (r.type === "daliuren") {
           const date = r.result?.date;
           if (date) summary = `時局：${date}`;
@@ -1196,6 +1492,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (r.type === 'tarot') titleText = '🔮 塔羅紀錄';
     else if (r.type === 'iching') titleText = '☯️ 易經紀錄';
     else if (r.type === 'zhuge') titleText = '🎋 諸葛神算紀錄';
+    else if (r.type === 'xiaoliuren') titleText = '🎲 小六壬紀錄';
     else if (r.type === 'daliuren') titleText = '🌌 大六壬紀錄';
 
     let detailHtml = `

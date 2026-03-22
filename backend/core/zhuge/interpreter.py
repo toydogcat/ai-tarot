@@ -27,7 +27,8 @@ def interpret_zhuge(question: str, lot_data: dict, language: str = "繁體中文
 
 使用者抽到的籤詩：
 第 {lot_data.get('id')} 籤：【{lot_data.get('poem')}】
-傳統籤意解說：{lot_data.get('explanation', '無')}
+解籤（白話提示）：{lot_data.get('interp1', '無')}
+解籤（古典意象）：{lot_data.get('interp2', '無')}
 
 {req_prompt}
 請務必使用「{language}」語言來撰寫你的最終解讀回覆。

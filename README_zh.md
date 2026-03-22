@@ -11,8 +11,12 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與
 </p>
 
 ### ⚙️ 專業解讀與測試管理 (Streamlit 介面)
+### ⚙️ 專業解讀與測試管理 (Streamlit 介面)
 <p align="center">
   <img src="sample/demo1.jpg" alt="AI Tarot & I-Ching Backend" width="800">
+</p>
+<p align="center">
+  <img src="sample/demo1_room.jpg" alt="Real-time Mentoring Monitor" width="800">
 </p>
 
 ### 💬 聊天機器人整合 (n8n AI Agent)
@@ -26,6 +30,7 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與
 - 🔮 **塔羅占卜**：完整 78 張塔羅牌、6 種經典牌陣、正逆位支援、詳細牌意。
 - ☯️ **易經卜卦**：模擬傳統金錢六爻卜卦，自動呈現本卦、變卦及動爻指示。
 - 🎋 **諸葛神算**：提供 384 籤傳統詩文與解意，結合 AI 進行白話精準解析。
+- 🎲 **小六壬**：基於傳統數字論斷初、中、終三傳，提供快速直覺的每日吉凶指引。
 - 🌌 **大六壬**：基於時辰起課，提供三傳四課的簡易排盤與格局，讓 AI 根據時空能量為您解讀吉凶。
 - 🗣️ **語音輸入提問**：支援麥克風語音轉文字辨識，並可於輸入框手動微調。
 - 🔍 **Tavily 外部時事搜尋**：自動從網路搜尋最新話題/時事背景（由 Gemma 3 整理摘要）。
@@ -35,6 +40,7 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與
 - ⚙️ **Hydra 動態設定管理**：透過 YAML 設定檔 (Customer1, Customer2) 隨時切換 AI 模型，並可由 Streamlit 後台一鍵自訂所有占卜系統（塔羅、易經、諸葛、大六壬）的專屬提示詞。
 - 🎵 **背景音樂 (BGM)**：可於設定檔或管理介面無縫切換多種冥想背景音樂，增添占卜氛圍。
 - 🎨 **自訂圖片格式**：支援 JPG/PNG 精美 AI 生成圖無縫切換。
+- 🛡️ **維運管理與即時觀測 (監視器)**：支援 Docker Compose 一鍵部署獨立的「導師包廂」，並提供 Streamlit 介面的 **即時觀測中心**，可自動掃描並監控所有包廂的即時連線狀態、可用次數，也可一鍵強制踢除異常顧客。
 - 🚀 **FastAPI 與 AI Agent Skill**：獨立的後端 API 端點 (`/api/tarot/draw` 等) 與 AI 技能說明文檔，讓未來的 AI Agent 也能自由幫你呼叫占卜服務。
 
 ## 快速開始
@@ -124,6 +130,14 @@ API 將預設運行於 `http://localhost:8000`。您可以透過 `http://localho
    python run.py
    ```
 4. 終端機會印出類似 `Ngrok 隧道開啟成功！遠端存取請前往: https://1234abcd.ngrok-free.app` 的網址，將該隨機網址分享給他人即可。
+
+#### 🐳 Docker 多房間部署 (正式環境)
+若要建立具備完整隔離環境、且能透過 Admin API 獨立指派額度或設定的「多房間」系統：
+```bash
+# 一鍵打包並啟動多個獨立導師包廂
+docker compose up -d --build
+```
+系統會自動在 port 8001 (`tarot-room-1`) 及 port 8002 (`tarot-room-2`) 啟動兩個完整的伺服器，同時渲染 FastAPI 與已編譯的 Vite 前端靜態檔。
 
 ## 🧪 自動化測試 (Unit Testing)
 

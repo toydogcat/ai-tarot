@@ -19,7 +19,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                 # 收到 Toby 傳來的對話或狀態更新，直接轉發給 Client
                 await manager.send_to_client(data)
         except WebSocketDisconnect:
-            manager.disconnect_toby()
+            await manager.disconnect_toby()
             logger.info("Toby disconnected")
     else:
         success = await manager.connect_client(websocket, client_id)

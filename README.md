@@ -11,8 +11,12 @@ An AI-driven Tarot card and I-Ching (Hexagram) divination web application, featu
 </p>
 
 ### ⚙️ Professional Reading & Management (Streamlit Backend)
+### ⚙️ Professional Reading & Management (Streamlit Backend)
 <p align="center">
   <img src="sample/demo1.jpg" alt="AI Tarot & I-Ching Backend" width="800">
+</p>
+<p align="center">
+  <img src="sample/demo1_room.jpg" alt="Real-time Mentoring Monitor" width="800">
 </p>
 
 ### 💬 Chat Bot Integration (n8n AI Agent)
@@ -26,6 +30,7 @@ An AI-driven Tarot card and I-Ching (Hexagram) divination web application, featu
 - 🔮 **Tarot Reading**: Full 78 cards, 6 classic spreads, upright/reversed meanings, and detailed interpretations.
 - ☯️ **I-Ching Divination**: Simulates traditional coin tossing to generate hexagrams, displaying original/changed hexagrams and moving lines.
 - 🎋 **Zhuge Shensuan**: Provides 384 traditional lots with poetic explanations and AI analysis.
+- 🎲 **Xiao Liu Ren**: Fast and intuitive 3-state divination based on traditional numerology, perfect for quick daily guidance.
 - 🌌 **Da Liu Ren**: Generates a simplified time-based pattern with San Chuan (Three Transmissions) and Si Ke (Four Hexagrams) for deep AI divination.
 - 🗣️ **Voice Input**: Supports microphone speech-to-text recognition, with manual text editing capabilities.
 - 🔍 **Tavily Web Search**: Automatically searches the web for the latest background topics/news (summarized via Gemma 3) to contextually enhance readings.
@@ -35,6 +40,7 @@ An AI-driven Tarot card and I-Ching (Hexagram) divination web application, featu
 - ⚙️ **Hydra Dynamic Configuration**: Switch AI models natively via YAML (Customer1, Customer2), and instantly edit context-specific system prompts (Tarot, I-Ching, Zhuge, Da Liu Ren) directly from the Streamlit UI.
 - 🎵 **Background Music (BGM)**: Seamlessly toggle different meditation tracks via config to enhance the divination atmosphere.
 - 🎨 **Custom Image Format**: Supports flawless switching between high-quality AI-generated `.jpg` and `.png` image formats.
+- 🛡️ **Admin Control & Real-Time Monitoring**: Deploy fully independent "Mentor Rooms" via Docker Compose, dynamically adjust AI configs, and track live connection states, usage quotas, and execute Kick controls directly from the Streamlit Observation Dashboard.
 - 🚀 **FastAPI & AI Agent Skills**: Exposes independent backend API endpoints (e.g. `/api/tarot/draw`) and AI skill documentation, allowing future AI agents to call the services directly.
 
 ## Quick Start
@@ -127,6 +133,14 @@ To share your application publicly online, the project integrates an automated N
    python share_ngrok.py
    ```
 5. The terminal will output a public URL such as `https://1234abcd.ngrok-free.app`. Share this link with anyone!
+
+#### 🐳 Docker Multi-Room Deployment (Production Mode)
+For hosting scalable environments with completely independent config overrides:
+```bash
+# Build and launch multiple independent "Mentor Rooms" via docker-compose
+docker compose up -d --build
+```
+This automatically boots up `tarot-room-1` (port 8001) and `tarot-room-2` (port 8002), serving both the FastAPI backend and pre-compiled Vite frontend dynamically.
 
 ## 🧪 Automated Testing (Unit Testing)
 

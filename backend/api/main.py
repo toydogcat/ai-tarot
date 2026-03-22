@@ -19,12 +19,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from api.routes import tarot, iching, history, zhuge, daliuren, ws, admin
+from api.routes import tarot, iching, history, zhuge, daliuren, xiaoliuren, ws, admin
 
 app.include_router(tarot.router)
 app.include_router(iching.router)
 app.include_router(history.router)
 app.include_router(zhuge.router)
+app.include_router(xiaoliuren.router)
 app.include_router(daliuren.router)
 app.include_router(ws.router)
 app.include_router(admin.router)
@@ -37,10 +38,6 @@ history_dir = BASE_DIR / "history"
 if history_dir.exists():
     app.mount("/history", StaticFiles(directory=str(history_dir)), name="history")
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to AI Tarot & IChing API. Visit /docs for more info."}
-
 from pydantic import BaseModel
 class SystemConfig(BaseModel):
     bgm_id: int
@@ -48,6 +45,7 @@ class SystemConfig(BaseModel):
     language: str
     guide_name: str
     enable_multiuser_login: bool
+    usage_limit: int
 
 @app.get("/api/system/config", response_model=SystemConfig)
 def get_system_config():
@@ -59,5 +57,15 @@ def get_system_config():
         profile=config_manager.active_profile,
         language=lang,
         guide_name=conf.app.get("guide_name", "toby"),
-        enable_multiuser_login=conf.app.get("enable_multiuser_login", False)
+        enable_multiuser_login=conf.app.get("enable_multiuser_login", False),
+        usage_limit=config_manager.get_remaining_usage()
     )
+
+frontend_dir = BASE_DIR.parent / "frontend" / "dist"
+if frontend_dir.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+else:
+    @app.get("/")
+    def read_root():
+        return {"message": "Welcome to AI Tarot & IChing API. Frontend build not found."}
+

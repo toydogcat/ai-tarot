@@ -12,6 +12,12 @@ router = APIRouter(prefix="/api/daliuren", tags=["Daliuren"])
 
 @router.post("/cast", response_model=DaliurenResponse)
 def cast_daliuren(req: DaliurenCastRequest):
+    from fastapi import HTTPException
+    limit = config_manager.get_remaining_usage()
+    if limit <= 0:
+        raise HTTPException(status_code=403, detail="可用次數已用盡 (Limit Exceeded)")
+    config_manager.decrement_usage()
+
     engine = DaliurenEngine()
     result = engine.draw_lesson()
     
