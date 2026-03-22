@@ -195,6 +195,10 @@ ai-tarot/
 - 🎨 **視覺圖像 (Images)**：牌面與卦象圖片是由強大的 [Nano Banana2](https://civitai.com/models/25995?modelVersionId=32988) 視覺基準模型生成，完美呈現了精妙的東方禪意與神祕學色彩。
 - 💻 **協作工程師 (Programming)**：專案核心架構、API 整合與程式碼重構打磨，由 Google DeepMind 打造的 agentic AI 軟體工程師 **Antigravity** 共同協助開發完成。
 
+<div align="right">
+  <sub><i>💡 <a href="ai_notice/VISION_ARCHITECTURE.md">Sneak peek: The visionary blueprint of the AI Consultant Framework</a></i></sub>
+</div>
+
 ## License
 
 MIT
