@@ -14,8 +14,15 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與
 <p align="center">
   <img src="sample/demo1.jpg" alt="AI Tarot & I-Ching Backend" width="800">
 </p>
+
+### 💬 聊天機器人整合 (n8n AI Agent)
+<p align="center">
+  <img src="sample/demo3.jpg" alt="Discord Bot Integration" width="800">
+</p>
+
 ## 功能特色
 
+- 💬 **多平台對話機器人**：透過 n8n Advanced AI 建立無狀態 (Stateless) API 介接，完美支援 Line / Discord / Openclaw 對話。
 - 🔮 **塔羅占卜**：完整 78 張塔羅牌、6 種經典牌陣、正逆位支援、詳細牌意。
 - ☯️ **易經卜卦**：模擬傳統金錢六爻卜卦，自動呈現本卦、變卦及動爻指示。
 - 🎋 **諸葛神算**：提供 384 籤傳統詩文與解意，結合 AI 進行白話精準解析。
@@ -77,18 +84,19 @@ assets/
 ```
 若在沒有圖片的情況下啟動，UI 會自動以無圖片的圖文方塊替代顯示，不會報錯。
 
-### 3. 環境變數設定
+### 4. 環境變數設定
 
 ```bash
-# 複製 .env 範例檔
+# 切換到 backend 目錄並複製環境變數範例檔
+cd backend
 cp .env.example .env
 
-# 編輯 .env 填入必要的 API Keys:
+# 編輯 backend/.env 填入必要的 API Keys:
 # GEMINI_API_KEY=your_gemini_key
-# TAVILY_API_KEY=your_tavily_key
+# N8N_API_KEY=your_n8n_key (如果你有啟用聊天機器人)
 ```
 
-### 3. 啟動應用
+### 5. 啟動應用
 
 本專案支援 **本機啟動** (0.0.0.0) 以及 **Ngrok 遠端分享**。
 

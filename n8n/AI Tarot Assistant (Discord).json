@@ -1,0 +1,310 @@
+{
+  "name": "AI Tarot Assistant (Discord)",
+  "nodes": [
+    {
+      "parameters": {
+        "guildIds": [
+          "1300272209637543998"
+        ],
+        "channelIds": [
+          "1485109149602938880"
+        ],
+        "value": "/ai-tarot ",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-discord-trigger.discordTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -80
+      ],
+      "id": "e451c7b5-8f24-4134-9649-a5eb5d37367d",
+      "name": "Discord Trigger",
+      "credentials": {
+        "discordBotTriggerApi": {
+          "id": "OzSQ0HpHo0GZL39j",
+          "name": "Discord Bot Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "options": {
+          "systemMessage": "你是一位親切、充滿智慧的占卜助理。\n當使用者呼叫你時，你必須判斷他們想從以下四種占卜中選擇哪一種：塔羅牌(tarot)、易經(iching)、諸葛神算(zhuge)、大六壬(daliuren)。\n同時，你還必須知道使用者『具體想問的問題』是什麼。\n\n如果使用者沒有指定占卜種類，請禮貌地詢問他想用哪一種。\n如果使用者沒有說明具體想問什麼問題，請禮貌地詢問他『想占卜什麼問題呢？』。\n\n當種類與問題都確定後，請呼叫對應的占卜 Tool，並將 Tool 回傳的 JSON 結果擷取出來，整理成優美、溫暖的文字回覆給使用者。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -112,
+        -80
+      ],
+      "id": "dd5c3a33-151b-49c6-a4a2-3e4d6d6d77a6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "=customKey",
+        "sessionKey": "={{ $('Discord Trigger').item.json.author.id }}\n",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        208
+      ],
+      "id": "af437625-e606-4156-85e9-12a5d72e17dd",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        208
+      ],
+      "id": "8bf43a46-c249-43b6-9cc8-634d3fc01724",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "nfPZ0CAffivqV41z",
+          "name": "Google Gemini(PaLM) Toby Api Proj"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.0.150:8000/api/tarot/draw",
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "question"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        144,
+        208
+      ],
+      "id": "50355764-e4c9-4486-8b4c-24c942ce2bea",
+      "name": "TarotTool"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.0.150:8000/api/iching/cast",
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "question"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        208
+      ],
+      "id": "289f4d4f-bab0-4662-800b-dc164bdc05d7",
+      "name": "IChingTool"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.0.150:8000/api/zhuge/draw",
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "question"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        208
+      ],
+      "id": "09059e70-e703-4b62-a45d-7aeab97514ae",
+      "name": "ZhugeTool"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://192.168.0.150:8000/api/daliuren/cast",
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "question"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        576,
+        208
+      ],
+      "id": "03214c3d-c64b-4789-bb15-6daa31f23b58",
+      "name": "DaliurenTool"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1300272209637543998",
+          "mode": "list",
+          "cachedResultName": "汪汪教 的伺服器",
+          "cachedResultUrl": "https://discord.com/channels/1300272209637543998"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1485109149602938880",
+          "mode": "list",
+          "cachedResultName": "算命館",
+          "cachedResultUrl": "https://discord.com/channels/1300272209637543998/1485109149602938880"
+        },
+        "content": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -80
+      ],
+      "id": "ad27e84c-4609-41a9-b321-895906fa89d6",
+      "name": "Send a message",
+      "webhookId": "ed36854b-7723-4910-b6b0-11f16f1dd0ba",
+      "credentials": {
+        "discordBotApi": {
+          "id": "NVJQFm6NbVkb5rYj",
+          "name": "Discord Bot account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Discord Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TarotTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IChingTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ZhugeTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DaliurenTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "33f78fb1-6b56-4b22-8b4d-493c1507a07f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "45201ab7bf5c3fcedd90e4d82e97e978de66d67bbdaead5935597ebe729634ae"
+  },
+  "id": "BL4Qo3UA7GB6xCtDJ5y3W",
+  "tags": []
+}

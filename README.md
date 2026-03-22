@@ -15,8 +15,14 @@ An AI-driven Tarot card and I-Ching (Hexagram) divination web application, featu
   <img src="sample/demo1.jpg" alt="AI Tarot & I-Ching Backend" width="800">
 </p>
 
+### 💬 Chat Bot Integration (n8n AI Agent)
+<p align="center">
+  <img src="sample/demo3.jpg" alt="Discord Bot Integration" width="800">
+</p>
+
 ## Features
 
+- 💬 **Multi-Platform Chat Bots**: Utilizing n8n Advanced AI as a conversational state machine, providing a stateless API backend for seamless Line / Discord integration.
 - 🔮 **Tarot Reading**: Full 78 cards, 6 classic spreads, upright/reversed meanings, and detailed interpretations.
 - ☯️ **I-Ching Divination**: Simulates traditional coin tossing to generate hexagrams, displaying original/changed hexagrams and moving lines.
 - 🎋 **Zhuge Shensuan**: Provides 384 traditional lots with poetic explanations and AI analysis.
@@ -81,12 +87,13 @@ If you start the app without images, the UI will automatically fall back to text
 ### 4. Setup Environment Variables
 
 ```bash
-# Copy the example environment file
-cp backend/.env.example backend/.env
+# Copy the example environment file inside the backend directory
+cd backend
+cp .env.example .env
 
 # Edit backend/.env and fill in required API keys:
 # GEMINI_API_KEY=your_gemini_key
-# TAVILY_API_KEY=your_tavily_key
+# N8N_API_KEY=your_n8n_key (if using the Chat Bot agent)
 ```
 
 ### 5. Running the Application
