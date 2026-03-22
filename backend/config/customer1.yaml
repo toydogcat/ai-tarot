@@ -3,6 +3,7 @@ app:
   bgm_id: 2
   api_port: 8000
   guide_name: toby
+  enable_multiuser_login: true
 paths:
   data_dir: data
   assets_dir: assets/images

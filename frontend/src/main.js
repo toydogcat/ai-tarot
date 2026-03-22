@@ -501,6 +501,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.guide_name) {
           guideName = data.guide_name;
       }
+      
+      // Auto-login fallback if multiuser login is disabled (backwards compatibility)
+      if (data.enable_multiuser_login !== true) {
+          currentUserName = guideName;
+          currentUserRole = 'toby';
+          loginOverlay.style.display = "none";
+          connectWebSocket(currentUserName);
+      }
       if (data.language) {
          const optionExists = Array.from(langSelect.options).some(opt => opt.value === data.language);
          if (optionExists) {

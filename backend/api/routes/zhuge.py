@@ -19,7 +19,9 @@ def draw_zhuge(req: ZhugeDrawRequest):
     audio_file = ""
     
     if req.question:
-        interpretation_text = interpret_zhuge(req.question, result, language=req.language)
+        conf = config_manager.get()
+        model_name = conf.ai_models.get("divination_model", "gemini-3.1-flash-lite-preview")
+        interpretation_text = interpret_zhuge(req.question, result, language=req.language, selected_model=model_name)
         
         client_name = config_manager.get().app.get("guide_name", "toby")
         if manager.active_client:

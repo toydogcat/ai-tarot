@@ -2,6 +2,7 @@ app:
   port: 8501
   bgm_id: 1
   guide_name: toby
+  enable_multiuser_login: false
 
 paths:
   data_dir: "data"

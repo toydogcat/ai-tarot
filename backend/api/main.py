@@ -47,6 +47,7 @@ class SystemConfig(BaseModel):
     profile: str
     language: str
     guide_name: str
+    enable_multiuser_login: bool
 
 @app.get("/api/system/config", response_model=SystemConfig)
 def get_system_config():
@@ -57,5 +58,6 @@ def get_system_config():
         bgm_id=conf.app.get("bgm_id", 1),
         profile=config_manager.active_profile,
         language=lang,
-        guide_name=conf.app.get("guide_name", "toby")
+        guide_name=conf.app.get("guide_name", "toby"),
+        enable_multiuser_login=conf.app.get("enable_multiuser_login", False)
     )

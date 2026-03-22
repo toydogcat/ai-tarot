@@ -7,7 +7,7 @@ from core.config_manager import config_manager
 class DaliurenReadingResult(BaseModel):
     reading: str = Field(description="大六壬解讀結果，以純文字回傳")
 
-def interpret_daliuren(question: str, lesson_data: dict, language: str = "繁體中文", selected_model: str = "gemini-2.5-flash", system_prompt: str = "") -> str:
+def interpret_daliuren(question: str, lesson_data: dict, language: str = "繁體中文", selected_model: str = "gemini-3.1-flash-lite-preview", system_prompt: str = "") -> str:
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable not set")
