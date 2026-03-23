@@ -16,3 +16,4 @@ hydra-core
 fastapi
 uvicorn
 kinliuren
+websockets

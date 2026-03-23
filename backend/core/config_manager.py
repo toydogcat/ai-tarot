@@ -37,6 +37,19 @@ class ConfigManager:
         path = CONFIG_DIR / f"{self.active_profile}.yaml"
         OmegaConf.save(self.config, path)
         
+    def get_remaining_usage(self) -> int:
+        self.config = self.load_config()
+        return int(self.config.app.get("usage_limit", 50))
+        
+    def decrement_usage(self) -> int:
+        self.config = self.load_config()
+        limit = int(self.config.app.get("usage_limit", 50))
+        if limit > 0:
+            self.config.app.usage_limit = limit - 1
+            self.save()
+            return limit - 1
+        return 0
+        
     def reset_to_default(self):
         default_path = CONFIG_DIR / "default.yaml"
         default_conf = OmegaConf.load(default_path)

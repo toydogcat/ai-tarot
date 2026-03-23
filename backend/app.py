@@ -52,12 +52,16 @@ engine = get_engine()
 # === 側邊欄 ===
 with st.sidebar:
     st.markdown("# 🌟 AI 智慧占卜")
+    
+    remaining_usage = config_manager.get_remaining_usage()
+    st.metric("剩餘可用次數", remaining_usage)
+    
     st.markdown("---")
 
     # 頁面切換
     page = st.radio(
         "📄 頁面",
-        ["🔮 塔羅占卜", "☯️ 易經卜卦", "🎋 諸葛神算", "🌌 大六壬", "📜 歷史紀錄", "⚙️ 設定管理"],
+        ["🔮 塔羅占卜", "☯️ 易經卜卦", "🎋 諸葛神算", "🎲 小六壬", "🌌 大六壬", "📜 歷史紀錄", "⚙️ 設定管理", "🌐 即時觀測"],
         label_visibility="collapsed",
     )
 
@@ -116,6 +120,12 @@ with st.sidebar:
         st.info("系統將為您隨機抽取三八四籤之一，並由 AI 進行解籤。")
         st.markdown("---")
         zhuge_draw_button = st.button("🎋 開始抽籤", use_container_width=True, type="primary")
+
+    elif page == "🎲 小六壬":
+        st.markdown("### 🎲 起卦方式")
+        st.info("系統將為您隨機產生三個數字，推演小六壬初傳、中傳、終傳，定局吉凶。")
+        st.markdown("---")
+        xlr_draw_button = st.button("🎲 開始起卦", use_container_width=True, type="primary")
 
     elif page == "🌌 大六壬":
         st.markdown("### 🌌 起課方式")
@@ -449,7 +459,7 @@ elif page == "🎋 諸葛神算":
                     interp = interpret_zhuge(user_question.strip(), result)
                     st.session_state["last_zg_interpretation"] = interp
                 
-                record_id = save_reading("zhuge", user_question.strip(), result, interp)
+                record_id = save_reading("zhuge", user_question.strip(), result, interp, client_name=config_manager.get().app.get("guide_name", "toby"))
                 
                 if interp and not interp.startswith("⚠️"):
                     audio_path = generate_audio(interp, record_id)
@@ -469,6 +479,67 @@ elif page == "🎋 諸葛神算":
             render_ai_interpretation(interp, title="🎋 AI 諸葛神算解讀")
     else:
         st.markdown("<div style='text-align: center; padding: 60px;'><h1>🎋 諸葛神算</h1></div>", unsafe_allow_html=True)
+
+# === 小六壬頁面 ===
+elif page == "🎲 小六壬":
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.markdown("🗣️ **語音輸入問題**")
+        audio_record = mic_recorder(
+            start_prompt="點擊開始錄音 🎤", stop_prompt="停止並辨識 ⏹️", key='xlr_recorder'
+        )
+        if audio_record:
+            audio_bytes = audio_record['bytes']
+            audio_hash = hash(audio_bytes)
+            if st.session_state.get("last_xlr_audio_hash") != audio_hash:
+                result = process_transcription(audio_bytes, format_hint="webm")
+                if result and not result.startswith(("⚠️", "❌")):
+                    st.session_state["xlr_user_question_input"] = result
+                    st.success("✅ 辨識成功！")
+                st.session_state["last_xlr_audio_hash"] = audio_hash
+
+    user_question = st.text_area(
+        "🎲 請輸入你想測算的問題：", placeholder="例如：尋物 / 謀事結果如何？", height=80, key="xlr_user_question_input"
+    )
+
+    if "xlr_draw_button" in locals() and xlr_draw_button:
+        if not user_question.strip():
+            st.warning("請先輸入祈問的問題 🙏")
+        else:
+            with st.spinner("🎲 正在推演小六壬..."):
+                from core.xiaoliuren.engine import XiaoliurenEngine
+                from core.xiaoliuren.interpreter import interpret_xiaoliuren
+                engine_xlr = XiaoliurenEngine()
+                res = engine_xlr.draw_lesson(None, None, None)
+                if res:
+                    st.session_state["last_xlr_result"] = res
+                    st.session_state["last_xlr_question"] = user_question.strip()
+                    
+                    interp = interpret_xiaoliuren(user_question.strip(), res)
+                    st.session_state["last_xlr_interpretation"] = interp
+                    
+                    record_id = save_reading("xiaoliuren", user_question.strip(), res, interp, client_name=config_manager.get().app.get("guide_name", "toby"))
+                    
+                    if interp and not interp.startswith("⚠️"):
+                        audio_path = generate_audio(interp, record_id)
+                        update_record_interpretation(datetime.now().strftime("%Y-%m-%d"), record_id, interp, audio_path)
+                        st.session_state["last_xlr_audio"] = audio_path
+
+    if "last_xlr_result" in st.session_state:
+        res = st.session_state["last_xlr_result"]
+        ques = st.session_state.get("last_xlr_question", "")
+        st.markdown("---")
+        from ui.xiaoliuren_ui import render_xiaoliuren
+        render_xiaoliuren(res, ques)
+        
+        interp = st.session_state.get("last_xlr_interpretation")
+        if interp:
+            if st.session_state.get("last_xlr_audio"):
+                st.audio(st.session_state["last_xlr_audio"])
+            render_ai_interpretation(interp, title="🎲 AI 小六壬解讀")
+    else:
+        st.markdown("<div style='text-align: center; padding: 60px;'><h1>🎲 小六壬</h1></div>", unsafe_allow_html=True)
+
 
 # === 大六壬頁面 ===
 elif page == "🌌 大六壬":
@@ -505,7 +576,7 @@ elif page == "🌌 大六壬":
                 interp = interpret_daliuren(user_question.strip(), result)
                 st.session_state["last_dlr_interpretation"] = interp
                 
-                record_id = save_reading("daliuren", user_question.strip(), result, interp)
+                record_id = save_reading("daliuren", user_question.strip(), result, interp, client_name=config_manager.get().app.get("guide_name", "toby"))
                 if interp and not interp.startswith("⚠️"):
                     audio_path = generate_audio(interp, record_id)
                     update_record_interpretation(datetime.now().strftime("%Y-%m-%d"), record_id, interp, audio_path)
@@ -565,6 +636,7 @@ elif page == "📜 歷史紀錄":
             else:
                 st.markdown("**占卜類型：** ☯️ 易經")
                 
+            st.markdown(f"**求問者：** `{record.get('client_name', 'toby')}`")
             st.markdown(f"**ID：** `{record['id']}`")
             st.markdown(f"**AI 狀態：** {status_icon} (解讀: {text_status}, 語音: {audio_status}, 搜尋: {search_status})")
 
@@ -615,10 +687,22 @@ elif page == "📜 歷史紀錄":
                 st.markdown(f"**AI 解讀：**\n\n{record['ai_interpretation']}")
 
     search_query = st.text_input("🔍 搜尋歷史解讀（輸入關鍵字）", "")
+    
+    # 提取所有的 client_name
+    all_clients = set()
+    dates = get_history_dates()
+    for d in dates:
+        for r in load_history(d):
+            all_clients.add(r.get("client_name", "toby"))
+    client_filter = st.selectbox("👤 客戶篩選", ["顯示全部"] + sorted(list(all_clients)))
+    
     st.markdown("---")
     
     if search_query:
         records = search_history_records(search_query)
+        if client_filter != "顯示全部":
+            records = [r for r in records if r.get("client_name", "toby") == client_filter]
+            
         if not records:
             st.info("找不到符合的紀錄。")
         else:
@@ -626,16 +710,16 @@ elif page == "📜 歷史紀錄":
             for record in records:
                 render_history_record(record, show_date=True)
     else:
-        dates = get_history_dates()
-
         if not dates:
             st.info("目前尚無任何占卜紀錄。去占卜一次吧！🔮")
         else:
             selected_date = st.selectbox("選擇日期", dates)
             records = load_history(selected_date)
+            if client_filter != "顯示全部":
+                records = [r for r in records if r.get("client_name", "toby") == client_filter]
 
             if not records:
-                st.info(f"{selected_date} 沒有任何紀錄。")
+                st.info(f"{selected_date} 沒有符合篩選的紀錄。")
             else:
                 st.markdown(f"共 **{len(records)}** 筆紀錄")
                 for record in reversed(records):
@@ -666,6 +750,7 @@ elif page == "⚙️ 設定管理":
     
     with st.form("config_form"):
         st.markdown("### 🖥️ 應用程式設定 (App config)")
+        guide_name = st.text_input("導師名稱 (Guide Name)", value=conf.app.get('guide_name', 'toby'))
         app_port = st.number_input("伺服器通訊埠 (Port)", value=int(conf.app.port), step=1)
         api_port = st.number_input("API 伺服器通訊埠 (API Port)", value=int(conf.app.get('api_port', 8000)), step=1)
         st.caption("提示：修改 Port 需要在啟動時套用 (或於 .streamlit/config.toml 設定)，這裡僅供狀態記錄與檢視。")
@@ -691,12 +776,25 @@ elif page == "⚙️ 設定管理":
         iching_system = st.text_area("系統提示詞 (System Prompt)", value=conf.prompts.iching_system, height=100)
         iching_requirements = st.text_area("解讀要求 (Requirements)", value=conf.prompts.iching_requirements, height=200)
 
+        st.markdown("### 🎋 諸葛神算提示詞設定 (Zhuge Prompts)")
+        zhuge_system = st.text_area("系統提示詞 (System Prompt)", value=conf.prompts.get('zhuge_system', ''), height=100, key='zg_sys')
+        zhuge_requirements = st.text_area("解讀要求 (Requirements)", value=conf.prompts.get('zhuge_requirements', ''), height=200, key='zg_req')
+
+        st.markdown("### 🎲 小六壬提示詞設定 (Xiao Liu Ren Prompts)")
+        xiaoliuren_system = st.text_area("系統提示詞 (System Prompt)", value=conf.prompts.get('xiaoliuren_system', ''), height=100, key='xlr_sys')
+        xiaoliuren_requirements = st.text_area("解讀要求 (Requirements)", value=conf.prompts.get('xiaoliuren_requirements', ''), height=200, key='xlr_req')
+
+        st.markdown("### 🌌 大六壬提示詞設定 (Da Liu Ren Prompts)")
+        daliuren_system = st.text_area("系統提示詞 (System Prompt)", value=conf.prompts.get('daliuren_system', ''), height=100, key='dlr_sys')
+        daliuren_requirements = st.text_area("解讀要求 (Requirements)", value=conf.prompts.get('daliuren_requirements', ''), height=200, key='dlr_req')
+
         st.markdown("### 🔍 搜尋摘要提示詞設定 (Search Summarizer Prompts)")
         search_summarizer = st.text_area("搜尋摘要提示詞 (Summarizer Prompt)", value=conf.prompts.search_summarizer, height=150)
         
         submit = st.form_submit_button("💾 儲存設定 (Save Configuration)")
         
         if submit:
+            conf.app.guide_name = guide_name
             conf.app.port = app_port
             conf.app.api_port = api_port
             conf.app.bgm_id = app_bgm_id
@@ -711,14 +809,54 @@ elif page == "⚙️ 設定管理":
             conf.prompts.iching_system = iching_system
             conf.prompts.iching_requirements = iching_requirements
             
+            conf.prompts.zhuge_system = zhuge_system
+            conf.prompts.zhuge_requirements = zhuge_requirements
+            
+            conf.prompts.xiaoliuren_system = xiaoliuren_system
+            conf.prompts.xiaoliuren_requirements = xiaoliuren_requirements
+
+            conf.prompts.daliuren_system = daliuren_system
+            conf.prompts.daliuren_requirements = daliuren_requirements
+            
             conf.prompts.search_summarizer = search_summarizer
             
             config_manager.save()
             st.success(f"✅ 設定檔 `{selected_profile}` 已成功儲存！")
             
     st.markdown("---")
+    st.markdown("### 🔌 WebSocket 連線管理 (Admin)")
+    col_k1, col_k2 = st.columns(2)
+    with col_k1:
+        if st.button("踢出目前 Toby (Kick Toby)", type="primary"):
+            import requests
+            try:
+                res = requests.post(f"http://localhost:{conf.app.api_port}/api/admin/kick_toby")
+                if res.json().get("success"):
+                    st.success("成功踢出 Toby")
+                else:
+                    st.warning(res.json().get("message", "無效操作"))
+            except Exception as e:
+                st.error(f"無法連接 API: {e}")
+    with col_k2:
+        if st.button("踢出目前客戶 (Kick Client)", type="primary"):
+            import requests
+            try:
+                res = requests.post(f"http://localhost:{conf.app.api_port}/api/admin/kick_client")
+                if res.json().get("success"):
+                    st.success("成功踢出客戶")
+                else:
+                    st.warning(res.json().get("message", "無效操作"))
+            except Exception as e:
+                st.error(f"無法連接 API: {e}")
+
+    st.markdown("---")
     st.markdown("### 🔄 還原出廠設定")
     if st.button("還原為預設值 (Factory Reset)", type="secondary"):
         config_manager.reset_to_default()
         st.success(f"已成功將 `{selected_profile}` 還原為出廠預設值！")
         st.rerun()
+
+# === 即時觀測頁面 ===
+elif page == "🌐 即時觀測":
+    from ui.observation_ui import render_observation_ui
+    render_observation_ui()

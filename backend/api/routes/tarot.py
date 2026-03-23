@@ -5,6 +5,8 @@ from core.tarot.spreads import get_spread_by_id, ALL_SPREADS, SINGLE_CARD
 from core.tarot.interpreter import get_ai_interpretation
 from core.tts import generate_audio
 from core.history import save_reading, update_record_interpretation
+from core.config_manager import config_manager
+from api.websocket_manager import manager
 from datetime import datetime
 import uuid
 from typing import List
@@ -28,6 +30,11 @@ def get_spreads():
 
 @router.post("/draw", response_model=TarotResponse)
 def draw_tarot(req: TarotDrawRequest):
+    limit = config_manager.get_remaining_usage()
+    if limit <= 0:
+        raise HTTPException(status_code=403, detail="可用次數已用盡 (Limit Exceeded)")
+    config_manager.decrement_usage()
+
     spread = get_spread_by_id(req.spread_id)
     if not spread:
         spread = SINGLE_CARD
@@ -51,13 +58,18 @@ def draw_tarot(req: TarotDrawRequest):
     if req.question:
         interpretation_text = get_ai_interpretation(req.question, result, language=req.language)
         
+        client_name = config_manager.get().app.get("guide_name", "toby")
+        if manager.active_client:
+            client_name = manager.active_client[1]
+            
         record_id = save_reading(
             record_type="tarot",
             question=req.question,
             result=result,
             interpretation=interpretation_text,
             ai_prompt="",
-            search_success=False
+            search_success=False,
+            client_name=client_name
         )
 
         if interpretation_text and "error" not in interpretation_text.lower() and not interpretation_text.startswith("⚠️"):

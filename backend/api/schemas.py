@@ -71,7 +71,9 @@ class ZhugeDrawRequest(BaseModel):
 class ZhugeResponse(BaseModel):
     id: str
     poem: str
-    explanation: str
+    explanation: Optional[str] = None
+    interp1: Optional[str] = None
+    interp2: Optional[str] = None
     interpretation: Optional[str] = None
     audio_path: Optional[str] = None
 
@@ -85,5 +87,16 @@ class DaliurenResponse(BaseModel):
     pattern: List[str]
     san_chuan: Dict[str, Any]
     si_ke: Dict[str, Any]
+    interpretation: Optional[str] = None
+    audio_path: Optional[str] = None
+
+class DivinationRequest(BaseModel):
+    question: Optional[str] = None
+    language: Optional[str] = "繁體中文"
+    enable_ai: Optional[bool] = True
+
+class DivinationResponse(BaseModel):
+    record_id: Optional[str] = None
+    result: Dict[str, Any]
     interpretation: Optional[str] = None
     audio_path: Optional[str] = None

@@ -11,22 +11,36 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與
 </p>
 
 ### ⚙️ 專業解讀與測試管理 (Streamlit 介面)
+### ⚙️ 專業解讀與測試管理 (Streamlit 介面)
 <p align="center">
   <img src="sample/demo1.jpg" alt="AI Tarot & I-Ching Backend" width="800">
 </p>
+<p align="center">
+  <img src="sample/demo1_room.jpg" alt="Real-time Mentoring Monitor" width="800">
+</p>
+
+### 💬 聊天機器人整合 (n8n AI Agent)
+<p align="center">
+  <img src="sample/demo3.jpg" alt="Discord Bot Integration" width="800">
+</p>
+
 ## 功能特色
 
+- 💬 **多平台對話機器人**：透過 n8n Advanced AI 建立無狀態 (Stateless) API 介接，完美支援 Line / Discord / Openclaw 對話。
 - 🔮 **塔羅占卜**：完整 78 張塔羅牌、6 種經典牌陣、正逆位支援、詳細牌意。
 - ☯️ **易經卜卦**：模擬傳統金錢六爻卜卦，自動呈現本卦、變卦及動爻指示。
 - 🎋 **諸葛神算**：提供 384 籤傳統詩文與解意，結合 AI 進行白話精準解析。
+- 🎲 **小六壬**：基於傳統數字論斷初、中、終三傳，提供快速直覺的每日吉凶指引。
 - 🌌 **大六壬**：基於時辰起課，提供三傳四課的簡易排盤與格局，讓 AI 根據時空能量為您解讀吉凶。
 - 🗣️ **語音輸入提問**：支援麥克風語音轉文字辨識，並可於輸入框手動微調。
 - 🔍 **Tavily 外部時事搜尋**：自動從網路搜尋最新話題/時事背景（由 Gemma 3 整理摘要）。
 - 🤖 **Gemini AI 深度解析**：結合牌陣/卦象與外部時事，透過最新 Gemini 3.1 Flash/Pro 引擎做深入推演。
-- 💾 **統一歷史紀錄與修復**：完整紀錄解讀與語音狀態，支援 CLI 技能修復塔羅與易經的失敗紀錄。
-- ⚙️ **Hydra 動態設定管理**：透過 YAML 設定檔 (Customer1, Customer2) 隨時切換 AI 模型、修改提示詞範本並還原出廠預設值。
+- 💾 **統一歷史紀錄與專屬過濾**：完整紀錄解讀與語音狀態，支援依「客戶名稱」在 Streamlit 後台直接下拉篩選歷史，並具備 CLI 技能修復失敗紀錄。
+- ⚡ **WebSocket 即時多用戶通訊**：導入 WebSocket 雙向即時連線，完美隔離並同步「導師 (Toby)」與「客戶端」的即時抽牌體驗，確保畫面零時差且不互相干擾。
+- ⚙️ **Hydra 動態設定管理**：透過 YAML 設定檔 (Customer1, Customer2) 隨時切換 AI 模型，並可由 Streamlit 後台一鍵自訂所有占卜系統（塔羅、易經、諸葛、大六壬）的專屬提示詞。
 - 🎵 **背景音樂 (BGM)**：可於設定檔或管理介面無縫切換多種冥想背景音樂，增添占卜氛圍。
 - 🎨 **自訂圖片格式**：支援 JPG/PNG 精美 AI 生成圖無縫切換。
+- 🛡️ **維運管理與即時觀測 (監視器)**：支援 Docker Compose 一鍵部署獨立的「導師包廂」，並提供 Streamlit 介面的 **即時觀測中心**，可自動掃描並監控所有包廂的即時連線狀態、可用次數，也可一鍵強制踢除異常顧客。
 - 🚀 **FastAPI 與 AI Agent Skill**：獨立的後端 API 端點 (`/api/tarot/draw` 等) 與 AI 技能說明文檔，讓未來的 AI Agent 也能自由幫你呼叫占卜服務。
 
 ## 快速開始
@@ -76,18 +90,19 @@ assets/
 ```
 若在沒有圖片的情況下啟動，UI 會自動以無圖片的圖文方塊替代顯示，不會報錯。
 
-### 3. 環境變數設定
+### 4. 環境變數設定
 
 ```bash
-# 複製 .env 範例檔
+# 切換到 backend 目錄並複製環境變數範例檔
+cd backend
 cp .env.example .env
 
-# 編輯 .env 填入必要的 API Keys:
+# 編輯 backend/.env 填入必要的 API Keys:
 # GEMINI_API_KEY=your_gemini_key
-# TAVILY_API_KEY=your_tavily_key
+# N8N_API_KEY=your_n8n_key (如果你有啟用聊天機器人)
 ```
 
-### 3. 啟動應用
+### 5. 啟動應用
 
 本專案支援 **本機啟動** (0.0.0.0) 以及 **Ngrok 遠端分享**。
 
@@ -115,6 +130,32 @@ API 將預設運行於 `http://localhost:8000`。您可以透過 `http://localho
    python run.py
    ```
 4. 終端機會印出類似 `Ngrok 隧道開啟成功！遠端存取請前往: https://1234abcd.ngrok-free.app` 的網址，將該隨機網址分享給他人即可。
+
+#### 🐳 Docker 多房間部署 (正式環境)
+若要建立具備完整隔離環境、且能透過 Admin API 獨立指派額度或設定的「多房間」系統：
+```bash
+# 一鍵打包並啟動多個獨立導師包廂
+docker compose up -d --build
+```
+系統會自動在 port 8001 (`tarot-room-1`) 及 port 8002 (`tarot-room-2`) 啟動兩個完整的伺服器，同時渲染 FastAPI 與已編譯的 Vite 前端靜態檔。
+
+## 🧪 自動化測試 (Unit Testing)
+
+本專案於 `backend/tests/` 提供了基於 `pytest` 的完整單元測試。涵蓋了以下核心模組：
+- **WebSocket 通訊**：測試多連線隔離與「導師 (Toby) / 客戶」的獨立廣播機制。
+- **動態設定 (ConfigManager)**：驗證 YAML 設定檔的讀寫與預設值備援。
+- **歷史紀錄 (History API)**：驗證依據「客戶名稱」建立的歷史紀錄篩選機制。
+- **AI 占卜解析引擎 (Interpreters)**：模擬並驗證即將傳入 Gemini 模型的推演 Prompt 架構是否正確載入系統設定。
+
+**執行測試：**
+
+```bash
+cd backend
+# 啟動虛擬環境 (或者您的 conda 環境)
+source venv/bin/activate
+pip install pytest pytest-asyncio httpx
+PYTHONPATH=. pytest -v tests/
+```
 
 ## 專案結構
 
@@ -153,6 +194,10 @@ ai-tarot/
 - 🎵 **背景音樂 (Music)**：由 [Suno](https://suno.com/) AI 音樂平台生成。Suno 讓創作專屬氛圍的冥想音樂變得無比簡單，為占卜過程帶來絕佳的沉浸體驗。
 - 🎨 **視覺圖像 (Images)**：牌面與卦象圖片是由強大的 [Nano Banana2](https://civitai.com/models/25995?modelVersionId=32988) 視覺基準模型生成，完美呈現了精妙的東方禪意與神祕學色彩。
 - 💻 **協作工程師 (Programming)**：專案核心架構、API 整合與程式碼重構打磨，由 Google DeepMind 打造的 agentic AI 軟體工程師 **Antigravity** 共同協助開發完成。
+
+<div align="right">
+  <sub><i>💡 <a href="ai_notice/VISION_ARCHITECTURE.md">Sneak peek: The visionary blueprint of the AI Consultant Framework</a></i></sub>
+</div>
 
 ## License
 

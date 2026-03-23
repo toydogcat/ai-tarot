@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # 房間 1 (Room 1)
+  mentor-room-1:
+    build: .
+    container_name: tarot-room-1
+    ports:
+      - "8001:8000"
+    volumes:
+      # History must be mounted out to persist reading records safely
+      - ./backend/history:/app/backend/history
+      # Optionally mount assets if you generate local images, otherwise read-only is fine
+      - ./backend/assets:/app/backend/assets
+    restart: unless-stopped
+    # .env & config/ are NOT mounted here! 
+    # They are built into the image and will be modified dynamically via the /api/admin endpoint.
+    # When you rebuild the image or recreate the container, the config will reset to whatever is checked into git.
+
+  # 房間 2 (Room 2) - 示範如何開多房
+  mentor-room-2:
+    build: .
+    container_name: tarot-room-2
+    ports:
+      - "8002:8000"
+    volumes:
+      # Use isolated histories by pointing to different host directories
+      - ./rooms/room2/history:/app/backend/history
+      - ./backend/assets:/app/backend/assets
+    restart: unless-stopped

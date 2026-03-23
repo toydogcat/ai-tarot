@@ -4,6 +4,8 @@ from core.iching.engine import perform_divination
 from core.iching.interpreter import get_ai_interpretation
 from core.tts import generate_audio
 from core.history import save_reading, update_record_interpretation
+from core.config_manager import config_manager
+from api.websocket_manager import manager
 from datetime import datetime
 import uuid
 
@@ -11,6 +13,12 @@ router = APIRouter(prefix="/api/iching", tags=["IChing"])
 
 @router.post("/cast", response_model=IChingResponse)
 def cast_iching(req: IChingCastRequest):
+    from fastapi import HTTPException
+    limit = config_manager.get_remaining_usage()
+    if limit <= 0:
+        raise HTTPException(status_code=403, detail="可用次數已用盡 (Limit Exceeded)")
+    config_manager.decrement_usage()
+
     result = perform_divination()
     
     lines_info = result["lines_info"]
@@ -23,13 +31,18 @@ def cast_iching(req: IChingCastRequest):
     if req.question:
         interpretation_text = get_ai_interpretation(req.question, result, language=req.language)
         
+        client_name = config_manager.get().app.get("guide_name", "toby")
+        if manager.active_client:
+            client_name = manager.active_client[1]
+            
         record_id = save_reading(
             record_type="iching",
             question=req.question,
             result=result,
             interpretation=interpretation_text,
             ai_prompt="",
-            search_success=False
+            search_success=False,
+            client_name=client_name
         )
 
         if interpretation_text and "error" not in interpretation_text.lower() and not interpretation_text.startswith("⚠️"):

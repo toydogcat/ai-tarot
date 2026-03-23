@@ -41,7 +41,7 @@ for start_idx, end_idx in batches:
 """
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.1-flash-lite-preview',
             contents=prompt,
             config=genai.types.GenerateContentConfig(
                 temperature=0.1
