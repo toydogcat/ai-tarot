@@ -32,15 +32,17 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與
 - 🎋 **諸葛神算**：提供 384 籤傳統詩文與解意，結合 AI 進行白話精準解析。
 - 🎲 **小六壬**：基於傳統數字論斷初、中、終三傳，提供快速直覺的每日吉凶指引。
 - 🌌 **大六壬**：基於時辰起課，提供三傳四課的簡易排盤與格局，讓 AI 根據時空能量為您解讀吉凶。
-- 🗣️ **語音輸入提問**：支援麥克風語音轉文字辨識，並可於輸入框手動微調。
+- 🗣️ **語音輸入與非同步 TTS**：支援麥克風語音轉文字辨識，並可於輸入框手動微調。現已全面非同步化並整合高品質 edge-tts，徹底解決 Event Loop 衝突。
 - 🔍 **Tavily 外部時事搜尋**：自動從網路搜尋最新話題/時事背景（由 Gemma 3 整理摘要）。
 - 🤖 **Gemini AI 深度解析**：結合牌陣/卦象與外部時事，透過最新 Gemini 3.1 Flash/Pro 引擎做深入推演。
 - 💾 **統一歷史紀錄與專屬過濾**：完整紀錄解讀與語音狀態，支援依「客戶名稱」在 Streamlit 後台直接下拉篩選歷史，並具備 CLI 技能修復失敗紀錄。
-- ⚡ **WebSocket 即時多用戶通訊**：導入 WebSocket 雙向即時連線，完美隔離並同步「導師 (Toby)」與「客戶端」的即時抽牌體驗，確保畫面零時差且不互相干擾。
+- ⚡ **WebSocket 即時多用戶通訊**：導入 WebSocket 雙向即時連線，完美隔離並同步「導師 (Toby)」與「客戶端」的即時抽牌體驗，具備優化的斷線重連機制。
+- 🛡️ **安全性強化**：導師帳號全面啟用 **Bcrypt** 密碼哈希加密，取代舊有的明文存儲，確保帳戶安全。
 - ⚙️ **Hydra 動態設定管理**：透過 YAML 設定檔 (Customer1, Customer2) 隨時切換 AI 模型，並可由 Streamlit 後台一鍵自訂所有占卜系統（塔羅、易經、諸葛、大六壬）的專屬提示詞。
 - 🎵 **背景音樂 (BGM)**：可於設定檔或管理介面無縫切換多種冥想背景音樂，增添占卜氛圍。
 - 🎨 **自訂圖片格式**：支援 JPG/PNG 精美 AI 生成圖無縫切換。
-- 🛡️ **維運管理與即時觀測 (監視器)**：支援 Docker Compose 一鍵部署獨立的「導師包廂」，並提供 Streamlit 介面的 **即時觀測中心**，可自動掃描並監控所有包廂的即時連線狀態、可用次數，也可一鍵強制踢除異常顧客。
+- 🛡️ **維運管理與即時觀測 (監視器)**：支援 Docker Compose 一鍵部署獨立的「導師包廂」，並提供 Streamlit 介面的 **即時觀測中心**，可自動掃描並監控所有包廂的即時連線狀態、可用次數，也可一鍵強制踢除異常顧客。同步支援 **AI-Factory 全局身分庫**，讓導師的好友與聊天內容能跨專案共享。
+- 📱 **PWA 行動端支援**：支援 Progressive Web App 定義，可在手機（Brave/Chrome）或電腦中點選「安裝」，享受無網址列、全螢幕的 Native App 體驗。
 - 🚀 **FastAPI 與 AI Agent Skill**：獨立的後端 API 端點 (`/api/tarot/draw` 等) 與 AI 技能說明文檔，讓未來的 AI Agent 也能自由幫你呼叫占卜服務。
 
 ## 快速開始
@@ -51,17 +53,23 @@ AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與
 
 ### 1. 啟動後端 API 與管理介面
 
+本專案支援 **雙環境** (uv / Conda)，未來開發建議優先使用高速的 `uv` 工具。
+
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
 
-# 啟動 FastAPI (預設 Port 8000)
-python run_api.py
+# 【推薦】使用 uv 閃電安裝 (uv sync)
+uv sync
+source .venv/bin/activate
+# (備用) 或使用傳統 Conda
+# conda activate toby
+# pip install -r requirements.txt
 
-# (可選) 啟動 Streamlit 管理與測試介面 (預設 Port 8501)
-streamlit run app.py
+# 啟動 API 伺服器 (FastAPI)
+python start.py api
+
+# 啟動管理與測試介面 (Streamlit)
+python start.py admin
 ```
 
 ### 2. 啟動華麗的 Vite 前端
@@ -108,16 +116,16 @@ cp .env.example .env
 
 #### 一般啟動 (本機 0.0.0.0 分享)
 ```bash
-python run.py
-# 或是直接使用 streamlit:
-# streamlit run app.py --server.address=0.0.0.0
+cd backend
+python start.py admin
 ```
-瀏覽器會自動開啟 `http://localhost:8501`。相同區域網路下的設備可以透過您的區域 IP 存取 (例如 `http://192.168.1.xxx:8501`)。
+瀏覽器會自動開啟 `http://localhost:10000`。相同區域網路下的設備可以透過您的區域 IP 存取 (例如 `http://192.168.1.xxx:10000`)。
 
 #### API 伺服器啟動 (供 AI Agent / 擴充使用)
 若要啟動 FastAPI 背景服務，請另外開啟終端機執行：
 ```bash
-python run_api.py
+cd backend
+python start.py api
 ```
 API 將預設運行於 `http://localhost:8000`。您可以透過 `http://localhost:8000/docs` 測試 Swagger UI。
 
@@ -127,7 +135,7 @@ API 將預設運行於 `http://localhost:8000`。您可以透過 `http://localho
 2. 將 Token 寫入 `.env` 檔案中：`NGROK_AUTHTOKEN=你的token`
 3. 執行統一啟動腳本：
    ```bash
-   python run.py
+   python start.py admin
    ```
 4. 終端機會印出類似 `Ngrok 隧道開啟成功！遠端存取請前往: https://1234abcd.ngrok-free.app` 的網址，將該隨機網址分享給他人即可。
 
@@ -152,9 +160,9 @@ docker compose up -d --build
 ```bash
 cd backend
 # 啟動虛擬環境 (或者您的 conda 環境)
-source venv/bin/activate
-pip install pytest pytest-asyncio httpx
-PYTHONPATH=. pytest -v tests/
+source .venv/bin/activate
+uv pip install pytest pytest-asyncio httpx
+uv run pytest -v tests/
 ```
 
 ## 專案結構
@@ -167,9 +175,8 @@ ai-tarot/
 │   ├── public/             # 靜態公共資源
 │   └── vite.config.js      # Vite 開發伺服器與 API 代理設定
 ├── backend/                # FastAPI / Streamlit 後端專案
-│   ├── run_api.py          # FastAPI 啟動入口 (8000)
-│   ├── app.py              # Streamlit 測試與管理後台 (8501)
-│   ├── run.py              # 整合啟動程式
+│   ├── start.py            # 統一啟動入口
+│   ├── app.py              # Streamlit 路由引擎 (主入口)
 │   ├── api/                # FastAPI 路由與 schemas 定義
 │   ├── core/               # 核心推演引擎 (塔羅、易經、AI解析、語音)
 │   ├── config/             # Hydra 設定檔目錄 (default/customer YAML)

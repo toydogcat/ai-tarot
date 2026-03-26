@@ -19,9 +19,8 @@ AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 def check_internet(host="8.8.8.8", port=53, timeout=2) -> bool:
     """檢查是否有網路連線"""
     try:
-        socket.setdefaulttimeout(timeout)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-        return True
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
     except OSError:
         return False
 
@@ -42,7 +41,7 @@ async def _edge_tts_generate(text: str, output_path: str):
     communicate = edge_tts.Communicate(text, VOICE)
     await communicate.save(output_path)
 
-def generate_audio(text: str, record_id: str) -> str | None:
+async def generate_audio(text: str, record_id: str) -> str | None:
     """
     將文字轉換為語音並回傳檔案路徑 (相對專案根目錄，或絕對路徑)
     
@@ -70,7 +69,7 @@ def generate_audio(text: str, record_id: str) -> str | None:
         has_internet = check_internet()
         if has_internet:
             logger.info("檢測到網路連線，使用 edge-tts 生成高音質語音...")
-            asyncio.run(_edge_tts_generate(cleaned_text, str(output_path_mp3)))
+            await _edge_tts_generate(cleaned_text, str(output_path_mp3))
             return str(output_path_mp3)
         else:
             logger.info("無網路連線，使用 pyttsx3 離線生成語音...")

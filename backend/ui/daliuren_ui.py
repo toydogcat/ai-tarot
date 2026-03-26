@@ -61,13 +61,9 @@ def render_daliuren(res: dict):
 
     import textwrap
     
-    # HTML Layout
-    html = textwrap.dedent(f"""
-    <div class="dlr-container">
-        <div class="dlr-header">
-            🌌 <b>時局</b>：{date_str} ({jieqi}) &nbsp;|&nbsp; <b>格局</b>：{pattern_str}
-        </div>
-    """)
+    # HTML Layout - NO leading whitespace to avoid Markdown code blocks
+    html = f"""<div class="dlr-container">
+<div class="dlr-header">🌌 <b>時局</b>：{date_str} ({jieqi}) &nbsp;|&nbsp; <b>格局</b>：{pattern_str}</div>"""
 
     # 三傳 (San Chuan)
     html += '<div class="dlr-title">三傳</div><div class="dlr-row">'
@@ -75,16 +71,13 @@ def render_daliuren(res: dict):
     for k in chuan_keys:
         if k in san_chuan:
             val = san_chuan[k]
-            # val e.g. ["寅", "后", "兄", "甲"] -> 寅(后) or just display 寅
             display_val = val[0] if isinstance(val, list) and len(val) > 0 else str(val)
             sub_val = val[1] if isinstance(val, list) and len(val) > 1 else ""
-            html += textwrap.dedent(f"""
-            <div class="dlr-item">
-                <span class="dlr-label">{k}</span>
-                <span class="dlr-val">{display_val}</span>
-                <span class="dlr-label" style="margin-top:2px;">{sub_val}</span>
-            </div>
-            """)
+            html += f"""<div class="dlr-item">
+<span class="dlr-label">{k}</span>
+<span class="dlr-val">{display_val}</span>
+<span class="dlr-label" style="margin-top:2px;">{sub_val}</span>
+</div>"""
     html += '</div>'
 
     # 四課 (Si Ke)
@@ -94,24 +87,19 @@ def render_daliuren(res: dict):
         if k in si_ke:
             val = si_ke[k]
             display_val = val[0] if isinstance(val, list) and len(val) > 0 else str(val)
-            # Usually display_val is 2 chars like "寅申", display them vertically
             if len(display_val) >= 2:
                 top = display_val[0]
                 bottom = display_val[1]
-                html += textwrap.dedent(f"""
-                <div class="dlr-item">
-                    <span class="dlr-label">{k}</span>
-                    <span class="dlr-val">{top}</span>
-                    <span class="dlr-val">{bottom}</span>
-                </div>
-                """)
+                html += f"""<div class="dlr-item">
+<span class="dlr-label">{k}</span>
+<span class="dlr-val">{top}</span>
+<span class="dlr-val">{bottom}</span>
+</div>"""
             else:
-                html += textwrap.dedent(f"""
-                <div class="dlr-item">
-                    <span class="dlr-label">{k}</span>
-                    <span class="dlr-val">{display_val}</span>
-                </div>
-                """)
+                html += f"""<div class="dlr-item">
+<span class="dlr-label">{k}</span>
+<span class="dlr-val">{display_val}</span>
+</div>"""
     html += '</div>'
 
     html += "</div>"

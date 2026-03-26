@@ -32,15 +32,17 @@ An AI-driven Tarot card and I-Ching (Hexagram) divination web application, featu
 - 🎋 **Zhuge Shensuan**: Provides 384 traditional lots with poetic explanations and AI analysis.
 - 🎲 **Xiao Liu Ren**: Fast and intuitive 3-state divination based on traditional numerology, perfect for quick daily guidance.
 - 🌌 **Da Liu Ren**: Generates a simplified time-based pattern with San Chuan (Three Transmissions) and Si Ke (Four Hexagrams) for deep AI divination.
-- 🗣️ **Voice Input**: Supports microphone speech-to-text recognition, with manual text editing capabilities.
+- 🗣️ **Voice Input & Async TTS**: Supports microphone speech-to-text recognition, with manual text editing. Now fully asynchronous with high-quality edge-tts integration to prevent event-loop conflicts.
 - 🔍 **Tavily Web Search**: Automatically searches the web for the latest background topics/news (summarized via Gemma 3) to contextually enhance readings.
 - 🤖 **Gemini AI Deep Analysis**: Combines spread/hexagram symbols with external context using the latest Gemini engines for profound readings.
 - 💾 **Unified History & Client Filtering**: Comprehensively logs all readings and audio data. Supports exclusive dropdown filtering by "Client Name" in the backend, plus detailed CLI skills for recovering failed predictions.
-- ⚡ **WebSocket Real-Time Multi-User Communication**: Ensures a truly live connection bridging the "Toby" supervisor and active "Clients" seamlessly, eliminating overlaps and syncing readings continuously.
+- ⚡ **WebSocket Real-Time Multi-User Communication**: Ensures a truly live connection bridging the "Toby" supervisor and active "Clients" seamlessly, with optimized reconnection logic.
+- 🛡️ **Security Hardening**: Mentor accounts are secured with **Bcrypt** password hashing, replacing legacy plaintext storage.
 - ⚙️ **Hydra Dynamic Configuration**: Switch AI models natively via YAML (Customer1, Customer2), and instantly edit context-specific system prompts (Tarot, I-Ching, Zhuge, Da Liu Ren) directly from the Streamlit UI.
 - 🎵 **Background Music (BGM)**: Seamlessly toggle different meditation tracks via config to enhance the divination atmosphere.
 - 🎨 **Custom Image Format**: Supports flawless switching between high-quality AI-generated `.jpg` and `.png` image formats.
-- 🛡️ **Admin Control & Real-Time Monitoring**: Deploy fully independent "Mentor Rooms" via Docker Compose, dynamically adjust AI configs, and track live connection states, usage quotas, and execute Kick controls directly from the Streamlit Observation Dashboard.
+- 🛡️ **Admin Control & Real-Time Monitoring**: Deploy fully independent "Mentor Rooms" via Docker Compose, dynamically adjust AI configs, and track live connection states, usage quotas, and execute Kick controls directly from the Streamlit Observation Dashboard. Fully supports the **AI-Factory Global Identity Tier** for shared mentor social data across projects.
+- 📱 **PWA Support**: Native-like app experience with Progressive Web App support—install the app on your home screen for full-screen, standalone usage.
 - 🚀 **FastAPI & AI Agent Skills**: Exposes independent backend API endpoints (e.g. `/api/tarot/draw`) and AI skill documentation, allowing future AI agents to call the services directly.
 
 ## Quick Start
@@ -53,15 +55,22 @@ The project currently utilizes a **Monorepo (Frontend/Backend Separation)** arch
 
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
 
-# Start FastAPI (Default Port: 8000)
-python run_api.py
+# [Recommended] Fast initialization using uv
+uv sync
+source .venv/bin/activate
+# (Fallback) Or use traditional Conda
+# conda activate toby
 
-# (Optional) Start Streamlit Admin & Testing Interface (Default Port: 8501)
-streamlit run app.py
+# (Fallback) Or use traditional Conda/venv
+# conda create -n toby python=3.10 && conda activate toby
+# pip install -r requirements.txt
+
+# Start API Server (FastAPI)
+python start.py api
+
+# Start Admin & Testing Interface (Streamlit)
+python start.py admin
 ```
 
 ### 2. Launch the Vite Frontend
@@ -109,17 +118,15 @@ This project supports **Local Start** (0.0.0.0) as well as **Ngrok Remote Tunnel
 #### Standard Local Start (0.0.0.0)
 ```bash
 cd backend
-python run.py
-# Or use streamlit directly:
-# streamlit run app.py --server.address=0.0.0.0
+python start.py admin
 ```
-Your browser will auto-open `http://localhost:8501`. Other devices on the same local network can access the app via your local IP (e.g., `http://192.168.1.xxx:8501`).
+Your browser will auto-open `http://localhost:10000`. Other devices on the same local network can access the app via your local IP (e.g., `http://192.168.1.xxx:10000`).
 
 #### API Server (For AI Agents / Extensions)
 To start just the FastAPI backend service, open a terminal and run:
 ```bash
 cd backend
-python run_api.py
+python start.py api
 ```
 The API will run on `http://localhost:8000`. You can test endpoints via Swagger UI at `http://localhost:8000/docs`.
 
@@ -130,7 +137,7 @@ To share your application publicly online, the project integrates an automated N
 3. Check that `frontend/vite.config.js` has `allowedHosts: true` (already configured).
 4. Run the sharing script smoothly from the root directory:
    ```bash
-   python share_ngrok.py
+   uv run python share_ngrok.py
    ```
 5. The terminal will output a public URL such as `https://1234abcd.ngrok-free.app`. Share this link with anyone!
 
@@ -154,10 +161,10 @@ The project includes a comprehensive `pytest` test suite located in `backend/tes
 
 ```bash
 cd backend
-# Activate virtual environment (or your conda env)
-source venv/bin/activate
-pip install pytest pytest-asyncio httpx
-PYTHONPATH=. pytest -v tests/
+# Activate virtual environment (uv or your conda env)
+source .venv/bin/activate
+uv pip install pytest pytest-asyncio httpx
+uv run pytest -v tests/
 ```
 
 ## Project Structure
@@ -170,9 +177,8 @@ ai-tarot/
 │   ├── public/             # Static public assets
 │   └── vite.config.js      # Vite dev server & API proxy config
 ├── backend/                # FastAPI / Streamlit Backend
-│   ├── run_api.py          # FastAPI entry point (8000)
-│   ├── app.py              # Streamlit test & admin UI (8501)
-│   ├── run.py              # Unified startup script
+│   ├── start.py            # Unified application entry point
+│   ├── app.py              # Streamlit router (Main entry)
 │   ├── api/                # FastAPI routes & schemas
 │   ├── core/               # Core engines (Tarot, I-Ching, AI Interpretation, TTS)
 │   ├── config/             # Hydra configs (default/customer YAML)

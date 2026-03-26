@@ -59,36 +59,28 @@ def get_ai_interpretation(question: str, result: dict, search_context: str = "",
     MODEL_ID = conf.ai_models.divination_model
     prompt = build_interpretation_prompt(question, result, search_context, language)
 
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            logger.info(f"Calling {MODEL_ID} for interpretation (Attempt {attempt + 1}/{max_retries})...")
-            response = client.models.generate_content(
-                model=MODEL_ID,
-                contents=prompt,
-            )
-            return response.text
-            
-        except errors.ClientError as e:
-            # 偵測是否為配額已滿 (HTTP 429)
-            if e.code == 429:
-                wait_time = (attempt + 1) * 10
-                logger.warning(f"⚠️ 配額已滿 (429 Error)。將在 {wait_time} 秒後重試...")
-                
-                if attempt < max_retries - 1:
-                    time.sleep(wait_time)
-                    continue
-                else:
-                    logger.error("API quota exceeded after max retries.")
-                    return "❌ 目前 API 使用量已達上限，請稍後再試。"
-            
-            # 其他 Client 錯誤
-            logger.error(f"Gemini Client Error: {e}")
-            return "error"
+    from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+    
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type((errors.ServerError, errors.ClientError)),
+        reraise=True
+    )
+    def _generate_with_retry():
+        logger.info(f"Calling {MODEL_ID} for Iching interpretation...")
+        return client.models.generate_content(
+            model=MODEL_ID,
+            contents=prompt,
+        )
 
-        except Exception as e:
-            # 系統性錯誤
-            logger.error(f"Unexpected error: {e}")
-            return "error"
-
-    return "error"
+    try:
+        response = _generate_with_retry()
+        return response.text
+    except errors.ClientError as e:
+        if e.code == 429:
+            return "❌ 目前 API 使用量已至上限，請稍後再試。"
+        return "⚠️ AI 解卦暫時不可用，請稍後再試。 (ClientError)"
+    except Exception as e:
+        logger.error(f"Iching API Error: {e}")
+        return "⚠️ 目前 AI 導師正忙於處理大量請求，請稍候片刻再試。 (Error: 503/Timeout)"

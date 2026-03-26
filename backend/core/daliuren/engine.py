@@ -25,11 +25,11 @@ class DaliurenEngine:
                 # result is a dictionary containing 節氣, 日期, 格局, 三傳, 四課, etc.
                 if isinstance(result, dict):
                     formatted = {
-                        "jieqi": getattr(result, "節氣", jq),
-                        "date": result.get("日期", f"{day_gz}日{hour_gz}時"),
-                        "pattern": result.get("格局", []),
-                        "san_chuan": result.get("三傳", {}),
-                        "si_ke": result.get("四課", {})
+                        "jieqi": result.get("節氣") or jq,
+                        "date": result.get("日期") or f"{day_gz}日{hour_gz}時",
+                        "pattern": result.get("格局") or [],
+                        "san_chuan": result.get("三傳") or {},
+                        "si_ke": result.get("四課") or {}
                     }
                     return formatted
             except Exception as e:

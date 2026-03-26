@@ -1,12 +1,9 @@
-"""全域設定檔"""
 from pathlib import Path
+from core.constants import BASE_DIR
 from core.config_manager import config_manager
 
 # 取得目前設定
 conf = config_manager.get()
-
-# 專案根目錄
-BASE_DIR = Path(__file__).resolve().parent
 
 # 資料路徑
 TAROT_DATA_DIR = BASE_DIR / conf.paths.data_dir / "tarot"

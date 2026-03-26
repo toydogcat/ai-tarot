@@ -8,14 +8,15 @@ from core.config_manager import config_manager
 from api.websocket_manager import manager
 import asyncio
 
+from core.db import check_and_deduct_usage
+
 router = APIRouter(prefix="/api/xiaoliuren", tags=["xiaoliuren"])
 
 @router.post("/draw", response_model=DivinationResponse)
 async def draw_xiaoliuren(request: DivinationRequest):
-    limit = config_manager.get_remaining_usage()
-    if limit <= 0:
-        raise HTTPException(status_code=403, detail="可用次數已用盡 (Limit Exceeded)")
-    config_manager.decrement_usage()
+    mentor_settings = check_and_deduct_usage(request.mentor_id)
+    enable_multiuser = mentor_settings["enable_multiuser"]
+    ai_enabled = mentor_settings["ai_enabled"]
 
     try:
         conf = config_manager.get()
@@ -33,11 +34,18 @@ async def draw_xiaoliuren(request: DivinationRequest):
         system_prompt = conf.ai_models.get("system_prompt", "")
         
         # Get AI
-        interpretation = "error"
-        audio_path = "error" if generate_audio_flag else None
-        record_id = None
-        
-        if request.enable_ai:
+        # Determine client name and solo mode status
+        client_name = request.mentor_id
+        is_solo = True
+        room = manager.rooms.get(request.mentor_id)
+        if room and room.main_client:
+            client_name = room.main_client.name
+            is_solo = False
+            
+        # Interpretation Logic
+        interpretation = ""
+        # Room-level ai_enabled is the master switch
+        if ai_enabled and request.enable_ai and enable_multiuser and not is_solo:
             interpretation = interpret_xiaoliuren(
                 question=request.question,
                 result_data=lesson,
@@ -45,42 +53,44 @@ async def draw_xiaoliuren(request: DivinationRequest):
                 selected_model=model_name,
                 system_prompt=system_prompt
             )
-            
-            # Save history early to get record_id
-            record_id = save_reading(
-                record_type="xiaoliuren",
-                question=request.question or "無問題",
-                result=lesson,
-                interpretation=interpretation,
-                ai_prompt=system_prompt,
-                ai_interpretation_audio_path=audio_path
-            )
-            
-            if interpretation != "error" and generate_audio_flag:
-                try:
-                    actual_audio_path = generate_audio(interpretation, record_id)
-                    if actual_audio_path:
-                        audio_path = actual_audio_path
-                        # update
-                        from core.history import update_record_interpretation
-                        import datetime
-                        today = datetime.datetime.now().strftime("%Y-%m-%d")
-                        update_record_interpretation(today, record_id, interpretation, audio_path)
-                except Exception as e:
-                    print(f"TTS Error: {e}")
         else:
-            interpretation = "AI解牌已關閉"
-            record_id = save_reading(
-                record_type="xiaoliuren",
-                question=request.question or "無問題",
-                result=lesson,
-                interpretation=interpretation,
-                ai_prompt=system_prompt,
-                ai_interpretation_audio_path=None
-            )
+            # Solo Mode, Trial Mode, or AI Disabled by Mentor
+            if not enable_multiuser:
+                interpretation = "⚠️ [Trial Mode] AI Interpretation Disabled. Support the project to unlock!"
+            elif not ai_enabled:
+                interpretation = "💡 AI Interpretation is currently DISABLED in your room settings."
+            else:
+                interpretation = "💡 [Solo Mode] Mentor testing - AI interpretation skipped."
 
-        # Notify via Websocket
-        if manager.active_client:
+        audio_path = None
+        # Save History
+        record_id = save_reading(
+            record_type="xiaoliuren",
+            question=request.question or "無問題",
+            result=lesson,
+            interpretation=interpretation,
+            ai_prompt=system_prompt,
+            ai_interpretation_audio_path=audio_path,
+            client_id=client_name,
+            mentor_id=request.mentor_id,
+            is_multiuser=enable_multiuser
+        )
+        
+        # Audio generation logic
+        if interpretation not in ["error", ""] and not interpretation.startswith(("⚠️", "💡")) and generate_audio_flag:
+            try:
+                actual_audio_path = await generate_audio(interpretation, record_id)
+                if actual_audio_path:
+                    audio_path = actual_audio_path
+                    from core.history import update_record_interpretation
+                    import datetime
+                    today = datetime.datetime.now().strftime("%Y-%m-%d")
+                    update_record_interpretation(today, record_id, interpretation, audio_path)
+            except Exception as e:
+                print(f"TTS Error: {e}")
+
+        # Notify via Websocket (Only if client is connected)
+        if room and room.main_client:
             push_data = {
                 "type": "divination_result",
                 "mode": "xiaoliuren",
@@ -90,7 +100,7 @@ async def draw_xiaoliuren(request: DivinationRequest):
                 "audio_path": audio_path,
                 "record_id": record_id
             }
-            asyncio.create_task(manager.send_to_client(push_data))
+            asyncio.create_task(manager.send_to_client(request.mentor_id, push_data))
 
         return DivinationResponse(
             record_id=record_id,

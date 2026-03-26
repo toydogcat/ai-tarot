@@ -58,32 +58,20 @@ def render_zhuge(res: dict):
 
     import textwrap
     
-    # Layout
-    html = textwrap.dedent(f"""
-    <div class="zg-container">
-        <div class="zg-header">
-            🎋 諸葛神算 第 {lot_id} 籤
-        </div>
-        <div class="zg-poem">
-            {poem}
-        </div>
-    """)
+    # Layout - Ensure NO leading whitespace to avoid Markdown code block triggered by 4 spaces
+    html = f"""<div class="zg-container">
+<div class="zg-header">🎋 諸葛神算 第 {lot_id} 籤</div>
+<div class="zg-poem">{poem}</div>"""
     
     if interp1:
-        html += textwrap.dedent(f"""
-        <div class="zg-explanation-title">白話解讀</div>
-        <div class="zg-explanation">
-            {interp1}
-        </div>
-        """)
+        html += f"""
+<div class="zg-explanation-title">白話解讀</div>
+<div class="zg-explanation">{interp1}</div>"""
     
     if interp2:
-        html += textwrap.dedent(f"""
-        <div class="zg-explanation-title">古典意象</div>
-        <div class="zg-explanation">
-            {interp2}
-        </div>
-        """)
+        html += f"""
+<div class="zg-explanation-title">古典意象</div>
+<div class="zg-explanation">{interp2}</div>"""
         
     html += "</div>"
     

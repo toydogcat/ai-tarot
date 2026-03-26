@@ -10,24 +10,28 @@ router = APIRouter(prefix="/api/history", tags=["History"])
 deck = TarotDeck()
 
 @router.get("/clients", response_model=List[str])
-def get_history_clients():
-    """取得所有歷史紀錄中的唯一客戶名稱"""
-    dates = get_history_dates()
+def get_history_clients(mentor_id: str | None = None):
+    """取得特定導師的所有歷史紀錄中的唯一客戶名稱"""
+    if not mentor_id:
+        return []
+    dates = get_history_dates(mentor_id)
     clients = set()
     for d in dates:
-        records = load_history(d)
+        records = load_history(d, mentor_id)
         for r in records:
             clients.add(r.get("client_name", "toby"))
     return sorted(list(clients))
 
 @router.get("", response_model=List[HistoryRecordResponse])
-def get_all_history(client_name: str = None, limit: int = 50):
+def get_all_history(client_name: str | None = None, mentor_id: str | None = None, limit: int = 50):
     """取得最新的歷史紀錄"""
-    dates = get_history_dates()
+    if not mentor_id:
+        return []
+    dates = get_history_dates(mentor_id)
     all_records = []
     
     for d in dates:
-        records = load_history(d)
+        records = load_history(d, mentor_id)
         if client_name:
             records = [r for r in records if r.get("client_name", "toby") == client_name]
         

@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 from omegaconf import OmegaConf
+from sqlalchemy import select, update
+from core.db import FactorySessionLocal, mentors
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
 
@@ -17,19 +19,23 @@ class ConfigManager:
     def load_config(self, profile=None):
         if profile is None:
             profile = self.active_profile
-        # Always reload from disk
-        path = CONFIG_DIR / f"{profile}.yaml"
-        if not path.exists():
-            path = CONFIG_DIR / "default.yaml"
-        return OmegaConf.load(path)
         
-    def set_active_profile(self, profile):
-        if profile in ["customer1", "customer2"]:
-            self.active_profile = profile
-            self.config = self.load_config()
-            
+        # 1. 載入基礎預設值
+        default_path = CONFIG_DIR / "default.yaml"
+        config = OmegaConf.load(default_path)
+        
+        # 2. 若非預設檔，則進行合併 (覆寫模式)
+        if profile != "default":
+            path = CONFIG_DIR / f"{profile}.yaml"
+            if path.exists():
+                override_config = OmegaConf.load(path)
+                config = OmegaConf.merge(config, override_config)
+            else:
+                # 若檔案不存在，則視為使用預設
+                pass
+        return config
+        
     def get(self):
-        # Always reload on get to ensure cross-session updates if another session modified the file
         self.config = self.load_config()
         return self.config
         
@@ -38,18 +44,27 @@ class ConfigManager:
         OmegaConf.save(self.config, path)
         
     def get_remaining_usage(self) -> int:
-        self.config = self.load_config()
-        return int(self.config.app.get("usage_limit", 50))
+        """從全局 Factory DB 讀取導師剩餘次數 (優先於 YAML)"""
+        conf = self.get()
+        mentor_id = conf.app.get("guide_name", "toby")
         
-    def decrement_usage(self) -> int:
+        with FactorySessionLocal() as db:
+            mentor = db.execute(select(mentors).where(mentors.c.mentor_id == mentor_id)).first()
+            if mentor:
+                return mentor.usage_limit
+        return int(conf.app.get("usage_limit", 5))
+
+    def set_usage(self, limit: int):
+        """同步更新 YAML 與 Factory DB 中的使用次數"""
         self.config = self.load_config()
-        limit = int(self.config.app.get("usage_limit", 50))
-        if limit > 0:
-            self.config.app.usage_limit = limit - 1
-            self.save()
-            return limit - 1
-        return 0
+        self.config.app.usage_limit = limit
+        self.save()
         
+        mentor_id = self.config.app.get("guide_name", "toby")
+        with FactorySessionLocal() as db:
+            db.execute(update(mentors).where(mentors.c.mentor_id == mentor_id).values(usage_limit=limit))
+            db.commit()
+            
     def reset_to_default(self):
         default_path = CONFIG_DIR / "default.yaml"
         default_conf = OmegaConf.load(default_path)
