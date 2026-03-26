@@ -3,7 +3,7 @@ import asyncio
 from datetime import datetime
 from core.daliuren.engine import DaliurenEngine
 from core.daliuren.interpreter import interpret_daliuren
-from core.history import save_complete_reading_sync
+from core.history import save_complete_reading
 from core.tts import generate_audio
 from core.audio_input import process_transcription
 from streamlit_mic_recorder import mic_recorder

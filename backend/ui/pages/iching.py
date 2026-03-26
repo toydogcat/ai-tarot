@@ -5,7 +5,7 @@ from core.iching.engine import perform_divination
 from core.iching.interpreter import get_ai_interpretation as get_iching_interp, build_interpretation_prompt as build_iching_prompt
 from ui.iching_ui import render_hexagram
 from core.logger import get_logger
-from core.history import save_complete_reading_sync
+from core.history import save_complete_reading
 from core.tts import generate_audio
 from core.audio_input import process_transcription
 from streamlit_mic_recorder import mic_recorder
