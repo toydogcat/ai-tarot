@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional, Any, Dict
 
 class TarotDrawRequest(BaseModel):
+    mentor_id: str
     spread_id: str = "single"
     question: Optional[str] = None
     language: Optional[str] = "繁體中文"
@@ -21,6 +22,7 @@ class TarotResponse(BaseModel):
     audio_path: Optional[str] = None
 
 class IChingCastRequest(BaseModel):
+    mentor_id: str
     question: Optional[str] = None
     language: Optional[str] = "繁體中文"
 
@@ -65,6 +67,7 @@ class HistoryRecordResponse(BaseModel):
     ai_interpretation_audio_path: Optional[str] = None
 
 class ZhugeDrawRequest(BaseModel):
+    mentor_id: str
     question: Optional[str] = None
     language: Optional[str] = "繁體中文"
 
@@ -78,6 +81,7 @@ class ZhugeResponse(BaseModel):
     audio_path: Optional[str] = None
 
 class DaliurenCastRequest(BaseModel):
+    mentor_id: str
     question: Optional[str] = None
     language: Optional[str] = "繁體中文"
 
@@ -91,6 +95,7 @@ class DaliurenResponse(BaseModel):
     audio_path: Optional[str] = None
 
 class DivinationRequest(BaseModel):
+    mentor_id: str
     question: Optional[str] = None
     language: Optional[str] = "繁體中文"
     enable_ai: Optional[bool] = True
@@ -100,3 +105,56 @@ class DivinationResponse(BaseModel):
     result: Dict[str, Any]
     interpretation: Optional[str] = None
     audio_path: Optional[str] = None
+
+# ---- Social Networking Schemas ----
+
+class FriendRequest(BaseModel):
+    mentor_id: str
+    target_id: str
+
+class FriendStatusResponse(BaseModel):
+    id: int
+    requester_id: str
+    receiver_id: str
+    status: str
+
+class SendMessageRequest(BaseModel):
+    mentor_id: str
+    receiver_id: str
+    message: str
+
+class ChatMessageResponse(BaseModel):
+    id: int
+    sender_id: str
+    receiver_id: str
+    message: str
+    timestamp: str
+
+class FriendInfo(BaseModel):
+    mentor_id: str
+    status: str
+    is_online: bool
+
+# ---- Notification Schemas ----
+
+class NotificationItem(BaseModel):
+    type: str # 'friend_request', 'unread_message', 'system'
+    sender_id: str
+    message: str
+    timestamp: str
+    payload: Optional[Dict[str, Any]] = None
+
+class NotificationSummary(BaseModel):
+    unread_messages_count: int
+    pending_friends_count: int
+    recent_notifications: List[NotificationItem]
+
+class FriendRequestItem(BaseModel):
+    id: int
+    requester_id: str
+    created_at: str
+
+class FriendResponseRequest(BaseModel):
+    mentor_id: str
+    requester_id: str
+    action: str # 'accept' or 'decline'

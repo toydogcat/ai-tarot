@@ -24,41 +24,42 @@ def manager():
     return ConnectionManager()
 
 @pytest.mark.asyncio
-async def test_connect_toby_success(manager):
+async def test_connect_mentor_success(manager):
     ws = MockWebSocket()
-    result = await manager.connect_toby(ws)
+    result = await manager.connect_mentor(ws, "toby")
     assert result is True
     assert ws.accepted is True
-    assert manager.active_toby == ws
+    assert manager.rooms["toby"].active_mentor == ws
 
 @pytest.mark.asyncio
-async def test_connect_toby_already_exists(manager):
+async def test_connect_mentor_already_exists(manager):
     ws1 = MockWebSocket()
-    await manager.connect_toby(ws1)
+    await manager.connect_mentor(ws1, "toby")
     
     ws2 = MockWebSocket()
-    result = await manager.connect_toby(ws2)
+    result = await manager.connect_mentor(ws2, "toby")
     assert result is False
     assert ws2.accepted is True
     assert ws2.closed is True
     assert ws2.close_code == 4001
-    assert "fake Toby" in ws2.sent_messages[0]["message"]
+    assert "fake Mentor" in ws2.sent_messages[0]["message"]
 
 @pytest.mark.asyncio
 async def test_connect_client_success(manager):
     ws = MockWebSocket()
-    result = await manager.connect_client(ws, "TestClient")
+    result = await manager.connect_client(ws, "toby", "TestClient")
     assert result is True
     assert ws.accepted is True
-    assert manager.active_client == (ws, "TestClient")
+    assert manager.rooms["toby"].main_client.name == "TestClient"
+    assert manager.rooms["toby"].main_client.websocket == ws
 
 @pytest.mark.asyncio
 async def test_connect_client_already_exists(manager):
     ws1 = MockWebSocket()
-    await manager.connect_client(ws1, "TestClient1")
+    await manager.connect_client(ws1, "toby", "TestClient1")
     
     ws2 = MockWebSocket()
-    result = await manager.connect_client(ws2, "TestClient2")
+    result = await manager.connect_client(ws2, "toby", "TestClient2")
     assert result is False
     assert ws2.accepted is True
     assert ws2.closed is True
@@ -67,34 +68,38 @@ async def test_connect_client_already_exists(manager):
 
 @pytest.mark.asyncio
 async def test_disconnect_and_kick(manager):
-    ws_toby = MockWebSocket()
+    ws_mentor = MockWebSocket()
     ws_client = MockWebSocket()
     
-    await manager.connect_toby(ws_toby)
-    await manager.connect_client(ws_client, "TestClient")
+    await manager.connect_mentor(ws_mentor, "toby")
+    await manager.connect_client(ws_client, "toby", "TestClient")
     
-    assert manager.active_toby is not None
-    assert manager.active_client is not None
+    assert manager.rooms["toby"].active_mentor is not None
+    assert manager.rooms["toby"].main_client is not None
     
-    manager.disconnect_client()
-    assert manager.active_client is None
+    await manager.disconnect_client("toby", ws_client)
+    assert manager.rooms["toby"].main_client is None
     
-    await manager.kick_toby()
-    assert manager.active_toby is None
-    assert ws_toby.closed is True
-    assert ws_toby.close_code == 4003
+    await manager.kick_mentor("toby")
+    assert manager.rooms["toby"].active_mentor is None
+    assert ws_mentor.closed is True
+    assert ws_mentor.close_code == 4003
 
 @pytest.mark.asyncio
-async def test_broadcast(manager):
-    ws_toby = MockWebSocket()
-    ws_client = MockWebSocket()
+async def test_multiple_rooms(manager):
+    ws1 = MockWebSocket()
+    ws2 = MockWebSocket()
     
-    await manager.connect_toby(ws_toby)
-    await manager.connect_client(ws_client, "Client1")
+    # Connect to different rooms
+    await manager.connect_mentor(ws1, "toby")
+    await manager.connect_mentor(ws2, "wang")
     
-    msg = {"hello": "world"}
-    await manager.broadcast(msg)
+    assert "toby" in manager.rooms
+    assert "wang" in manager.rooms
     
-    # Check that both received the broadcast message
-    assert ws_toby.sent_messages[-1] == msg
-    assert ws_client.sent_messages[-1] == msg
+    # Broadcast only to toby's room
+    msg = {"hello": "toby"}
+    await manager.broadcast("toby", msg)
+    
+    assert ws1.sent_messages[-1] == msg
+    assert len(ws2.sent_messages) == 0

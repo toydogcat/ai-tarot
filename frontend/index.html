@@ -3,32 +3,153 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>AI Tarot & I-Ching</title>
+  <meta name="theme-color" content="#1a1a1a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AI Tarot" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/assets/images/icon-192.jpg" />
   <link
     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;400;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css">
+  <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 
 <body>
-  <!-- 登入與角色選擇 Overlay -->
-  <div id="loginOverlay" class="modal-backdrop"
-    style="z-index: 9999; background: #000; display: flex; align-items: center; justify-content: center;">
+  <!-- 系統控制面板 (左上角) -->
+  <div id="systemControls" class="system-controls">
+    <button id="toggleControlsBtn" class="toggle-controls-btn" title="展開/縮小控制項">🪄</button>
+    
+    <div class="controls-content">
+      <!-- 語言選擇器 (整合進控制列) -->
+      <select id="langSelect" style="background:none; border:none; color:#E8D5B7; font-size:0.85rem; cursor:pointer;">
+        <option value="繁體中文">繁體中文</option>
+        <option value="简体中文">简体中文</option>
+        <option value="English">English</option>
+        <option value="日本語">日本語</option>
+        <option value="Español">Español</option>
+      </select>
+      
+      <div class="control-divider"></div>
+  
+      <audio id="bgmAudio" loop></audio>
+      <div class="bgm-controls">
+        <button id="bgmPrev" class="bgm-btn" title="上一首">⏮</button>
+        <button id="bgmToggle" class="bgm-btn" title="播放/暫停">▶️</button>
+        <button id="bgmNext" class="bgm-btn" title="下一首">⏭</button>
+      </div>
+      <div class="bgm-info">
+        <span id="bgmName">Loading...</span>
+      </div>
+      <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.1" value="0.5">
+    </div>
+  </div>
+  <!-- 登入與角色選擇 Overlay (身分路徑優化) -->
+  <div id="loginOverlay" class="modal-backdrop">
+    <div class="login-card">
+      <h1 class="login-title">AI Tarot</h1>
+      <p class="login-subtitle">探索命運的秘密 (Explore Destiny)</p>
+      
+      <div class="login-actions">
+        <!-- 客戶路徑 (新增房間分流) -->
+        <div class="path-group">
+          <span id="pathLabelTop" class="path-label" data-i18n="admin_login_path_label_client">我是客戶 (I am Client)</span>
+          <div class="client-inputs">
+            <input type="text" id="targetMentorInput" placeholder="導師 ID (Required Mentor ID)" class="glass-input">
+            <input type="text" id="clientNameInput" placeholder="您的稱呼 (Your Name - Optional)" class="glass-input">
+          </div>
+          <button id="enterMagicBtn" class="primary-btn">開啟大門 (Enter)</button>
+        </div>
+        
+        <div class="divider-text">或是 (OR)</div>
+        
+        <!-- 導師路徑 -->
+        <div class="path-group">
+          <span id="pathLabelBottom" class="path-label" data-i18n="admin_login_path_label_admin">我是導師 (I am Mentor)</span>
+          <!-- Google Sign-In Container (Populated via JS) -->
+          <div id="googleSigninContainer" style="display: flex; justify-content: center; margin-top: 10px;"></div>
+        </div>
+      </div>
+      
+      <div class="login-footer" style="padding: 10px 0; display: flex; flex-direction: column; gap: 8px;">
+        <div>導師申請？ <a href="#" id="showSignupBtn" class="signup-link">點此註冊 (Sign Up)</a></div>
+        <!-- 隱藏的管理員登入區塊 (Glassmorphism Styled) -->
+        <div id="adminLoginFields" class="hidden" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 20px; text-align: left; animation: fadeIn 0.3s ease;">
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label style="font-size: 0.75rem; color: #a78bfa; letter-spacing: 1px; text-transform: uppercase;" data-i18n="admin_login_id_label">管理員帳號 (Admin ID)</label>
+            <input type="text" id="adminMentorInput" placeholder="管理員 ID (Admin ID)" data-i18n-placeholder="admin_login_id_placeholder" class="glass-input" style="font-size: 0.95rem; padding: 12px; margin-top: 5px; border-color: rgba(167, 139, 250, 0.3);">
+          </div>
+          <div class="form-group">
+            <div style="position: relative; display: flex; align-items: center;">
+              <input type="password" id="adminKeyInput" placeholder="••••••••" class="glass-input" style="font-size: 0.95rem; padding: 12px; margin-top: 5px; border-color: rgba(167, 139, 250, 0.3); width: 100%;">
+              <button id="togglePasswordBtn" type="button" style="position: absolute; right: 10px; background: none; border: none; font-size: 1.1rem; cursor: pointer; color: rgba(255,255,255,0.4); transition: color 0.2s; padding: 5px; top: 55%; transform: translateY(-50%);">👁️</button>
+            </div>
+          </div>
+        </div>
+        <a href="#" id="toggleAdminLogin" style="color: rgba(255,255,255,0.4); font-size: 0.8rem; text-decoration: none; margin-top: 10px; display: inline-block; transition: color 0.2s;">
+          <span id="toggleAdminIcon">🔑</span> <span id="toggleAdminText" data-i18n="admin_login_toggle_key">使用 Key 登入 (Login with Key)</span>
+        </a>
+      </div>
+
+      <!-- Quick Login Section -->
+      <div id="quickLoginSection" class="hidden" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <p style="font-size: 0.75rem; color: #888; margin-bottom: 10px;">快速登入 (Quick Login):</p>
+        <div id="quickLoginContainer" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+          <!-- JS will inject buttons here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 註冊 Modal -->
+  <div id="signupModal" class="modal-backdrop hidden" style="z-index: 10000; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center;">
     <div class="modal-content glass-panel" style="text-align: center; padding: 40px; max-width: 400px; width: 100%;">
-      <h2 style="margin-bottom: 20px; color: #E8D5B7;">進入魔幻世界(Magic World)</h2>
-      <input type="text" id="usernameInput" placeholder="請輸入你的名字"
+      <h2 style="margin-bottom: 20px; color: #E8D5B7;" data-i18n="signup_title">申請成為導師(Apply Mentor)</h2>
+      <input type="email" id="signupEmailInput" placeholder="Gmail (Google Account)" data-i18n-placeholder="signup_email_placeholder"
+        style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white;" />
+      <input type="text" id="signupIdInput" placeholder="Desired Mentor ID" data-i18n-placeholder="signup_id_placeholder"
         style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white;" />
-      <button id="enterMagicBtn" class="primary-btn" style="width: 100%;">開啟大門(Enter)</button>
+      <button id="submitSignupBtn" class="primary-btn" style="width: 100%; margin-bottom: 15px;" data-i18n="signup_submit_btn">提交申請(Submit)</button>
+      <button id="closeSignupBtn" class="secondary-btn" style="width: 100%;" data-i18n="signup_cancel_btn">取消(Cancel)</button>
     </div>
   </div>
 
   <!-- 客戶專屬等待畫面 -->
   <div id="clientWaitingOverlay" class="modal-backdrop hidden"
     style="z-index: 9998; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;">
-    <div class="modal-content glass-panel" style="text-align: center;">
-      <div class="spinner" style="margin: 0 auto 20px;"></div>
-      <h2 id="clientWaitText" style="color: #E8D5B7;">等待您的導師開啟魔法陣...</h2>
+    <div class="modal-content glass-panel" style="text-align: center; max-width: 450px;">
+      <div class="crystal-ball" id="magicCrystalBall">
+          <div class="ball-inner"></div>
+          <div class="ball-mist"></div>
+          <div class="ball-sparkle"></div>
+        </div>
+        <p class="loader-text" data-i18n="loader_text">神祕力量正在運作中...</p>
+        <p id="loadingStatus" style="font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 10px;"></p>
+      <h2 id="clientWaitText" style="color: #E8D5B7; margin-bottom: 25px;" data-i18n="client_wait_text">等待您的導師開啟魔法陣...</h2>
+      
+      <!-- Busy Message Container -->
+      <div id="busyMessageArea" class="hidden" style="margin-bottom: 25px; padding: 15px; background: rgba(255, 170, 0, 0.1); border: 1px solid rgba(255, 170, 0, 0.3); border-radius: 12px;">
+        <p style="color: #ffaa00; font-size: 0.95rem; margin: 0; line-height: 1.6;" data-i18n="busy_message">
+          <span style="font-size: 1.2rem; margin-right: 5px;">🔮</span> 
+          導師目前正在與其他緣人進行連結，請稍候片刻...
+        </p>
+      </div>
+      
+      <div class="form-group" style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <label data-i18n="label_energy_color" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; display: block;">選擇您的能量顏色 (Choose your energy color)</label>
+        <div class="color-selector" id="clientColorSelector" style="justify-content: center;">
+          <div class="color-opt active" data-color="red" style="background: #ff4b2b;" title="紅"></div>
+          <div class="color-opt" data-color="orange" style="background: #ff9068;" title="橙"></div>
+          <div class="color-opt" data-color="yellow" style="background: #fff94c;" title="黃"></div>
+          <div class="color-opt" data-color="green" style="background: #4ef037;" title="綠"></div>
+          <div class="color-opt" data-color="blue" style="background: #0080ff;" title="藍"></div>
+          <div class="color-opt" data-color="indigo" style="background: #4b0082;" title="靛"></div>
+          <div class="color-opt" data-color="purple" style="background: #9d50bb;" title="紫"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -38,13 +159,17 @@
   <div class="container">
     <header>
       <div class="header-titles">
-        <h1 class="title" data-i18n="title">AI Tarot <span class="divider">&</span> I-Ching</h1>
+        <h1 class="title" data-i18n="title">AI Tarot & I-Ching<span class="mentor-badge">Mentor Edition</span></h1>
         <p class="subtitle" data-i18n="subtitle">探索潛意識的古老智慧引導</p>
-        <p id="usageStatusText" style="display: none; color: #E8D5B7; font-size: 0.9em; margin-top: 5px;">剩餘可用次數: <span
-            id="usageLimitSpan">-</span></p>
+        <div id="welcomeMentor" style="display: none; font-size: 0.9rem; color: #FFD700; margin-top: 5px; font-weight: bold; text-shadow: 0 0 10px rgba(255,215,0,0.3);">
+          Welcome, <span id="welcomeMentorName">---</span>!
+        </div>
+        <div id="usageStatusText" style="display: none; margin-top: 8px; font-size: 0.85rem; color: var(--primary-color); letter-spacing: 1px;">
+           <span style="opacity:0.6;">ENERGY QUOTA:</span> <span id="usageLimitSpan" style="font-weight:bold;">-</span>
+        </div>
       </div>
-      <div class="lang-selector">
-        <select id="langSelect" class="secondary-btn"
+      <div class="lang-selector" style="display:none;">
+        <select id="langSelectOld" class="secondary-btn"
           style="padding: 0.5rem; border-radius: 8px; font-family: inherit; cursor: pointer; background: rgba(255,255,255,0.1); color: var(--text-light); border: 1px solid rgba(255,255,255,0.2);">
           <option value="繁體中文" style="color: black;">繁體中文</option>
           <option value="简体中文" style="color: black;">简体中文</option>
@@ -55,6 +180,48 @@
       </div>
     </header>
 
+    <!-- 房間設定面板 (Room Settings) - 導師登入後顯示 -->
+    <div id="roomSettingsPanel" class="glass-panel room-settings-card hidden" style="padding: 1.2rem 1.5rem; margin-bottom: 1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h3 style="margin:0; color:#a78bfa; font-size:0.9rem; letter-spacing:1px; font-weight:800; text-transform:uppercase;">⚙️ 房間設定 (Room Settings)</h3>
+        <span id="roomLevelBadge" class="level-badge">LEVEL: SINGLE</span>
+      </div>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">AI 輔助解讀 (AI Interpretation)</span>
+            <span id="aiRestrictionNote" class="restriction-hint"></span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="aiEnabledToggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">最大緣人數 (Max Guests)</span>
+            <span id="guestRestrictionNote" class="restriction-hint"></span>
+          </div>
+          <div class="guest-count-control">
+            <input type="number" id="maxGuestsInput" min="1" max="10" value="1" class="glass-input-small">
+            <span class="unit">人</span>
+          </div>
+        </div>
+      </div>
+      <div id="settingsUpdateStatus" class="settings-status"></div>
+      
+      <!-- Announcement Editor (Mentor Only) -->
+      <div class="form-group" style="margin-top: 1.5rem; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 1.5rem;">
+        <label style="color: #a78bfa; font-size: 0.85rem; margin-bottom: 10px; display: block;">📢 緣人歡迎辭 (Customer Announcement)</label>
+        <textarea id="announcementInput" rows="2" class="glass-input" placeholder="輸入要給客戶看到的訊息或連結..." style="font-size: 0.9rem; min-height: 60px;"></textarea>
+        
+        <div class="share-link-section">
+          <button id="copyShareLinkBtn" class="share-link-btn" title="複製房間連結">🔗 分享連結 (Share Link)</button>
+          <span id="copyLinkStatus" style="font-size: 0.75rem; color: #4ef037; opacity: 0;">已複製至剪貼簿!</span>
+        </div>
+      </div>
+    </div>
+
     <div class="tabs">
       <button id="tabTarot" class="tab-btn active" data-i18n="tab_tarot">🔮 塔羅占卜</button>
       <button id="tabIChing" class="tab-btn" data-i18n="tab_iching">☯️ 易經卜卦</button>
@@ -64,34 +231,26 @@
       <button id="tabHistory" class="tab-btn" data-i18n="tab_history">📜 歷史紀錄</button>
     </div>
 
+    <!-- Announcement Banner for Clients -->
+    <div id="announcementBanner" class="announcement-banner hidden">
+      <div class="announcement-icon">🏮</div>
+      <div id="announcementText" class="announcement-text"></div>
+    </div>
+
     <main>
       <!-- 導師的問題暫存區 (僅導師可見) -->
-      <div id="questionStashPanel" class="glass-panel"
-        style="display: none; padding: 1rem; margin-bottom: 1.5rem; text-align: left;">
-        <h3 style="margin-top:0; color:#FFD700; font-size:1rem; margin-bottom:0.8rem;">📥 客戶問題暫存區 (點擊載入)</h3>
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;" id="stashContainer">
-          <button class="stash-btn" id="stashBtn-0"
-            style="flex:1; min-width:80px; padding:0.5rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
-            title="空位">[空]</button>
-          <button class="stash-btn" id="stashBtn-1"
-            style="flex:1; min-width:80px; padding:0.5rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
-            title="空位">[空]</button>
-          <button class="stash-btn" id="stashBtn-2"
-            style="flex:1; min-width:80px; padding:0.5rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
-            title="空位">[空]</button>
-          <button class="stash-btn" id="stashBtn-3"
-            style="flex:1; min-width:80px; padding:0.5rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
-            title="空位">[空]</button>
-          <button class="stash-btn" id="stashBtn-4"
-            style="flex:1; min-width:80px; padding:0.5rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
-            title="空位">[空]</button>
-          <button class="stash-btn" id="stashBtn-5"
-            style="flex:1; min-width:80px; padding:0.5rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
-            title="空位">[空]</button>
-          <button id="clearStashBtn" class="secondary-btn" style="padding:0.5rem; border-radius:8px; margin-left: auto;"
-            title="清空暫存區">🧹</button>
+      <!-- 緣人感應佇列 (Seeker Connection Queue) -->
+      <div id="questionStashPanel" class="glass-panel glass-accent-gold"
+        style="display: none; padding: 1.5rem; margin-bottom: 2rem; text-align: left;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+           <h3 style="margin:0; color:var(--primary-color); font-size:0.9rem; letter-spacing:1px; font-weight:800; text-transform:uppercase;" data-i18n="stash_panel_title">🔮 緣人感應佇列 (Seeker Connection Queue)</h3>
+           <button id="clearStashBtn" class="secondary-btn" style="padding:0.4rem 0.8rem; border-radius:6px; font-size:0.8rem; opacity:0.6;" title="清空佇列">Clear All</button>
+        </div>
+        <div class="seeker-queue-container" id="stashContainer">
+           <!-- JavaScript will inject .seeker-card elements here -->
         </div>
       </div>
+
 
       <!-- 塔羅控制面板 -->
       <section id="tarotPanel" class="glass-panel controls">
@@ -189,7 +348,7 @@
       <!-- 載入動畫 -->
       <div id="loader" class="loader-container hidden">
         <div class="spinner"></div>
-        <p data-i18n="loader_text">神祕力量正在運作中...</p>
+        <p data-i18n="loader_text" style="margin-top:20px;">神祕力量正在運作中...</p>
       </div>
 
       <!-- 占卜結果區塊 -->
@@ -233,7 +392,7 @@
           <h2 data-i18n="tab_history" style="margin: 0; white-space: nowrap;">歷史紀錄</h2>
           <select id="historyClientFilter"
             style="padding: 0.5rem; border-radius: 8px; background: rgba(0,0,0,0.5); color: #E8D5B7; border: 1px solid rgba(255,255,255,0.2); max-width: 150px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-            <option value="">全部客戶 (All)</option>
+            <option value="" data-i18n="history_filter_all">全部客戶 (All)</option>
           </select>
         </div>
         <div id="historyGrid" class="history-grid"></div>
@@ -251,6 +410,59 @@
       <button id="closeModalBtn" class="close-btn">&times;</button>
       <div id="modalBody">
         <!-- 將動態插入內容 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Bell (Top Right or near social) -->
+  <button id="notificationBellBtn" class="fab-btn secondary-fab hidden" style="bottom: 90px; right: 20px;" title="通知中心">🔔<span id="notificationBadge" class="badge hidden">0</span></button>
+  
+  <div id="notificationPanel" class="glass-panel notification-panel hidden">
+    <div class="social-header">
+      <h3 style="color: #E8D5B7; margin: 0;">通知中心</h3>
+      <button id="closeNotificationBtn" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">&times;</button>
+    </div>
+    <div id="notificationList" class="notification-list" style="max-height: 400px; overflow-y: auto; padding: 10px;">
+      <div style="text-align:center; color:#888; padding: 20px;">尚無新通知</div>
+    </div>
+  </div>
+
+  <!-- Social Panel (Floating on right) -->
+  <button id="socialToggleBtn" class="fab-btn hidden" title="社群與好友" data-i18n-title="social_toggle_title">💬</button>
+  <div id="socialPanel" class="glass-panel social-sliding-panel">
+    <div class="social-header">
+      <h3 style="color: #E8D5B7; margin: 0;" data-i18n="social_title">社群通訊</h3>
+      <button id="closeSocialBtn" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">&times;</button>
+    </div>
+    
+    <div class="social-tabs">
+      <button id="tabFriends" class="social-tab active" data-i18n="social_tab_friends">好友列表</button>
+      <button id="tabChat" class="social-tab" data-i18n="social_tab_chat">聊天室</button>
+    </div>
+
+    <!-- Friends Tab -->
+    <div id="friendsView" class="social-view">
+      <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+        <input type="text" id="addFriendInput" placeholder="輸入導師 ID..." data-i18n-placeholder="social_add_placeholder" style="flex:1;" />
+        <button id="addFriendBtn" class="secondary-btn" data-i18n="social_add_btn" style="padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white; cursor: pointer;">加入</button>
+      </div>
+      <ul id="friendsList" class="friends-list">
+        <li style="text-align:center; color:#888;" data-i18n="social_loading">載入中...</li>
+      </ul>
+    </div>
+
+    <!-- Chat Tab -->
+    <div id="chatView" class="social-view hidden" style="display: flex; flex-direction: column; height: 100%;">
+      <div id="chatHeader" style="padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); font-weight: bold; color: #E8D5B7; display:flex; align-items:center; justify-content:space-between;">
+        <span><span data-i18n="social_chat_prefix">與</span> <span id="currentChatTarget" style="color:var(--primary-color);">---</span> <span data-i18n="social_chat_suffix">聊天</span></span>
+        <button id="backToFriendsBtn" style="background:none;border:none;color:#888;cursor:pointer;">🔙</button>
+      </div>
+      <div id="chatMessages" class="chat-messages" style="flex: 1; overflow-y: auto; margin: 10px 0; display: flex; flex-direction: column; gap: 8px; padding-right:5px;">
+        <div style="text-align:center; color:#888; margin-top: 20px;" data-i18n="social_no_chat_selected">請先從好友列表選擇導師</div>
+      </div>
+      <div style="display: flex; gap: 5px; margin-top: auto;">
+        <input type="text" id="chatInput" placeholder="輸入訊息..." data-i18n-placeholder="social_msg_placeholder" style="flex: 1;" disabled />
+        <button id="sendChatBtn" class="primary-btn" data-i18n="social_send_btn" style="padding: 0.5rem; width: auto;" disabled>傳送</button>
       </div>
     </div>
   </div>

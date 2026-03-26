@@ -1,40 +1,38 @@
-"""History 系統 — 紀錄每次占卜到 history/ 資料夾"""
-import json
+"""History 系統 — 紀錄每次占卜到 PostgreSQL"""
 import uuid
+import json
 from datetime import datetime
-from pathlib import Path
+from typing import Optional
 
-from config import BASE_DIR
-from core.tarot.models import SpreadResult
+from sqlalchemy import select, insert, delete, update, desc, or_, func
+
 from core.logger import get_logger
-
-HISTORY_DIR = BASE_DIR / "history"
-HISTORY_DIR.mkdir(exist_ok=True)
+from core.db import engine, readings, init_db
+from config import config_manager
 
 logger = get_logger("history")
 
+# 初始化資料庫表格 (如果不存在)
+init_db()
 
-def _get_today_file() -> Path:
-    """取得今天的 history JSON 檔案路徑"""
-    today = datetime.now().strftime("%Y-%m-%d")
-    return HISTORY_DIR / f"{today}.json"
-
-
-def _load_today_records() -> list[dict]:
-    """載入今天的紀錄"""
-    filepath = _get_today_file()
-    if filepath.exists():
-        with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
-
-
-def _save_records(records: list[dict], filepath: Path | None = None):
-    """儲存紀錄"""
-    if filepath is None:
-        filepath = _get_today_file()
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(records, f, ensure_ascii=False, indent=2)
+def _dict_to_record(row) -> dict:
+    """轉換 SQLAlchemy Row 為前端/依賴端相容的字典"""
+    if not row:
+        return {}
+    r = dict(row._mapping)
+    # 將 datetime 轉回 string
+    r['timestamp'] = r['created_at'].isoformat() if r['created_at'] else None
+    if r.get('recovered_at'):
+        r['recovered_at'] = r['recovered_at'].isoformat()
+    # 相容舊版，補充一些固定 key
+    r['type'] = r['record_type']
+    
+    # tarot 的相容性
+    if r['type'] == 'tarot' and isinstance(r.get('result'), dict):
+        r['spread'] = r['result'].get('spread', {})
+        r['cards'] = r['result'].get('cards', [])
+        
+    return r
 
 def save_reading(
     record_type: str,
@@ -44,27 +42,19 @@ def save_reading(
     ai_prompt: str | None = None,
     ai_interpretation_audio_path: str | None = None,
     search_success: bool = True,
-    client_name: str = "toby",
+    mentor_id: str = "toby",
+    client_id: str = "toby",
+    is_multiuser: bool = True,
 ) -> str:
     """
-    儲存一次占卜/卜卦紀錄
-
-    Args:
-        record_type: 'tarot' 或是 'iching'
-        question: 使用者問題
-        result: 抽牌或卜卦結果 (SpreadResult 或 Dict)
-        interpretation: AI 解讀（None 或 'error' 如果失敗）
-        ai_prompt: 送給大語言模型的提示詞
-
-    Returns:
-        紀錄 ID
+    儲存一次占卜/卜卦紀錄到 PostgreSQL
     """
     record_id = str(uuid.uuid4())[:8]
     now = datetime.now()
 
     # 組合紀錄結果資料
     result_data = {}
-    if record_type == "tarot":
+    if record_type == "tarot" and not isinstance(result, dict):
         cards_data = []
         for i, drawn_card in enumerate(result.drawn_cards):
             pos = result.spread.positions[i]
@@ -87,7 +77,7 @@ def save_reading(
             },
             "cards": cards_data
         }
-    elif record_type == "iching":
+    elif record_type == "iching" and "tosses" in (result if isinstance(result, dict) else {}):
         result_data = {
             "tosses": result["tosses"],
             "original_hexagram": result["original_hexagram"]["name"] if result["original_hexagram"] else None,
@@ -103,181 +93,263 @@ def save_reading(
             "interp2": result.get("interp2")
         }
     elif record_type == "daliuren":
+        result_inner = result if isinstance(result, dict) else {}
         result_data = {
-            "jieqi": result.get("jieqi"),
-            "date": result.get("date"),
-            "pattern": result.get("pattern"),
-            "san_chuan": result.get("san_chuan"),
-            "si_ke": result.get("si_ke")
+            "jieqi": result_inner.get("jieqi") or result_inner.get("節氣"),
+            "date": result_inner.get("date") or result_inner.get("日期"),
+            "pattern": result_inner.get("pattern") or result_inner.get("格局"),
+            "san_chuan": result_inner.get("san_chuan") or result_inner.get("三傳"),
+            "si_ke": result_inner.get("si_ke") or result_inner.get("四課")
         }
+    else:
+        result_data = result if isinstance(result, dict) else {}
 
-    # 判斷 AI 狀態
-    ai_status = {
-        "interpretation": "success",
-        "audio": "error",
-        "search": "success" if search_success else "error"
-    }
+    # === [核心實作] 單人模式 (Trial 版) AI 限縮邏輯 ===
     
-    if interpretation is None or interpretation == "error" or interpretation.startswith("⚠️") or interpretation.startswith("❌"):
-        ai_status["interpretation"] = "error"
+    if not is_multiuser:
+        # 單人試用版，強制關閉 AI 服務
         interpretation = "error"
-    elif ai_interpretation_audio_path:
-        ai_status["audio"] = "success"
+        ai_interpretation_audio_path = None
+        search_success = False
+        ai_status = {
+            "interpretation": "error",
+            "audio": "error",
+            "search": "error"
+        }
+    else:
+        # 多人版正常判斷
+        ai_status = {
+            "interpretation": "success",
+            "audio": "error",
+            "search": "success" if search_success else "error"
+        }
+        if interpretation is None or interpretation == "error" or interpretation.startswith("⚠️") or interpretation.startswith("❌"):
+            ai_status["interpretation"] = "error"
+            interpretation = "error"
+        elif ai_interpretation_audio_path:
+            ai_status["audio"] = "success"
 
-    record = {
-        "id": record_id,
-        "type": record_type,
-        "timestamp": now.isoformat(),
-        "time_display": now.strftime("%H:%M:%S"),
-        "client_name": client_name,
-        "question": question,
-        "result": result_data,
-        "ai_prompt": ai_prompt or "",
-        "ai_interpretation": interpretation,
-        "ai_status": ai_status,
-        "ai_interpretation_audio_path": ai_interpretation_audio_path,
-    }
-
-    # 歷史向下相容：如果是 tarot，加上舊有第一層的欄位
-    if record_type == "tarot":
-        record["spread"] = result_data["spread"]
-        record["cards"] = result_data["cards"]
-
-    records = _load_today_records()
-    records.append(record)
-    _save_records(records)
+    # 新增寫入 PostgreSQL
+    stmt = insert(readings).values(
+        id=record_id,
+        record_type=record_type,
+        created_at=now,
+        time_display=now.strftime("%H:%M:%S"),
+        mentor_id=mentor_id,
+        client_id=client_id,
+        question=question,
+        result=result_data,
+        ai_prompt=ai_prompt or "",
+        ai_interpretation=interpretation,
+        ai_status=ai_status,
+        audio_path=ai_interpretation_audio_path,
+        recovered_at=None
+    )
+    
+    with engine.begin() as conn:
+        conn.execute(stmt)
 
     logger.info(
-        f"占卜紀錄已儲存 [ID={record_id}] [{record_type}] "
+        f"占卜紀錄已儲存至 DB [ID={record_id}] [{record_type}] "
         f"問題='{question[:30]}...' "
-        f"AI={ai_status}"
+        f"Mentor={mentor_id} Client={client_id} AI={ai_status}"
     )
 
     return record_id
 
+async def save_complete_reading(
+    record_type: str,
+    question: str,
+    result: any,
+    get_interpretation_func,
+    build_prompt_func,
+    search_func,
+    generate_audio_func,
+    mentor_id: str = "toby",
+    client_id: str = "toby",
+) -> tuple[str, str]:
+    """
+    一站式處理：外部搜尋 -> 提示詞建立 -> AI 解讀 -> 存入資料庫 -> 語音合成 -> 更新紀錄
+    回傳: (record_id, interpretation)
+    """
+    # 1. 執行外部搜尋
+    search_context, search_success = "", True
+    if search_func:
+        try:
+            search_context, search_success = search_func(question)
+        except Exception as e:
+            logger.error(f"外部搜尋異常: {e}")
+            search_success = False
 
-def get_history_dates() -> list[str]:
-    """取得所有有紀錄的日期（降序）"""
-    files = sorted(HISTORY_DIR.glob("*.json"), reverse=True)
-    return [f.stem for f in files]
+    # 2. 建立 AI 提示詞 (用於紀錄，方便後續修復)
+    ai_prompt = ""
+    if build_prompt_func:
+        try:
+            ai_prompt = build_prompt_func(question, result, search_context)
+        except Exception as e:
+            logger.error(f"建立提示詞失敗: {e}")
 
+    # 3. 取得 AI 解讀
+    interpretation = "error"
+    try:
+        interpretation = get_interpretation_func(question, result, search_context)
+    except Exception as e:
+        logger.error(f"AI 解讀失敗: {e}")
+        interpretation = f"⚠️ 解讀發生異常: {e}"
 
-def load_history(date: str) -> list[dict]:
+    # 4. 初始儲存紀錄
+    record_id = save_reading(
+        record_type=record_type,
+        question=question,
+        result=result,
+        interpretation=interpretation,
+        ai_prompt=ai_prompt,
+        search_success=search_success,
+        mentor_id=mentor_id,
+        client_id=client_id
+    )
+
+    # 5. 產生語音 (如果解讀成功)
+    if interpretation and not interpretation.startswith(("⚠️", "error", "❌")):
+        try:
+            audio_path = await generate_audio_func(interpretation, record_id)
+            if audio_path:
+                update_record_interpretation(datetime.now().strftime("%Y-%m-%d"), record_id, interpretation, audio_path)
+        except Exception as e:
+            logger.error(f"語音合成或更新失敗: {e}")
+
+    return record_id, interpretation
+
+def get_history_dates(mentor_id: str | None = None) -> list[str]:
+    """取得所有有紀錄的日期（降序） - 基於 created_at"""
+    # 這裡我們用 date_trunc 取得不重複日期
+    with engine.begin() as conn:
+        query = select(func.date(readings.c.created_at).label("d")).distinct()
+        if mentor_id:
+            query = query.where(readings.c.mentor_id == mentor_id)
+        query = query.order_by(desc("d"))
+        
+        results = conn.execute(query).fetchall()
+        return [str(r[0]) for r in results if r[0]]
+
+def load_history(date_str: str, mentor_id: str | None = None) -> list[dict]:
     """載入特定日期的紀錄"""
-    filepath = HISTORY_DIR / f"{date}.json"
-    if filepath.exists():
-        with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
-
-
-def get_error_records(date: str | None = None) -> list[dict]:
-    """
-    取得指定日期（或全部）中 AI 狀態為 error 的紀錄
-
-    Args:
-        date: 指定日期，None 則搜尋全部
-    """
-    errors = []
-    if date:
-        dates = [date]
-    else:
-        dates = get_history_dates()
-
-    for d in dates:
-        records = load_history(d)
+    with engine.begin() as conn:
+        query = select(readings).where(func.date(readings.c.created_at) == date_str)
+        if mentor_id:
+            query = query.where(readings.c.mentor_id == mentor_id)
+        query = query.order_by(desc(readings.c.created_at))
+        
+        rows = conn.execute(query).fetchall()
+        # 兼容原本 json 的格式
+        records = [_dict_to_record(row) for row in rows]
         for r in records:
-            ai_status = r.get("ai_status", {})
-            if isinstance(ai_status, str):
-                if ai_status == "error":
-                    r["_date"] = d
-                    errors.append(r)
-            elif ai_status.get("interpretation") == "error":
-                r["_date"] = d
-                errors.append(r)
-    return errors
+            r["_date"] = date_str
+        return records
 
+def get_error_records(date_str: str | None = None, mentor_id: str | None = None) -> list[dict]:
+    """取得 AI 狀態為 error 的紀錄"""
+    with engine.begin() as conn:
+        # MySQL/PostgreSQL json extraction: ai_status->>'interpretation' == 'error'
+        query = select(readings).where(
+            readings.c.ai_interpretation == "error"
+        )
+        if date_str:
+            query = query.where(func.date(readings.c.created_at) == date_str)
+        if mentor_id:
+            query = query.where(readings.c.mentor_id == mentor_id)
+            
+        rows = conn.execute(query).fetchall()
+        
+        records = []
+        for row in rows:
+            r = _dict_to_record(row)
+            if r['timestamp']:
+                r['_date'] = r['timestamp'][:10]
+            records.append(r)
+        return records
 
-def update_record_interpretation(date: str, record_id: str, interpretation: str, audio_path: str | None = None) -> bool:
-    """
-    更新特定紀錄的 AI 解讀（用於修復 error）
+def update_record_interpretation(date_str: str, record_id: str, interpretation: str, audio_path: str | None = None) -> bool:
+    """更新特定紀錄的 AI 解讀（用於修復 error）"""
+    with engine.begin() as conn:
+        # First check if exists
+        query = select(readings).where(readings.c.id == record_id)
+        row = conn.execute(query).fetchone()
+        if not row:
+            return False
+            
+        ai_status = row.ai_status if row.ai_status else {}
+        
+        if interpretation:
+            ai_status["interpretation"] = "success"
+        if audio_path:
+            ai_status["audio"] = "success"
+            
+        stmt = update(readings).where(readings.c.id == record_id).values(
+            ai_interpretation=interpretation,
+            ai_status=ai_status,
+            audio_path=audio_path if audio_path else row.audio_path,
+            recovered_at=datetime.now()
+        )
+        res = conn.execute(stmt)
+        
+        logger.info(f"紀錄 {record_id} AI 解讀已修復")
+        return res.rowcount > 0
 
-    Args:
-        date: 紀錄日期
-        record_id: 紀錄 ID
-        interpretation: 新的 AI 解讀
+def search_history_records(query_str: str, mentor_id: str | None = None, limit: int = 10) -> list[dict]:
+    """資料庫全文/模糊搜尋"""
+    if not query_str.strip():
+        return []
 
-    Returns:
-        是否成功更新
-    """
-    filepath = HISTORY_DIR / f"{date}.json"
-    if not filepath.exists():
+    with engine.begin() as conn:
+        # 使用 PostgreSQL 原生 full-text search (FTS)
+        # 用 coalesce 確保如果 question 或 ai_interpretation 有 NULL 不會讓整個字串變 NULL
+        vector_col = func.to_tsvector(
+            'simple', 
+            func.coalesce(readings.c.question, '') + ' ' + func.coalesce(readings.c.ai_interpretation, '')
+        )
+        # 使用 plainto_tsquery 會自動將輸入字串轉為查詢格式 (自動插入 &)
+        ts_query = func.plainto_tsquery('simple', query_str)
+        
+        query = select(readings).where(vector_col.op('@@')(ts_query))
+        
+        if mentor_id:
+            query = query.where(readings.c.mentor_id == mentor_id)
+            
+        query = query.order_by(desc(readings.c.created_at)).limit(limit)
+        
+        rows = conn.execute(query).fetchall()
+        records = []
+        for row in rows:
+            r = _dict_to_record(row)
+            if r['created_at']:
+                r['_date'] = r['created_at'].isoformat()[:10]
+            r['_search_score'] = 100 # ILIKE 固定分數
+            records.append(r)
+            
+        return records
+
+def delete_record(date_str: str, record_id: str) -> bool:
+    """刪除單筆紀錄"""
+    with engine.begin() as conn:
+        stmt = delete(readings).where(readings.c.id == record_id)
+        res = conn.execute(stmt)
+        if res.rowcount > 0:
+            logger.info(f"已從資料庫刪除紀錄 {record_id}")
+            return True
         return False
 
-    records = load_history(date)
-    for record in records:
-        if record["id"] == record_id:
-            # 確保 ai_status 是字典
-            if isinstance(record.get("ai_status"), str) or "ai_status" not in record:
-                record["ai_status"] = {"interpretation": "error", "audio": "error", "search": "skipped"}
-                
-            if interpretation:
-                record["ai_interpretation"] = interpretation
-                record["ai_status"]["interpretation"] = "success"
-            
-            if audio_path:
-                record["ai_interpretation_audio_path"] = audio_path
-                record["ai_status"]["audio"] = "success"
-                
-            record["recovered_at"] = datetime.now().isoformat()
-            
-            _save_records(records, filepath)
-            logger.info(f"紀錄 {record_id} AI 解讀已修復")
-            return True
-
-    return False
-
-def search_history_records(query: str, limit: int = 10) -> list[dict]:
-    """使用 thefuzz 進行歷史紀錄語意搜尋"""
-    if not query.strip():
-        return []
-
-    try:
-        from thefuzz import process
-    except ImportError:
-        logger.error("thefuzz 套件未安裝，無法進行搜尋")
-        return []
-
-    dates = get_history_dates()
-    all_records = []
-    
-    for d in dates:
-        records = load_history(d)
-        for r in records:
-            ai_status = r.get("ai_status", {})
-            is_valid = False
-            if isinstance(ai_status, str):
-                is_valid = ai_status in ("success", "recovered")
-            else:
-                is_valid = ai_status.get("interpretation") == "success"
-                
-            if is_valid and r.get("ai_interpretation"):
-                r["_date"] = d
-                all_records.append(r)
-
-    if not all_records:
-        return []
-
-    choices = {i: r["ai_interpretation"] for i, r in enumerate(all_records)}
-    
-    results = process.extract(query, choices, limit=limit)
-    
-    matched_records = []
-    for match_str, score, key in results:
-        if score > 30: # fuzzy 門檻
-            record = all_records[key].copy()
-            record["_search_score"] = score
-            matched_records.append(record)
-            
-    return matched_records
-
+def delete_records_batch(records_to_delete: list[dict]) -> int:
+    """大量刪除紀錄"""
+    if not records_to_delete:
+        return 0
+        
+    ids_to_delete = [r["id"] for r in records_to_delete if "id" in r]
+    if not ids_to_delete:
+        return 0
+        
+    with engine.begin() as conn:
+        stmt = delete(readings).where(readings.c.id.in_(ids_to_delete))
+        res = conn.execute(stmt)
+        logger.info(f"已從資料庫批次刪除 {res.rowcount} 筆紀錄")
+        return res.rowcount

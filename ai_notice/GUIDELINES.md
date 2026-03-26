@@ -1,9 +1,11 @@
 # 🌟 AI 智慧占卜 (Tarot & I-Ching) 專案開發注意事項
 
 ## 環境設定
-- **Python 環境**：使用 Conda `toby` 環境 (啟用方式：`conda activate toby`)
-- **環境變數**：複製 `.env.example` 為 `.env` 並填入 `GEMINI_API_KEY`、`TAVILY_API_KEY` 與 `NGROK_AUTHTOKEN`。
-- **依賴安裝**：`pip install -r requirements.txt`，確保包含 `tavily-python`, `SpeechRecognition`, `pydub`, `streamlit-mic-recorder`, `fastapi`, `uvicorn`, `hydra-core` 等套件。
+- **Python 環境 (雙環境支援)**：
+  - **首選 (uv)**：專案開發未來以 `uv` 為主。請在 `backend/` 目錄建立與使用 `.venv` 虛擬環境 (`uv venv` 搭配 `uv pip install -r requirements.txt`)。
+  - **備用 (Conda)**：保留支援 Conda `toby` 環境 (`conda activate toby`)。
+- **環境變數**：複製 `.env.example` 為 `.env` 並根據使用環境調整 `PYTHON_PATH`，同時填入必要的 API Keys。
+- **依賴安裝**：優先使用 `uv pip install -r requirements.txt` 進行極速安裝，確保環境完整。
 
 ## 專案結構規範
 | 目錄 | 用途 |

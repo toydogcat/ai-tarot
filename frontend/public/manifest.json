@@ -1,0 +1,22 @@
+{
+  "short_name": "AI Tarot",
+  "name": "AI Tarot & I-Ching Divination",
+  "icons": [
+    {
+      "src": "/assets/images/icon-192.jpg",
+      "type": "image/jpeg",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/images/icon-512.jpg",
+      "type": "image/jpeg",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#000000",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#1a1a1a",
+  "description": "Professional AI-powered Tarot, I-Ching, and Zhuge Shensuan divination platform."
+}

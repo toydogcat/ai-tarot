@@ -14,11 +14,11 @@ def render_xiaoliuren(result_data: dict, question: str):
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.info(f"**初傳**<br>數字：{nums[0] if len(nums)>0 else ''}<br>落宮：{small_states[0] if len(small_states)>0 else ''}")
+        st.info(f"**初傳**\n\n數字：{nums[0] if len(nums)>0 else ''}\n\n落宮：{small_states[0] if len(small_states)>0 else ''}")
     with col2:
-        st.info(f"**中傳**<br>數字：{nums[1] if len(nums)>1 else ''}<br>落宮：{small_states[1] if len(small_states)>1 else ''}")
+        st.info(f"**中傳**\n\n數字：{nums[1] if len(nums)>1 else ''}\n\n落宮：{small_states[1] if len(small_states)>1 else ''}")
     with col3:
-        st.success(f"**終傳 (定局)**<br>數字：{nums[2] if len(nums)>2 else ''}<br>落宮：{final_state}")
+        st.success(f"**終傳 (定局)**\n\n數字：{nums[2] if len(nums)>2 else ''}\n\n落宮：{final_state}")
 
     st.markdown("---")
     st.markdown(f"#### 📜 【{final_state}】傳統卦義")

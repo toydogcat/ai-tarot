@@ -2,6 +2,7 @@
 import argparse
 import os
 import sys
+import asyncio
 from pathlib import Path
 
 # 確保可以 import 專案模組
@@ -70,7 +71,7 @@ def build_repair_prompt(record: dict) -> str:
 
 
 
-def repair_single(date: str, record_id: str) -> bool:
+async def repair_single(date: str, record_id: str) -> bool:
     """修復單筆紀錄"""
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
@@ -117,7 +118,7 @@ def repair_single(date: str, record_id: str) -> bool:
         interpretation = response.text
 
         print("   🎵 正在生成語音...")
-        audio_path = generate_audio(interpretation, record_id)
+        audio_path = await generate_audio(interpretation, record_id)
         if audio_path:
             print("   ✅ 語音生成成功")
 
@@ -157,7 +158,7 @@ def get_missing_audio_records(date: str | None = None) -> list[dict]:
     return missing
 
 
-def fix_audio_single(date: str, record_id: str) -> bool:
+async def fix_audio_single(date: str, record_id: str) -> bool:
     """為單筆紀錄補件語音"""
     records = load_history(date)
     target = None
@@ -174,7 +175,7 @@ def fix_audio_single(date: str, record_id: str) -> bool:
         return False
 
     print(f"🎵 正在為紀錄 {record_id} 生成語音...")
-    audio_path = generate_audio(interpretation, record_id)
+    audio_path = await generate_audio(interpretation, record_id)
     if audio_path:
         # 這裡借用 update_record_interpretation 的邏輯，但只更新 audio_path
         return update_record_interpretation(date, record_id, interpretation, audio_path)
@@ -224,7 +225,7 @@ def main():
         success_count = 0
         for m in missing:
             date = m.get("_date", "unknown")
-            if fix_audio_single(date, m["id"]):
+            if await fix_audio_single(date, m["id"]):
                 success_count += 1
         
         print(f"完成！成功補件 {success_count}/{len(missing)} 筆語音紀錄")
@@ -240,7 +241,7 @@ def main():
         success_count = 0
         for e in errors:
             date = e.get("_date", "unknown")
-            if repair_single(date, e["id"]):
+            if await repair_single(date, e["id"]):
                 success_count += 1
             print()
 
@@ -248,10 +249,87 @@ def main():
         return
 
     if args.date and args.id:
-        repair_single(args.date, args.id)
+        await repair_single(args.date, args.id)
         return
 
     parser.print_help()
+
+
+async def main_async():
+    parser = argparse.ArgumentParser(description="修復 AI 解牌失敗或缺少語音的歷史紀錄")
+    parser.add_argument("--list", action="store_true", help="列出所有 error 紀錄")
+    parser.add_argument("--date", type=str, help="指定日期 (YYYY-MM-DD)")
+    parser.add_argument("--id", type=str, help="指定紀錄 ID")
+    parser.add_argument("--all", action="store_true", help="修復所有 error 紀錄")
+    parser.add_argument("--fix-audio", action="store_true", help="修復缺少語音的紀錄")
+
+    args = parser.parse_args()
+
+    if args.list:
+        errors = get_error_records(args.date)
+        missing_audio = get_missing_audio_records(args.date)
+        
+        if not errors and not missing_audio:
+            print("🎉 沒有任何紀錄需要修復！")
+            return
+
+        if errors:
+            print(f"找到 {len(errors)} 筆 error 紀錄：\n")
+            for e in errors:
+                date = e.get("_date", "unknown")
+                print(f"  ❌ [{date}] ID={e['id']}  {e['question'][:50]}...")
+            print()
+
+        if missing_audio:
+            print(f"找到 {len(missing_audio)} 筆缺少語音的紀錄：\n")
+            for m in missing_audio:
+                date = m.get("_date", "unknown")
+                print(f"  🎵 [{date}] ID={m['id']}  {m['question'][:50]}...")
+            print()
+        return
+
+    if args.fix_audio:
+        missing = get_missing_audio_records(args.date)
+        if not missing:
+            print("🎉 沒有任何紀錄需要補件語音！")
+            return
+
+        print(f"🔧 準備為 {len(missing)} 筆紀錄生成語音...\n")
+        success_count = 0
+        for m in missing:
+            date = m.get("_date", "unknown")
+            if await fix_audio_single(date, m["id"]):
+                success_count += 1
+        
+        print(f"完成！成功補件 {success_count}/{len(missing)} 筆語音紀錄")
+        return
+
+    if args.all:
+        errors = get_error_records(args.date)
+        if not errors:
+            print("🎉 沒有任何 error 紀錄需要修復！")
+            return
+
+        print(f"🔧 準備修復 {len(errors)} 筆紀錄...\n")
+        success_count = 0
+        for e in errors:
+            date = e.get("_date", "unknown")
+            if await repair_single(date, e["id"]):
+                success_count += 1
+            print()
+
+        print(f"完成！成功修復 {success_count}/{len(errors)} 筆紀錄")
+        return
+
+    if args.date and args.id:
+        await repair_single(args.date, args.id)
+        return
+
+    parser.print_help()
+
+
+def main():
+    asyncio.run(main_async())
 
 
 if __name__ == "__main__":

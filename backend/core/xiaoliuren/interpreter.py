@@ -48,23 +48,28 @@ def interpret_xiaoliuren(question: str, result_data: dict, language: str = "繁�
     if system_prompt:
         prompt = f"系統設定：\n{system_prompt}\n\n" + prompt
 
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            logger.info(f"Calling {selected_model} for Xiao Liu Ren interpretation (Attempt {attempt + 1})...")
-            response = client.models.generate_content(
-                model=selected_model,
-                contents=prompt,
-            )
-            return response.text
-        except errors.ClientError as e:
-            if e.code == 429:
-                wait_time = (attempt + 1) * 5
-                time.sleep(wait_time)
-                continue
-            logger.error(f"Xiao Liu Ren API expected error: {e}")
-            return "error"
-        except Exception as e:
-            logger.error(f"Unexpected error in XiaoLiuRen interpretation: {e}")
-            return "error"
-    return "error"
+    from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+    
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type((errors.ServerError, errors.ClientError)),
+        reraise=True
+    )
+    def _generate_with_retry():
+        logger.info(f"Calling {selected_model} for Xiao Liu Ren interpretation...")
+        return client.models.generate_content(
+            model=selected_model,
+            contents=prompt,
+        )
+
+    try:
+        response = _generate_with_retry()
+        return response.text
+    except errors.ClientError as e:
+        if e.code == 429:
+            return "❌ 目前 API 使用量已至上限，請稍後再試。"
+        return "⚠️ AI 解讀暫時不可用，請稍後再試。 (ClientError)"
+    except Exception as e:
+        logger.error(f"XiaoLiuRen API Error: {e}")
+        return "⚠️ 目前 AI 導師正忙於處理大量請求，請稍候片刻再試。 (Error: 503/Timeout)"

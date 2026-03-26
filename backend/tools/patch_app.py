@@ -11,7 +11,7 @@ from core.zhuge.interpreter import interpret_zhuge
 from core.daliuren.engine import DaliurenEngine
 from core.daliuren.interpreter import interpret_daliuren
 """
-content = content.replace("from core.config_manager import config_manager", "from core.config_manager import config_manager\n" + new_imports)
+content = content.replace("from core.config_manager import config_manager", "from core.config_manager import config_manager\nimport asyncio\n" + new_imports)
 
 # 2. Add to side menu
 content = content.replace(
@@ -84,7 +84,7 @@ elif page == "🎋 諸葛神算":
                 record_id = save_reading("zhuge", user_question.strip(), result, interp)
                 
                 if interp and not interp.startswith("⚠️"):
-                    audio_path = generate_audio(interp, record_id)
+                    audio_path = asyncio.run(generate_audio(interp, record_id))
                     update_record_interpretation(datetime.now().strftime("%Y-%m-%d"), record_id, interp, audio_path)
                     st.session_state["last_zg_audio"] = audio_path
 
@@ -139,7 +139,7 @@ elif page == "🌌 大六壬":
             
             record_id = save_reading("daliuren", user_question.strip(), result, interp)
             if interp and not interp.startswith("⚠️"):
-                audio_path = generate_audio(interp, record_id)
+                audio_path = asyncio.run(generate_audio(interp, record_id))
                 update_record_interpretation(datetime.now().strftime("%Y-%m-%d"), record_id, interp, audio_path)
                 st.session_state["last_dlr_audio"] = audio_path
 

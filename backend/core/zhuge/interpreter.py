@@ -35,15 +35,31 @@ def interpret_zhuge(question: str, lot_data: dict, language: str = "繁體中文
 {system_prompt}
 """
     
-    response = client.models.generate_content(
-        model=selected_model,
-        contents=prompt,
-        config=genai.types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=ZhugeReadingResult,
-            temperature=0.7
-        )
+    from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+    from google.genai.errors import ServerError
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type(ServerError),
+        reraise=True
     )
+    def _generate_with_retry():
+        return client.models.generate_content(
+            model=selected_model,
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=ZhugeReadingResult,
+                temperature=0.7
+            )
+        )
+
+    try:
+        response = _generate_with_retry()
+    except Exception as e:
+        print(f"Gemini API 呼叫失敗: {e}")
+        return "⚠️ 目前 AI 導師正忙於處理大量請求，請稍候片刻再試，或嘗試重新抽籤。 (Error: 503/Timeout)"
     
     try:
         import json
