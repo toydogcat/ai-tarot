@@ -25,9 +25,13 @@ def start_ngrok(port):
 
     print(f"=====================================")
     print(f"啟動 ngrok 代理 local port {port}...")
+    domain = os.getenv("NGROK_DOMAIN")
     try:
         # 開啟 tunnel
-        public_url = ngrok.connect(port).public_url
+        if domain:
+            public_url = ngrok.connect(port, domain=domain).public_url
+        else:
+            public_url = ngrok.connect(port).public_url
         print(f"=====================================")
         print(f"🎉 成功分享！您的對外公開網址為:")
         print(f"👉 {public_url}")
