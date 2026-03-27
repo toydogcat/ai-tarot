@@ -533,7 +533,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 } catch (e) {
                     console.error("Login Error:", e);
-                    alert("登入介面連線異常: " + e.message);
+                    alert(`登入介面連線異常 (URL: ${API_BASE}): ` + e.message);
                 }
             } else {
                 // 客戶路徑

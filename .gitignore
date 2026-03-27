@@ -221,3 +221,4 @@ history/
 
 # other 
 TMP/
+.firebase/
