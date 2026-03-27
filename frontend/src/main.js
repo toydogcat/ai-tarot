@@ -111,7 +111,10 @@ const langToCode = {
   "简体中文": "zh-CN",
   "English": "en-US",
   "日本語": "ja-JP",
-  "Español": "es-ES"
+  "Español": "es-ES",
+  "한국어": "ko-KR",
+  "Français": "fr-FR",
+  "Tiếng Việt": "vi-VN"
 };
 
 function updateUI(lang) {
