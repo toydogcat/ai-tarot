@@ -45,7 +45,7 @@ def render_zhuge_page(zhuge_draw_button):
                 st.session_state["last_zg_question"] = user_question.strip()
                 
                 # 使用統一的紀錄生命週期管理器
-                record_id, interp = asyncio.run(save_complete_reading(
+                record_id, interp, audio_path = asyncio.run(save_complete_reading(
                     record_type="zhuge",
                     question=user_question.strip(),
                     result=result,
@@ -58,11 +58,7 @@ def render_zhuge_page(zhuge_draw_button):
                 
                 st.session_state["last_zg_interpretation"] = interp
                 st.session_state["last_zg_record_id"] = record_id
-                
-                if interp and not interp.startswith(("⚠️", "error")):
-                    st.session_state["last_zg_audio"] = f"history/audio/{datetime.now().strftime('%Y-%m-%d')}/{record_id}.mp3"
-                else:
-                    st.session_state["last_zg_audio"] = None
+                st.session_state["last_zg_audio"] = audio_path
 
     if "last_zg_result" in st.session_state:
         res = st.session_state["last_zg_result"]

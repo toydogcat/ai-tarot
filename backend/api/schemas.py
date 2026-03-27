@@ -64,7 +64,7 @@ class HistoryRecordResponse(BaseModel):
     changed_hexagram: Optional[str] = None
     
     ai_interpretation: Optional[str] = None
-    ai_interpretation_audio_path: Optional[str] = None
+    audio_path: Optional[str] = None
 
 class ZhugeDrawRequest(BaseModel):
     mentor_id: str

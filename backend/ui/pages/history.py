@@ -84,9 +84,16 @@ def render_history_page():
             else:
                 if record.get("recovered_at"):
                     st.success(f"已於 {record['recovered_at']} 修復")
-                if record.get("ai_interpretation_audio_path"):
+                if record.get("audio_path"):
                     import os
-                    audio_file = record.get("ai_interpretation_audio_path")
+                    audio_file = record.get("audio_path")
+                    # 如果是相對路徑，嘗試從 BASE_DIR 找
+                    if not os.path.exists(audio_file):
+                        from config import BASE_DIR
+                        full_path = os.path.join(BASE_DIR, audio_file)
+                        if os.path.exists(full_path):
+                            audio_file = full_path
+                    
                     if os.path.exists(audio_file):
                         st.audio(audio_file)
                     else:

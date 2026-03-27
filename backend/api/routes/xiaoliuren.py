@@ -45,7 +45,7 @@ async def draw_xiaoliuren(request: DivinationRequest):
         # Interpretation Logic
         interpretation = ""
         # Room-level ai_enabled is the master switch
-        if ai_enabled and request.enable_ai and enable_multiuser and not is_solo:
+        if ai_enabled and request.enable_ai and (enable_multiuser or not is_solo):
             interpretation = interpret_xiaoliuren(
                 question=request.question,
                 result_data=lesson,

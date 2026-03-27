@@ -35,7 +35,7 @@ async def cast_daliuren(req: DaliurenCastRequest):
             
         # Interpretation Logic
         interpretation_text = ""
-        if enable_multiuser and ai_enabled and not is_solo:
+        if ai_enabled and (enable_multiuser or not is_solo):
             conf = config_manager.get()
             model_name = conf.ai_models.get("divination_model", "gemini-3.1-flash-lite-preview")
             interpretation_text = interpret_daliuren(req.question, result, language=req.language, selected_model=model_name)

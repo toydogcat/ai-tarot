@@ -63,7 +63,7 @@ async def draw_tarot(req: TarotDrawRequest):
         
     # Interpretation Logic
     interpretation_text = ""
-    if enable_multiuser and ai_enabled and not is_solo:
+    if ai_enabled and (enable_multiuser or not is_solo):
         interpretation_text = get_ai_interpretation(req.question, result, language=req.language)
     else:
         # Solo Mode, Trial Mode, or AI Disabled by Mentor
