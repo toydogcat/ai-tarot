@@ -1,5 +1,10 @@
-const API_BASE = "/api";
-const ASSETS_BASE = "";
+const NGROK_BASE = "https://1a21-2407-4d00-1c09-84e8-1e69-7aff-fe62-390e.ngrok-free.app";
+const IS_LOCAL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+const API_BASE = IS_LOCAL ? "/api" : `${NGROK_BASE}/api`;
+const ASSETS_BASE = IS_LOCAL ? "" : NGROK_BASE;
+const WS_HOST = IS_LOCAL ? window.location.host : NGROK_BASE.replace(/^https?:\/\//, "");
+const WS_PROTOCOL = IS_LOCAL ? (window.location.protocol === 'https:' ? 'wss:' : 'ws:') : 'wss:';
 
 // --- BGM Control Logic ---
 const bgmTracks = [
@@ -378,39 +383,45 @@ document.addEventListener("DOMContentLoaded", () => {
            statusEl.style.color = "#ef4444";
        }
    }
+    // Firebase Google Auth Callback
+    window.loginWithGoogleFirebase = async () => {
+        try {
+            console.log("[Auth] Starting Firebase Google Login...");
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const result = await firebase.auth().signInWithPopup(provider);
+            const user = result.user;
+            const idToken = await user.getIdToken();
 
-   // Google SSO Callback
-   window.handleGoogleCredentialResponse = async (response) => {
-       try {
-           console.log("[Auth] Google Credential received, verifying with backend...");
-           const r = await fetch(`${API_BASE}/auth/google_login`, {
-               method: "POST",
-               headers: { "Content-Type": "application/json" },
-               body: JSON.stringify({ credential: response.credential })
-           });
-           
-           const data = await r.json();
-           
-           if (r.ok && data.role === "toby") {
-               handleLoginSuccess(data.mentor_id, "toby");
-           } else if (r.status === 404 && data.detail === "NOT_REGISTERED") {
-               // New user - show signup modal
-               const payload = JSON.parse(atob(response.credential.split('.')[1]));
-               const emailInput = document.getElementById("signupEmailInput");
-               const modal = document.getElementById("signupModal");
-               if (emailInput && modal) {
-                   emailInput.value = payload.email || "";
-                   modal.classList.remove("hidden");
-                   alert("Google 驗證成功！您尚未註冊為導師，請填寫您想要的 ID 以完成申請。");
-               }
-           } else {
-               alert("Google 登入失敗：" + (data.detail || "未知錯誤"));
-           }
-       } catch(e) {
-           console.error("Google Auth Error:", e);
-           alert("Google 驗證連線異常: " + e.message);
-       }
-   };
+            console.log("[Auth] Firebase ID Token obtained, verifying with backend...");
+            const r = await fetch(`${API_BASE}/auth/google_login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ credential: idToken })
+            });
+            
+            const data = await r.json();
+            
+            if (r.ok && (data.role === "toby" || data.role === "admin")) {
+                handleLoginSuccess(data.mentor_id, data.role);
+            } else if (r.status === 404 && data.detail === "NOT_REGISTERED") {
+                // New user - show signup modal
+                const emailInput = document.getElementById("signupEmailInput");
+                const modal = document.getElementById("signupModal");
+                if (emailInput && modal) {
+                    emailInput.value = user.email || "";
+                    modal.classList.remove("hidden");
+                    alert("Firebase 驗證成功！您尚未註冊為導師，請填寫您想要的 ID 以完成申請。");
+                }
+            } else {
+                alert("Firebase 登入失敗：" + (data.detail || "未知錯誤"));
+            }
+        } catch(e) {
+            console.error("Firebase Auth Error:", e);
+            if (e.code !== "auth/popup-closed-by-user") {
+                alert("Google 驗證連線異常: " + e.message);
+            }
+        }
+    };
   initBGM();
   // Tabs
   const tabTarot = document.getElementById("tabTarot");
@@ -783,8 +794,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!mentorId) mentorId = guideName; // 預設
       if (!clientId) clientId = currentUserName || 'guest';
       
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = window.location.host; 
+      const protocol = WS_PROTOCOL;
+      const host = WS_HOST; 
       
       let wsUrl = "";
       if (isMentor()) {
@@ -1335,21 +1346,21 @@ document.addEventListener("DOMContentLoaded", () => {
          }
       }
 
-      if (data.google_client_id) {
-          console.log("[Auth] Initializing Google SSO with prompt: select_account");
-          google.accounts.id.initialize({
-              client_id: data.google_client_id,
-              callback: handleGoogleCredentialResponse,
-              auto_select: false,
-              prompt: 'select_account'
-          });
-          const btnContainer = document.getElementById("googleSigninContainer");
-          if (btnContainer) {
-              google.accounts.id.renderButton(
-                  btnContainer,
-                  { theme: "outline", size: "large", width: 310, shape: "pill" }
-              );
-          }
+      // Initializing Firebase-based Google Auth UI
+      const btnContainer = document.getElementById("googleSigninContainer");
+      if (btnContainer) {
+          btnContainer.innerHTML = `
+              <button onclick="loginWithGoogleFirebase()" style="
+                  display: flex; align-items: center; justify-content: center;
+                  width: 310px; height: 50px; background: white; color: #444;
+                  border: 1px solid #ddd; border-radius: 25px; cursor: pointer;
+                  font-family: Roboto, sans-serif; font-weight: 500; font-size: 16px;
+                  transition: all 0.2s;
+              " onmouseover="this.style.background='#f8f8f8'" onmouseout="this.style.background='white'">
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width: 18px; margin-right: 12px;">
+                  Continue with Google (Firebase)
+              </button>
+          `;
       }
 
     })

@@ -9,9 +9,13 @@ from datetime import datetime
 from sqlalchemy import select, update
 from core.db import SessionLocal, mentors
 from core.mailer import send_verification_email, log_signup_to_json
+from core.firebase_config import verify_token, init_firebase
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+# Initialize Firebase on router load
+init_firebase()
 
 class LoginRequest(BaseModel):
     mentor: str
@@ -79,22 +83,13 @@ class GoogleLoginRequest(BaseModel):
 
 @router.post("/google_login", response_model=LoginResponse)
 async def google_login(req: GoogleLoginRequest):
-    import json
-    import base64
-    
     try:
-        # Simple decode (In production, use google-auth to verify signature)
-        parts = req.credential.split('.')
-        if len(parts) != 3:
-            raise ValueError("Invalid JWT format")
-            
-        padded = parts[1] + '=' * (4 - len(parts[1]) % 4)
-        payload_data = base64.b64decode(padded)
-        payload = json.loads(payload_data)
+        # Verify Firebase ID Token
+        payload = verify_token(req.credential)
         email = payload.get("email")
         
         if not email:
-            raise HTTPException(status_code=400, detail="Google account has no email.")
+            raise HTTPException(status_code=400, detail="Firebase account has no email.")
             
         with FactorySessionLocal() as db:
             mentor = db.execute(select(mentors).where(mentors.c.email == email)).first()
@@ -105,7 +100,7 @@ async def google_login(req: GoogleLoginRequest):
                 
                 db.execute(update(mentors).where(mentors.c.mentor_id == mentor.mentor_id).values(last_active_at=func.now()))
                 db.commit()
-                logger.info(f"Mentor {mentor.mentor_id} logged in via Google SSO ({email}).")
+                logger.info(f"Mentor {mentor.mentor_id} logged in via Firebase Auth ({email}).")
                 return LoginResponse(
                     role="toby", 
                     mentor_id=mentor.mentor_id, 
@@ -116,11 +111,11 @@ async def google_login(req: GoogleLoginRequest):
                 )
             else:
                 # User doesn't exist, tell frontend to show signup
-                logger.info(f"Google user {email} not found in mentors table.")
+                logger.info(f"Firebase user {email} not found in mentors table.")
                 raise HTTPException(status_code=404, detail="NOT_REGISTERED")
                 
     except Exception as e:
-        logger.error(f"Google Login Error: {e}")
+        logger.error(f"Firebase Login Error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/register")

@@ -16,6 +16,27 @@
     rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css">
   <script src="https://accounts.google.com/gsi/client" async></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
+
+  <script>
+    // Firebase Config from User
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0lzNusHGHN3q5FBqM6M2PFcDdHjjmJt4",
+      authDomain: "ai-factory-tarot.firebaseapp.com",
+      projectId: "ai-factory-tarot",
+      storageBucket: "ai-factory-tarot.firebasestorage.app",
+      messagingSenderId: "869997180055",
+      appId: "1:869997180055:web:bcba971a0f8b65e10725d2",
+      measurementId: "G-JQQ65XX5VH"
+    };
+    // Initialize
+    firebase.initializeApp(firebaseConfig);
+    const analytics = firebase.analytics();
+  </script>
 </head>
 
 <body>

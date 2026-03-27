@@ -15,7 +15,9 @@ app = FastAPI(title="AI Tarot & IChing API", version="1.0.0", description="FastA
 @app.on_event("startup")
 def startup_event():
     from core.tasks import start_scheduler
+    from core.firebase_config import init_firebase
     start_scheduler()
+    init_firebase()
 
 @app.on_event("shutdown")
 def shutdown_event():
@@ -24,7 +26,7 @@ def shutdown_event():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|ai-factory-tarot\.web\.app|ai-factory-tarot\.firebaseapp\.com)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
