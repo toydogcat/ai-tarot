@@ -17,6 +17,7 @@ WORKDIR /app/backend
 # Install system dependencies for any compiled python packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy backend requirements and install

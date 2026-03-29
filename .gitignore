@@ -219,6 +219,27 @@ history/
 **/assets/tarot/*.png
 **/assets/*.zip
 
-# other 
-TMP/
+# build and dist
+frontend/dist/
+dist/
+node_modules/
 .firebase/
+firebase-debug.log*
+firestore-debug.log*
+
+# environments
+.env
+.env.*
+!.env.example
+.env.production
+.env.staging
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# other
+TMP/
+.pdm-python
+.pdm-build/
+.pixi/
