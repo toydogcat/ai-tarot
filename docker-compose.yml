@@ -1,9 +1,11 @@
-version: '3.8'
+# Docker Compose for AI-Tarot Modular Deployment
 
 services:
   # 房間 1 (Room 1)
   mentor-room-1:
-    build: .
+    build:
+      context: .
+      network: host
     container_name: tarot-room-1
     ports:
       - "8001:8000"
@@ -13,13 +15,22 @@ services:
       # Optionally mount assets if you generate local images, otherwise read-only is fine
       - ./backend/assets:/app/backend/assets
     restart: unless-stopped
-    # .env & config/ are NOT mounted here! 
+    networks:
+      - tarot-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     # They are built into the image and will be modified dynamically via the /api/admin endpoint.
     # When you rebuild the image or recreate the container, the config will reset to whatever is checked into git.
 
   # 房間 2 (Room 2) - 示範如何開多房
   mentor-room-2:
-    build: .
+    build:
+      context: .
+      network: host
     container_name: tarot-room-2
     ports:
       - "8002:8000"
@@ -28,3 +39,27 @@ services:
       - ./rooms/room2/history:/app/backend/history
       - ./backend/assets:/app/backend/assets
     restart: unless-stopped
+    networks:
+      - tarot-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # --- PROD Isolation Test Tunnel (Optional) ---
+  # 僅用於輔助測試：將本地已啟動的 8001 port (Room 1) 轉發到 trycloudflare.com
+  cloudflared-test:
+    image: cloudflare/cloudflared:latest
+    container_name: ai-tarot-cloudflared-test-1
+    network_mode: host
+    command: tunnel --url http://localhost:8001
+    depends_on:
+      mentor-room-1:
+        condition: service_healthy
+    restart: "no" # 僅在手動測試時啟動
+
+networks:
+  tarot-net:
+    name: tarot-net

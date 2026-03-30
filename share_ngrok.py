@@ -3,8 +3,9 @@ import sys
 import subprocess
 from dotenv import load_dotenv
 
-# 讀取 .env 中的 NGROK_AUTHTOKEN
-load_dotenv(os.path.join(os.path.dirname(__file__), "backend", ".env"))
+# 讀取 .env 中的 NGROK_AUTHTOKEN 與 STAGE
+# 使用 override=True 確保腳本內部的 STAGE 能從檔案正確認領
+load_dotenv(os.path.join(os.path.dirname(__file__), "backend", ".env"), override=True)
 
 def start_ngrok(port):
     try:
@@ -25,9 +26,22 @@ def start_ngrok(port):
 
     print(f"=====================================")
     print(f"啟動 ngrok 代理 local port {port}...")
+    stage = os.getenv("STAGE", "dev").lower()
+    domain = os.getenv("NGROK_DOMAIN")
+    
     try:
         # 開啟 tunnel
-        public_url = ngrok.connect(port).public_url
+        # 僅在 prod 模式使用固定 domain，且若失敗則自動回退到隨機域名
+        if stage == "prod" and domain:
+            try:
+                print(f"模式: PRODUCTION (嘗試使用固定域名: {domain})")
+                public_url = ngrok.connect(port, domain=domain).public_url
+            except Exception as e:
+                print(f"⚠️ 固定域名連線失敗 ({e})，正在回退至隨機域名...")
+                public_url = ngrok.connect(port).public_url
+        else:
+            print(f"模式: {stage.upper()} (使用隨機域名)")
+            public_url = ngrok.connect(port).public_url
         print(f"=====================================")
         print(f"🎉 成功分享！您的對外公開網址為:")
         print(f"👉 {public_url}")
@@ -48,4 +62,4 @@ def start_ngrok(port):
         ngrok.kill()
 
 if __name__ == "__main__":
-    start_ngrok(5173)
+    start_ngrok(8000)

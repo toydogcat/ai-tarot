@@ -15,7 +15,9 @@ app = FastAPI(title="AI Tarot & IChing API", version="1.0.0", description="FastA
 @app.on_event("startup")
 def startup_event():
     from core.tasks import start_scheduler
+    from core.firebase_config import init_firebase
     start_scheduler()
+    init_firebase()
 
 @app.on_event("shutdown")
 def shutdown_event():
@@ -24,7 +26,8 @@ def shutdown_event():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    # 支援 localhost, 內網 IP 以及 Firebase 的正式與 Staging (Hosting Channel) 網址
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|ai-factory-tarot(--[\w\-]+)?\.web\.app|ai-factory-tarot(--[\w\-]+)?\.firebaseapp\.com)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,6 +53,12 @@ if assets_dir.exists():
 history_dir = BASE_DIR / "history" 
 if history_dir.exists():
     app.mount("/history", StaticFiles(directory=str(history_dir)), name="history")
+
+# --- Health Check (Monitoring) ---
+@app.get("/api/health")
+def health_check():
+    """Liveness & Readiness probe for Docker/K8s/AI-Factory"""
+    return {"status": "healthy", "version": "1.0.0"}
 
 from pydantic import BaseModel
 class SystemConfig(BaseModel):

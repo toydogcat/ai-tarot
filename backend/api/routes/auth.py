@@ -9,9 +9,13 @@ from datetime import datetime
 from sqlalchemy import select, update
 from core.db import SessionLocal, mentors
 from core.mailer import send_verification_email, log_signup_to_json
+from core.firebase_config import verify_token, init_firebase
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+# Initialize Firebase on router load
+init_firebase()
 
 class LoginRequest(BaseModel):
     mentor: str
@@ -79,33 +83,29 @@ class GoogleLoginRequest(BaseModel):
 
 @router.post("/google_login", response_model=LoginResponse)
 async def google_login(req: GoogleLoginRequest):
-    import json
-    import base64
-    
     try:
-        # Simple decode (In production, use google-auth to verify signature)
-        parts = req.credential.split('.')
-        if len(parts) != 3:
-            raise ValueError("Invalid JWT format")
-            
-        padded = parts[1] + '=' * (4 - len(parts[1]) % 4)
-        payload_data = base64.b64decode(padded)
-        payload = json.loads(payload_data)
+        # Verify Firebase ID Token
+        payload = verify_token(req.credential)
         email = payload.get("email")
         
         if not email:
-            raise HTTPException(status_code=400, detail="Google account has no email.")
+            raise HTTPException(status_code=400, detail="Firebase account has no email.")
             
         with FactorySessionLocal() as db:
             mentor = db.execute(select(mentors).where(mentors.c.email == email)).first()
             
             if mentor:
+                # Task 2: Block toby/guest from Google login
+                if mentor.mentor_id == 'toby' or 'guest' in mentor.mentor_id:
+                    logger.warning(f"Blocked Google login attempt for restricted ID: {mentor.mentor_id}")
+                    raise HTTPException(status_code=403, detail="此帳號受限，請使用 Key 登入 (This account is restricted, please use Key login).")
+
                 if mentor.status != 'active' and mentor.mentor_id != 'toby':
                      raise HTTPException(status_code=403, detail=f"Account status: {mentor.status}. Please wait for admin approval.")
                 
                 db.execute(update(mentors).where(mentors.c.mentor_id == mentor.mentor_id).values(last_active_at=func.now()))
                 db.commit()
-                logger.info(f"Mentor {mentor.mentor_id} logged in via Google SSO ({email}).")
+                logger.info(f"Mentor {mentor.mentor_id} logged in via Firebase Auth ({email}).")
                 return LoginResponse(
                     role="toby", 
                     mentor_id=mentor.mentor_id, 
@@ -116,53 +116,78 @@ async def google_login(req: GoogleLoginRequest):
                 )
             else:
                 # User doesn't exist, tell frontend to show signup
-                logger.info(f"Google user {email} not found in mentors table.")
+                logger.info(f"Firebase user {email} not found in mentors table.")
                 raise HTTPException(status_code=404, detail="NOT_REGISTERED")
                 
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Google Login Error: {e}")
+        logger.error(f"Firebase Login Error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
+
+class RegisterRequest(BaseModel):
+    mentor_id: str
+    credential: str # Firebase ID Token
 
 @router.post("/register")
 async def register_mentor(req: RegisterRequest):
-    mentor_id = req.mentor_id.lower().strip()
-    email = req.email.strip()
-    
-    if not mentor_id or not email:
-        raise HTTPException(status_code=400, detail="ID and Email required.")
+    try:
+        # Task 2: Verify Firebase token during registration
+        payload = verify_token(req.credential)
+        email = payload.get("email")
         
-    with FactorySessionLocal() as db:
-        # Check if exists
-        exists = db.execute(select(mentors).where((mentors.c.mentor_id == mentor_id) | (mentors.c.email == email))).first()
-        if exists:
-             raise HTTPException(status_code=400, detail="Mentor ID or Email already registered.")
+        if not email:
+            raise HTTPException(status_code=400, detail="Google account has no email.")
+            
+        mentor_id = req.mentor_id.lower().strip()
         
-        token = secrets.token_urlsafe(32)
-        # Temporary random password
-        temp_pw = secrets.token_hex(4)
-        
-        db.execute(insert(mentors).values(
-            mentor_id=mentor_id,
-            password=PasswordHasher.hash(temp_pw),
-            email=email,
-            status='pending',
-            verification_token=token,
-            enable_multiuser_login=False,
-            usage_limit=5,
-            bgm_id=1
-        ))
-        db.commit()
-        
-        # Log to JSON as requested
-        log_signup_to_json(email, mentor_id)
-        
-        # Send Email
-        sent = send_verification_email(email, token)
-        
-        return {
-            "message": "Registration submitted. Please check your email for verification.",
-            "email_sent": sent
-        }
+        if not mentor_id:
+            raise HTTPException(status_code=400, detail="Mentor ID required.")
+            
+        # Block system-like IDs for registration
+        if mentor_id == 'toby' or 'guest' in mentor_id or 'admin' in mentor_id:
+            raise HTTPException(status_code=400, detail="This Mentor ID is reserved or invalid.")
+            
+        with FactorySessionLocal() as db:
+            # Check if exists
+            exists = db.execute(select(mentors).where((mentors.c.mentor_id == mentor_id) | (mentors.c.email == email))).first()
+            if exists:
+                 raise HTTPException(status_code=400, detail="Mentor ID or Email already registered.")
+            
+            token = secrets.token_urlsafe(32)
+            # Temporary random password (can be changed later by mentor if needed, but primary is Google)
+            temp_pw = secrets.token_hex(8)
+            
+            db.execute(insert(mentors).values(
+                mentor_id=mentor_id,
+                password=PasswordHasher.hash(temp_pw),
+                email=email,
+                status='pending',
+                verification_token=token,
+                enable_multiuser_login=False,
+                usage_limit=5,
+                bgm_id=1
+            ))
+            db.commit()
+            
+            # Log to JSON as requested
+            log_signup_to_json(email, mentor_id)
+            
+            # Send Email
+            sent = send_verification_email(email, token)
+            
+            logger.info(f"New mentor registration submitted: {mentor_id} ({email})")
+            return {
+                "status": "success", 
+                "message": "Registration submitted. Please check your email for verification.",
+                "email_sent": sent
+            }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Registration Error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/verify")
 async def verify_email(token: str):

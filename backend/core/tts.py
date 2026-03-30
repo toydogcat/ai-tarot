@@ -2,6 +2,7 @@
 import os
 import socket
 import asyncio
+from datetime import datetime
 import pyttsx3
 from pathlib import Path
 
@@ -41,45 +42,55 @@ async def _edge_tts_generate(text: str, output_path: str):
     communicate = edge_tts.Communicate(text, VOICE)
     await communicate.save(output_path)
 
-async def generate_audio(text: str, record_id: str) -> str | None:
+async def generate_audio(text: str, record_id: str, date_str: str | None = None) -> str | None:
     """
-    將文字轉換為語音並回傳檔案路徑 (相對專案根目錄，或絕對路徑)
+    將文字轉換為語音並回傳檔案路徑 (相對專案根目錄)
     
     Args:
         text: 要轉換的文字
         record_id: 作為檔名的一部份
+        date_str: 日期字串 (YYYY-MM-DD)，用於建立子目錄
         
     Returns:
-        生成的音檔路徑 (絕對路徑字串)，若失敗則回傳 None
+        生成的音檔路徑 (相對路徑字串)，若失敗則回傳 None
     """
     if not text or text == "error" or text.startswith("⚠️"):
         return None
         
-    cleaned_text = clean_text(text)
-    output_path_mp3 = AUDIO_DIR / f"{record_id}.mp3"
-    output_path_wav = AUDIO_DIR / f"{record_id}.wav"
+    date_str = date_str or datetime.now().strftime("%Y-%m-%d")
+    # 建立日期子目錄
+    target_dir = AUDIO_DIR / date_str
+    target_dir.mkdir(parents=True, exist_ok=True)
     
+    cleaned_text = clean_text(text)
+    output_path_mp3 = target_dir / f"{record_id}.mp3"
+    output_path_wav = target_dir / f"{record_id}.wav"
+    
+    # 相對路徑 (從 BASE_DIR 開始)
+    rel_path_mp3 = os.path.relpath(output_path_mp3, BASE_DIR)
+    rel_path_wav = os.path.relpath(output_path_wav, BASE_DIR)
+
     # 如果已經存在，就不重複生成
     if output_path_mp3.exists():
-        return str(output_path_mp3)
+        return rel_path_mp3
     if output_path_wav.exists():
-        return str(output_path_wav)
+        return rel_path_wav
 
     try:
         has_internet = check_internet()
         if has_internet:
-            logger.info("檢測到網路連線，使用 edge-tts 生成高音質語音...")
+            logger.info(f"檢測到網路連線，使用 edge-tts 生成高音質語音 ({date_str}/{record_id})...")
             await _edge_tts_generate(cleaned_text, str(output_path_mp3))
-            return str(output_path_mp3)
+            return rel_path_mp3
         else:
-            logger.info("無網路連線，使用 pyttsx3 離線生成語音...")
+            logger.info(f"無網路連線，使用 pyttsx3 離線生成語音 ({date_str}/{record_id})...")
             engine = pyttsx3.init()
             # 調整語速 (依需求微調)
             rate = engine.getProperty('rate')
             engine.setProperty('rate', rate - 30) 
             engine.save_to_file(cleaned_text, str(output_path_wav))
             engine.runAndWait()
-            return str(output_path_wav)
+            return rel_path_wav
             
     except Exception as e:
         logger.error(f"語音生成失敗: {e}")

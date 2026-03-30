@@ -56,7 +56,7 @@ def render_iching_page(iching_draw_button):
             # 使用統一的紀錄生命週期管理器
             from core.search import perform_tavily_search
             
-            record_id, interpretation = asyncio.run(save_complete_reading(
+            record_id, interpretation, audio_path = asyncio.run(save_complete_reading(
                 record_type="iching",
                 question=user_question.strip(),
                 result=result,
@@ -69,11 +69,7 @@ def render_iching_page(iching_draw_button):
             
             st.session_state["last_iching_interpretation"] = interpretation
             st.session_state["last_iching_record_id"] = record_id
-            
-            if interpretation and not interpretation.startswith(("⚠️", "error")):
-                st.session_state["last_iching_audio_path"] = f"history/audio/{datetime.now().strftime('%Y-%m-%d')}/{record_id}.mp3"
-            else:
-                st.session_state["last_iching_audio_path"] = None
+            st.session_state["last_iching_audio_path"] = audio_path
 
     if "last_iching_result" in st.session_state:
         res = st.session_state["last_iching_result"]

@@ -167,10 +167,10 @@ async def save_complete_reading(
     generate_audio_func,
     mentor_id: str = "toby",
     client_id: str = "toby",
-) -> tuple[str, str]:
+) -> tuple[str, str, str | None]:
     """
     一站式處理：外部搜尋 -> 提示詞建立 -> AI 解讀 -> 存入資料庫 -> 語音合成 -> 更新紀錄
-    回傳: (record_id, interpretation)
+    回傳: (record_id, interpretation, audio_path)
     """
     # 1. 執行外部搜尋
     search_context, search_success = "", True
@@ -210,15 +210,17 @@ async def save_complete_reading(
     )
 
     # 5. 產生語音 (如果解讀成功)
+    audio_path = None
     if interpretation and not interpretation.startswith(("⚠️", "error", "❌")):
         try:
-            audio_path = await generate_audio_func(interpretation, record_id)
+            today_str = datetime.now().strftime("%Y-%m-%d")
+            audio_path = await generate_audio_func(interpretation, record_id, date_str=today_str)
             if audio_path:
-                update_record_interpretation(datetime.now().strftime("%Y-%m-%d"), record_id, interpretation, audio_path)
+                update_record_interpretation(today_str, record_id, interpretation, audio_path)
         except Exception as e:
             logger.error(f"語音合成或更新失敗: {e}")
 
-    return record_id, interpretation
+    return record_id, interpretation, audio_path
 
 def get_history_dates(mentor_id: str | None = None) -> list[str]:
     """取得所有有紀錄的日期（降序） - 基於 created_at"""

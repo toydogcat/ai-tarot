@@ -110,42 +110,71 @@ cp .env.example .env
 # N8N_API_KEY=your_n8n_key (如果你有啟用聊天機器人)
 ```
 
-### 5. 啟動應用
+## 🚀 部署與測試階段 (Deployment Stages)
 
-本專案支援 **本機啟動** (0.0.0.0) 以及 **Ngrok 遠端分享**。
+專案目前劃分為三個環境階段，確保從開發到正式上線的穩定性。
 
-#### 一般啟動 (本機 0.0.0.0 分享)
+### 1. 開發階段 (Local Dev)
+- **目標**：快速迭代後端邏輯與前端 UI。
+- **後端**：
+  ```bash
+  cd backend && python start.py api
+  ```
+- **前端**：
+  ```bash
+  cd frontend && npm install && npm run dev
+  ```
+- **存取點**：`http://localhost:5173`
+
+### 2. 預行階段 (Firebase Hosting Channel)
+- **目標**：驗證遠端連線與手機端存取，使用臨時 URL 也不會影響正式站。
+- **後端 (ngrok)**：
+  ```bash
+  # 自動開啟隧道並同步更新 .env.staging
+  uv run python share_ngrok.py
+  ```
+- **前端 (Firebase Channel)**：
+  ```bash
+  cd frontend
+  npm run build:stg
+  firebase hosting:channel:deploy staging
+  ```
+- **存取點**：Firebase 提供之臨時網址 (例如 `ai-factory-tarot--staging-xxx.web.app`)。
+
+### 3. 生產隔離測試 (Docker + Tunnel)
+- **目標**：完整的容器化驗證，符合「有限責任」插件架構。
+
+#### 🚀 一鍵自动化部屬 (One-Line Deployment)
+如果您已經安裝 `docker`, `python`, `npm` 與 `firebase-tools`，可以直接執行整合腳本：
 ```bash
-cd backend
-python start.py admin
+./run.sh
 ```
-瀏覽器會自動開啟 `http://localhost:10000`。相同區域網路下的設備可以透過您的區域 IP 存取 (例如 `http://192.168.1.xxx:10000`)。
+該腳本會自動完成以下動作：
+1. 檢查並清除 port 8001/8002 的占用。
+2. 使用 `docker compose` 重建並啟動後端房間。
+3. 執行 `catch_url.py` 自動同步隧道網址至前端環境變數。
+4. 編譯前端正式版並部署至 Firebase。
 
-#### API 伺服器啟動 (供 AI Agent / 擴充使用)
-若要啟動 FastAPI 背景服務，請另外開啟終端機執行：
+#### 🛠️ 手動步驟
+- **後端 (Docker)**：
+  ```bash
+  docker compose up -d --build
+  python catch_url.py
+  ```
+- **前端 (Firebase Production)**：
+  ```bash
+  cd frontend && npm run build:prod && firebase deploy
+  ```
+- **存取點**：正式網域 `https://ai-factory-tarot.web.app` 或 Cloudflare 隧道網址 (前端 `main.js` 具備環境感知，會自動切換存取路徑)。
+
+---
+
+### 🐳 Docker 多房間管理 (Production Mode)
+若要建立多個獨立的導師包廂：
 ```bash
-cd backend
-python start.py api
+docker compose up -d
 ```
-API 將預設運行於 `http://localhost:8000`。您可以透過 `http://localhost:8000/docs` 測試 Swagger UI。
-
-#### Ngrok 外網遠端分享啟動
-若需要將 Tarot App 分享給外網使用者，專案內建整合了 Ngrok：
-1. 前往 Ngrok 註冊並獲取 [Auth Token](https://dashboard.ngrok.com/get-started/your-authtoken)
-2. 將 Token 寫入 `.env` 檔案中：`NGROK_AUTHTOKEN=你的token`
-3. 執行統一啟動腳本：
-   ```bash
-   python start.py admin
-   ```
-4. 終端機會印出類似 `Ngrok 隧道開啟成功！遠端存取請前往: https://1234abcd.ngrok-free.app` 的網址，將該隨機網址分享給他人即可。
-
-#### 🐳 Docker 多房間部署 (正式環境)
-若要建立具備完整隔離環境、且能透過 Admin API 獨立指派額度或設定的「多房間」系統：
-```bash
-# 一鍵打包並啟動多個獨立導師包廂
-docker compose up -d --build
-```
-系統會自動在 port 8001 (`tarot-room-1`) 及 port 8002 (`tarot-room-2`) 啟動兩個完整的伺服器，同時渲染 FastAPI 與已編譯的 Vite 前端靜態檔。
+這會啟動 `tarot-room-1` (port 8001) 與 `tarot-room-2` (port 8002)，各房間具備獨立的歷史紀錄與設定。
 
 ## 🧪 自動化測試 (Unit Testing)
 
