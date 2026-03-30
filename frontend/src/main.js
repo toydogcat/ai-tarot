@@ -13,9 +13,17 @@ const WS_PROTOCOL = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const originalFetch = window.fetch;
 window.fetch = async function (url, options = {}) {
     if (typeof url === 'string' && (url.includes('trycloudflare.com') || url.includes('ngrok-free.dev') || url.includes('/api/'))) {
-        options.headers = options.headers || {};
-        options.headers['ngrok-skip-browser-warning'] = '69420';
-        options.headers['cf-skip-browser-warning'] = 'any';
+        if (!options.headers) {
+            options.headers = {};
+        }
+        
+        if (options.headers instanceof Headers) {
+            options.headers.set('ngrok-skip-browser-warning', '69420');
+            options.headers.set('cf-skip-browser-warning', 'any');
+        } else {
+            options.headers['ngrok-skip-browser-warning'] = '69420';
+            options.headers['cf-skip-browser-warning'] = 'any';
+        }
     }
     return originalFetch(url, options);
 };

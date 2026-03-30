@@ -11,9 +11,9 @@ CONTAINER_NAME = "ai-tarot-cloudflared-test-1"
 def catch_and_update():
     print(f"🔍 正在監控 {CONTAINER_NAME} 的日誌以獲取 Cloudflare URL...")
     
-    # Run docker logs -f
+    # Run docker logs -f --since 1m to avoid picking up stale URLs from previous runs
     process = subprocess.Popen(
-        ["docker", "logs", "-f", CONTAINER_NAME],
+        ["docker", "logs", "-f", "--since", "1m", CONTAINER_NAME],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True
