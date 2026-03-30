@@ -25,13 +25,13 @@
   <script>
     // Firebase Config from User
     const firebaseConfig = {
-      apiKey: "AIzaSyB0lzNusHGHN3q5FBqM6M2PFcDdHjjmJt4",
+      apiKey: "AIzaSyB0lzNusHGHN3q5FBqM6M2PFcDdHJjmJt4",
       authDomain: "ai-factory-tarot.firebaseapp.com",
       projectId: "ai-factory-tarot",
       storageBucket: "ai-factory-tarot.firebasestorage.app",
       messagingSenderId: "869997180055",
-      appId: "1:869997180055:web:bcba971a0f8b65e10725d2",
-      measurementId: "G-JQQ65XX5VH"
+      appId: "1:869997180055:web:5b2827a85e0ff4c80725d2",
+      measurementId: "G-S3M30CXRLV"
     };
     // Initialize
     firebase.initializeApp(firebaseConfig);
@@ -128,16 +128,28 @@
     </div>
   </div>
 
-  <!-- 註冊 Modal -->
+  <!-- 註冊 Modal (Google Mandatory Flow) -->
   <div id="signupModal" class="modal-backdrop hidden" style="z-index: 10000; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center;">
     <div class="modal-content glass-panel" style="text-align: center; padding: 40px; max-width: 400px; width: 100%;">
-      <h2 style="margin-bottom: 20px; color: #E8D5B7;" data-i18n="signup_title">申請成為導師(Apply Mentor)</h2>
-      <input type="email" id="signupEmailInput" placeholder="Gmail (Google Account)" data-i18n-placeholder="signup_email_placeholder"
-        style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white;" />
-      <input type="text" id="signupIdInput" placeholder="Desired Mentor ID" data-i18n-placeholder="signup_id_placeholder"
-        style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white;" />
-      <button id="submitSignupBtn" class="primary-btn" style="width: 100%; margin-bottom: 15px;" data-i18n="signup_submit_btn">提交申請(Submit)</button>
-      <button id="closeSignupBtn" class="secondary-btn" style="width: 100%;" data-i18n="signup_cancel_btn">取消(Cancel)</button>
+      <h2 style="margin-bottom: 5px; color: #E8D5B7;" data-i18n="signup_title">申請成為導師(Apply Mentor)</h2>
+      <p style="font-size: 0.8rem; color: #888; margin-bottom: 25px;">註冊需驗證 Gmail 帳號 (Google Required)</p>
+      
+      <div id="signupStep1">
+        <button id="googleSignupVerifyBtn" class="google-btn" style="width: 100%; margin-bottom: 10px;">Login with Google to Verify</button>
+        <p style="font-size: 0.7rem; color: rgba(255,255,255,0.4);">我們先驗證您的身份，再設定 ID</p>
+      </div>
+
+      <div id="signupStep2" class="hidden">
+        <div style="background: rgba(var(--primary-rgb), 0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(var(--primary-rgb), 0.2);">
+          <span style="font-size: 0.8rem; color: var(--primary-color);">Email Verified:</span>
+          <div id="signupVerifiedEmail" style="font-weight: bold; font-size: 0.9rem;"></div>
+        </div>
+        <input type="text" id="signupIdInput" placeholder="Desired Mentor ID" data-i18n-placeholder="signup_id_placeholder"
+          style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white;" />
+        <button id="submitSignupBtn" class="primary-btn" style="width: 100%; margin-bottom: 15px;" data-i18n="signup_submit_btn">提交申請(Submit)</button>
+      </div>
+      
+      <button id="closeSignupBtn" class="secondary-btn" style="width: 100%; margin-top: 10px;" data-i18n="signup_cancel_btn">取消(Cancel)</button>
     </div>
   </div>
 
@@ -211,7 +223,11 @@
     <div id="roomSettingsPanel" class="glass-panel room-settings-card hidden" style="padding: 1.2rem 1.5rem; margin-bottom: 1rem;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h3 style="margin:0; color:#a78bfa; font-size:0.9rem; letter-spacing:1px; font-weight:800; text-transform:uppercase;">⚙️ 房間設定 (Room Settings)</h3>
-        <span id="roomLevelBadge" class="level-badge">LEVEL: SINGLE</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span id="wsStatusBadge" class="ws-badge disconnected">WS: OFFLINE</span>
+          <span id="occupancyBadge" class="occupancy-badge">GUESTS: 0/0</span>
+          <span id="roomLevelBadge" class="level-badge">LEVEL: SINGLE</span>
+        </div>
       </div>
       <div class="settings-grid">
         <div class="setting-item">

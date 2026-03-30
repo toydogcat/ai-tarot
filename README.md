@@ -111,43 +111,71 @@ cp .env.example .env
 # N8N_API_KEY=your_n8n_key (if using the Chat Bot agent)
 ```
 
-### 5. Running the Application
+## 🚀 Deployment & Testing Stages
 
-This project supports **Local Start** (0.0.0.0) as well as **Ngrok Remote Tunneling**.
+The project is structured into three distinct environment stages to ensure stability from development to production.
 
-#### Standard Local Start (0.0.0.0)
+### 1. Development Stage (Local Dev)
+- **Goal**: Rapid backend logic & UI iteration.
+- **Backend**: 
+  ```bash
+  cd backend && python start.py api
+  ```
+- **Frontend**: 
+  ```bash
+  cd frontend && npm install && npm run dev
+  ```
+- **Access**: `http://localhost:5173`
+
+### 2. Staging Stage (Firebase Hosting Channel)
+- **Goal**: Verify remote connectivity & mobile access using temporary URLs.
+- **Backend (ngrok)**:
+  ```bash
+  # Automatically shares local API and updates .env.staging
+  uv run python share_ngrok.py
+  ```
+- **Frontend (Firebase Channel)**:
+  ```bash
+  cd frontend
+  npm run build:stg
+  firebase hosting:channel:deploy staging
+  ```
+- **Access**: Via the temporary URL provided by Firebase (e.g., `ai-factory-tarot--staging-xxx.web.app`).
+
+### 3. Production Isolation Test (Docker + Tunnel)
+- **Goal**: Full containerized verification with "Limited Liability" plug-in architecture.
+
+#### 🚀 The One-Line Deployment (Automated)
+If you have `docker`, `python`, `npm`, and `firebase-tools` installed, you can run the entire production sync with one command:
 ```bash
-cd backend
-python start.py admin
+./run.sh
 ```
-Your browser will auto-open `http://localhost:10000`. Other devices on the same local network can access the app via your local IP (e.g., `http://192.168.1.xxx:10000`).
+This script will:
+1. Kill any processes on ports 8001/8002.
+2. Restart backend containers with `docker compose`.
+3. Auto-sync the Cloudflare Tunnel URL to frontend configs via `catch_url.py`.
+4. Build the production frontend and deploy to Firebase.
 
-#### API Server (For AI Agents / Extensions)
-To start just the FastAPI backend service, open a terminal and run:
+#### 🛠️ Manual Steps
+- **Backend (Docker)**:
+  ```bash
+  docker compose up -d --build
+  python catch_url.py
+  ```
+- **Frontend (Firebase Production)**:
+  ```bash
+  cd frontend && npm run build:prod && firebase deploy
+  ```
+- **Access**: `https://ai-factory-tarot.web.app` or the Cloudflare Tunnel URL directly (thanks to "Environment Aware" routing in `main.js`).
+
+---
+
+### 🐳 Docker Multi-Room Management
+For hosting multiple independent "Mentor Rooms" via docker-compose:
 ```bash
-cd backend
-python start.py api
+docker compose up -d
 ```
-The API will run on `http://localhost:8000`. You can test endpoints via Swagger UI at `http://localhost:8000/docs`.
-
-#### Ngrok Remote Public Sharing
-To share your application publicly online, the project integrates an automated Ngrok script:
-1. Register for Ngrok and get an [Auth Token](https://dashboard.ngrok.com/get-started/your-authtoken)
-2. Add your token to the `backend/.env` file: `NGROK_AUTHTOKEN=your_token_here`
-3. Check that `frontend/vite.config.js` has `allowedHosts: true` (already configured).
-4. Run the sharing script smoothly from the root directory:
-   ```bash
-   uv run python share_ngrok.py
-   ```
-5. The terminal will output a public URL such as `https://1234abcd.ngrok-free.app`. Share this link with anyone!
-
-#### 🐳 Docker Multi-Room Deployment (Production Mode)
-For hosting scalable environments with completely independent config overrides:
-```bash
-# Build and launch multiple independent "Mentor Rooms" via docker-compose
-docker compose up -d --build
-```
-This automatically boots up `tarot-room-1` (port 8001) and `tarot-room-2` (port 8002), serving both the FastAPI backend and pre-compiled Vite frontend dynamically.
+This boots `tarot-room-1` (port 8001) and `tarot-room-2` (port 8002). Each room uses its own `/backend/history` volume for persistence.
 
 ## 🧪 Automated Testing (Unit Testing)
 

@@ -1,10 +1,24 @@
-const NGROK_BASE = "https://denice-ephebic-remissly.ngrok-free.dev";
-const IS_LOCAL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+// 判斷是否為「同域」存取：如果當前網址跟 API 網址一致，或是在 Tunnel 模式下直接訪問
+const IS_SAME_ORIGIN = !VITE_API_URL || VITE_API_URL.includes(window.location.hostname);
+const IS_LOCAL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname.startsWith("192.168."));
 
-const API_BASE = IS_LOCAL ? "/api" : `${NGROK_BASE}/api`;
-const ASSETS_BASE = IS_LOCAL ? "" : NGROK_BASE;
-const WS_HOST = IS_LOCAL ? window.location.host : NGROK_BASE.replace(/^https?:\/\//, "");
-const WS_PROTOCOL = IS_LOCAL ? (window.location.protocol === 'https:' ? 'wss:' : 'ws:') : 'wss:';
+// 如果是同域訪問（例如直接開 Tunnel 網址），直接用相對路徑 /api
+const API_BASE = (IS_SAME_ORIGIN || IS_LOCAL) ? "/api" : `${VITE_API_URL}/api`;
+const ASSETS_BASE = (IS_SAME_ORIGIN || IS_LOCAL) ? "" : VITE_API_URL;
+const WS_HOST = (IS_SAME_ORIGIN || IS_LOCAL) ? window.location.host : VITE_API_URL.replace(/^https?:\/\//, "");
+const WS_PROTOCOL = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+
+// --- Ngrok Skip Warning Patch ---
+const originalFetch = window.fetch;
+window.fetch = async function (url, options = {}) {
+    if (typeof url === 'string' && (url.includes('trycloudflare.com') || url.includes('ngrok-free.dev') || url.includes('/api/'))) {
+        options.headers = options.headers || {};
+        options.headers['ngrok-skip-browser-warning'] = '69420';
+        options.headers['cf-skip-browser-warning'] = 'any';
+    }
+    return originalFetch(url, options);
+};
 
 // --- BGM Control Logic ---
 const bgmTracks = [
@@ -96,7 +110,7 @@ let translations = {};
 
 async function loadTranslations() {
     try {
-        const response = await fetch('/src/i18n.json');
+        const response = await fetch('/i18n.json');
         if (!response.ok) throw new Error('Failed to load i18n.json');
         translations = await response.json();
         console.log("Translations loaded successfully.");
@@ -294,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!panel) return;
 
         try {
-            const res = await fetch(`/api/auth/me?mentor_id=${encodeURIComponent(currentMentorId)}`);
+            const res = await fetch(`${API_BASE}/auth/me?mentor_id=${encodeURIComponent(currentMentorId)}`);
             const data = await res.json();
 
             if (res.ok) {
@@ -359,7 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
         statusEl.style.color = "#E8D5B7";
 
         try {
-            const res = await fetch(`/api/auth/settings`, {
+            const res = await fetch(`${API_BASE}/auth/settings`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -401,16 +415,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const data = await r.json();
 
+            // Task 2: Handle restriction if backend returns 403 (blocked admin/guest)
+            if (r.status === 403) {
+                alert(data.detail || "此帳號受限 (Access Restricted)");
+                return;
+            }
+
             if (r.ok && (data.role === "toby" || data.role === "admin")) {
                 handleLoginSuccess(data.mentor_id, data.role);
             } else if (r.status === 404 && data.detail === "NOT_REGISTERED") {
-                // New user - show signup modal
-                const emailInput = document.getElementById("signupEmailInput");
+                // New user - show signup modal Step 2
+                const emailInfo = document.getElementById("signupVerifiedEmail");
+                const step1 = document.getElementById("signupStep1");
+                const step2 = document.getElementById("signupStep2");
                 const modal = document.getElementById("signupModal");
-                if (emailInput && modal) {
-                    emailInput.value = user.email || "";
+                
+                if (emailInfo && step1 && step2 && modal) {
+                    emailInfo.innerText = user.email || "";
+                    window._currentFirebaseToken = idToken; // Store for final submission
+                    step1.classList.add("hidden");
+                    step2.classList.remove("hidden");
                     modal.classList.remove("hidden");
-                    alert("Firebase 驗證成功！您尚未註冊為導師，請填寫您想要的 ID 以完成申請。");
+                    alert("Firebase 驗證成功！您目前的 Google 帳號尚未註冊。");
                 }
             } else {
                 alert("Firebase 登入失敗：" + (data.detail || "未知錯誤"));
@@ -533,7 +559,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 } catch (e) {
                     console.error("Login Error:", e);
-                    alert("登入介面連線異常: " + e.message);
+                    alert(`登入介面連線異常 (URL: ${API_BASE}): ` + e.message);
                 }
             } else {
                 // 客戶路徑
@@ -555,16 +581,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (showSignupBtn) {
-        showSignupBtn.onclick = (e) => { e.preventDefault(); signupModal.classList.remove("hidden"); };
+        showSignupBtn.onclick = (e) => { 
+            e.preventDefault(); 
+            document.getElementById("signupStep1").classList.remove("hidden");
+            document.getElementById("signupStep2").classList.add("hidden");
+            signupModal.classList.remove("hidden"); 
+        };
     }
+
+    const googleSignupVerifyBtn = document.getElementById("googleSignupVerifyBtn");
+    if (googleSignupVerifyBtn) {
+        googleSignupVerifyBtn.onclick = () => window.loginWithGoogleFirebase();
+    }
+
     if (closeSignupBtn) {
         closeSignupBtn.onclick = () => signupModal.classList.add("hidden");
     }
     if (submitSignupBtn) {
         submitSignupBtn.onclick = async () => {
-            const email = signupEmailInput.value.trim();
             const mentor_id = signupIdInput.value.trim();
-            if (!email || !mentor_id) return alert("請填寫 Email 與 導師 ID");
+            const idToken = window._currentFirebaseToken;
+
+            if (!idToken) return alert("請先完成 Google 驗證");
+            if (!mentor_id) return alert("請填寫您想要的 導師 ID");
 
             submitSignupBtn.disabled = true;
             submitSignupBtn.innerText = "提交中...";
@@ -572,11 +611,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const r = await fetch(`${API_BASE}/auth/register`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, mentor_id })
+                    body: JSON.stringify({ credential: idToken, mentor_id: mentor_id })
                 });
                 const data = await r.json();
                 if (r.ok) {
-                    alert("申請已提交！請至您的 Gmail 點擊驗證連結，驗證後管理員將進行審核。");
+                    alert("申請已提交！驗證通過後管理員將進行審核。");
                     signupModal.classList.add("hidden");
                 } else {
                     alert(data.detail || "申請失敗");
@@ -814,10 +853,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         ws.onopen = () => {
             console.log("WebSocket connected as", currentUserRole);
+            isWsConnected = true;
             loginOverlay.style.display = "none";
+            
+            const badge = document.getElementById("wsStatusBadge");
+            if (badge) {
+                badge.innerText = "WS: ONLINE";
+                badge.classList.remove("disconnected");
+                badge.classList.add("connected");
+            }
+
             if (currentUserRole === 'client') {
                 document.querySelector('.tabs').style.display = 'none'; // 客戶看不到 Tabs
-                // 客戶端立即獲得發問權限，無需等待導師
                 setupClientQuestionUI('tarot');
             } else {
                 updateStashUI(); // 導師顯示問題暫存區
@@ -2722,7 +2769,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function fetchNotifications() {
         if (!currentMentorId) return;
         try {
-            const resp = await fetch(`/api/social/notifications?mentor_id=${encodeURIComponent(currentMentorId)}`);
+            const resp = await fetch(`${API_BASE}/social/notifications?mentor_id=${encodeURIComponent(currentMentorId)}`);
             if (!resp.ok) return;
             const data = await resp.json();
             updateNotificationUI(data);
@@ -2795,7 +2842,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     loadChatHistory(item.sender_id);
 
                     // Mark as read
-                    fetch(`/api/social/messages/read?mentor_id=${encodeURIComponent(currentMentorId)}&sender_id=${encodeURIComponent(item.sender_id)}`, { method: 'POST' })
+                    fetch(`${API_BASE}/social/messages/read?mentor_id=${encodeURIComponent(currentMentorId)}&sender_id=${encodeURIComponent(item.sender_id)}`, { method: 'POST' })
                         .then(() => fetchNotifications());
                 };
             }
@@ -2819,7 +2866,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function handleFriendResponse(requesterId, action) {
         try {
-            const resp = await fetch(`/api/social/friends/respond`, {
+            const resp = await fetch(`${API_BASE}/social/friends/respond`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -2884,7 +2931,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fetch API key first then init agent
     console.log("Attempting to fetch Gemini Key for Page-Agent...");
-    fetch(`/api/config/keys`).then(r => {
+    fetch(`${API_BASE}/config/keys`).then(r => {
         if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
         return r.json();
     }).then(data => {
