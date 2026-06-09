@@ -17,16 +17,22 @@ def render_hexagram(hexagram_data, lines_binary, moving_indices=None):
     
     hex_id = hexagram_data.get('id')
     if hex_id:
-        prefer_format = st.session_state.get("prefer_image_format", "jpg")
+        prefer_format = st.session_state.get("prefer_image_format", "webp")
         img_dir = ICHING_ASSETS_DIR / "hexagrams"
-        img_path = img_dir / f"{hex_id}.{prefer_format}"
         
-        # Fallback to other format if preferred doesn't exist
-        if not img_path.exists():
-            alt_format = "png" if prefer_format == "jpg" else "jpg"
-            img_path = img_dir / f"{hex_id}.{alt_format}"
+        formats = ["webp", "jpg", "png"]
+        if prefer_format in formats:
+            formats.remove(prefer_format)
+            formats.insert(0, prefer_format)
             
-        if img_path.exists():
+        img_path = None
+        for fmt in formats:
+            candidate = img_dir / f"{hex_id}.{fmt}"
+            if candidate.exists():
+                img_path = candidate
+                break
+            
+        if img_path and img_path.exists():
             st.image(str(img_path), use_container_width=True)
             
     st.markdown(f"### {hexagram_data['name']}")

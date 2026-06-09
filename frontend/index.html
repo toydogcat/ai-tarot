@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="AI Tarot" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/assets/images/icon-192.jpg" />
+  <link rel="apple-touch-icon" href="/assets/images/icon-192.webp" />
   <link
     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+TC:wght@300;400;700&display=swap"
     rel="stylesheet">
@@ -43,7 +43,6 @@
   <!-- 系統控制面板 (左上角) -->
   <div id="systemControls" class="system-controls">
     <button id="toggleControlsBtn" class="toggle-controls-btn" title="展開/縮小控制項">🪄</button>
-    
     <div class="controls-content">
       <!-- 語言選擇器 (整合進控制列) -->
       <select id="langSelect" style="background:none; border:none; color:#E8D5B7; font-size:0.85rem; cursor:pointer;">
@@ -55,6 +54,14 @@
         <option value="한국어">한국어</option>
         <option value="Français">Français</option>
         <option value="Tiếng Việt">Tiếng Việt</option>
+      </select>
+      
+      <div class="control-divider"></div>
+
+      <!-- 模式選擇器 (API / 離線本機) -->
+      <select id="runModeSelect" style="background:none; border:none; color:#E8D5B7; font-size:0.85rem; cursor:pointer;" title="連線模式">
+        <option value="api">🔌 API 連線</option>
+        <option value="offline">📴 離線本機</option>
       </select>
       
       <div class="control-divider"></div>
@@ -433,10 +440,17 @@
         <div
           style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem; width: 100%; gap: 10px;">
           <h2 data-i18n="tab_history" style="margin: 0; white-space: nowrap;">歷史紀錄</h2>
-          <select id="historyClientFilter"
-            style="padding: 0.5rem; border-radius: 8px; background: rgba(0,0,0,0.5); color: #E8D5B7; border: 1px solid rgba(255,255,255,0.2); max-width: 150px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-            <option value="" data-i18n="history_filter_all">全部客戶 (All)</option>
-          </select>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div id="offlineHistoryActions" style="display: none; gap: 8px;">
+              <button id="exportHistoryBtn" style="padding: 0.4rem 0.8rem; border-radius: 8px; background: rgba(255,215,0,0.15); color: #FFD700; border: 1px solid rgba(255,215,0,0.3); font-size: 0.85rem; cursor: pointer;">匯出</button>
+              <button id="importHistoryBtn" style="padding: 0.4rem 0.8rem; border-radius: 8px; background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); font-size: 0.85rem; cursor: pointer;">匯入</button>
+              <input type="file" id="importHistoryFile" accept=".json" style="display: none;">
+            </div>
+            <select id="historyClientFilter"
+              style="padding: 0.5rem; border-radius: 8px; background: rgba(0,0,0,0.5); color: #E8D5B7; border: 1px solid rgba(255,255,255,0.2); max-width: 150px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+              <option value="" data-i18n="history_filter_all">全部客戶 (All)</option>
+            </select>
+          </div>
         </div>
         <div id="historyGrid" class="history-grid"></div>
       </section>

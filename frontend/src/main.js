@@ -1,3 +1,17 @@
+import {
+  getRunMode,
+  setRunMode,
+  isOffline,
+  fetchSpreads,
+  drawTarotCard,
+  castIChingHexagram,
+  drawZhugeLot,
+  drawXiaoliurenLesson,
+  castDaliurenLesson,
+  fetchHistory,
+  fetchClientList
+} from './engines/divinationService.js';
+
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 // 判斷是否為「同域」存取：如果當前網址跟 API 網址一致，或是在 Tunnel 模式下直接訪問
 const IS_SAME_ORIGIN = !VITE_API_URL || VITE_API_URL.includes(window.location.hostname);
@@ -13,9 +27,17 @@ const WS_PROTOCOL = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const originalFetch = window.fetch;
 window.fetch = async function (url, options = {}) {
     if (typeof url === 'string' && (url.includes('trycloudflare.com') || url.includes('ngrok-free.dev') || url.includes('/api/'))) {
-        options.headers = options.headers || {};
-        options.headers['ngrok-skip-browser-warning'] = '69420';
-        options.headers['cf-skip-browser-warning'] = 'any';
+        if (!options.headers) {
+            options.headers = {};
+        }
+        
+        if (options.headers instanceof Headers) {
+            options.headers.set('ngrok-skip-browser-warning', '69420');
+            options.headers.set('cf-skip-browser-warning', 'any');
+        } else {
+            options.headers['ngrok-skip-browser-warning'] = '69420';
+            options.headers['cf-skip-browser-warning'] = 'any';
+        }
     }
     return originalFetch(url, options);
 };
@@ -492,6 +514,91 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     // Initial update
     updateUI(langSelect.value);
+
+    // Execution Mode Integration
+    const runModeSelect = document.getElementById("runModeSelect");
+
+    function applyRunMode(mode) {
+        setRunMode(mode);
+        if (runModeSelect) {
+            runModeSelect.value = mode;
+        }
+
+        const loginOverlay = document.getElementById("loginOverlay");
+        const clientWaitingOverlay = document.getElementById("clientWaitingOverlay");
+        const socialToggleBtn = document.getElementById("socialToggleBtn");
+        const notificationBellBtn = document.getElementById("notificationBellBtn");
+        const roomSettingsPanel = document.getElementById("roomSettingsPanel");
+        const wsStatusBadge = document.getElementById("wsStatusBadge");
+
+        if (mode === 'offline') {
+            console.log("[Mode] Switching to OFFLINE mode.");
+            if (loginOverlay) loginOverlay.style.display = "none";
+            if (clientWaitingOverlay) clientWaitingOverlay.classList.add("hidden");
+            if (socialToggleBtn) socialToggleBtn.classList.add("hidden");
+            if (notificationBellBtn) notificationBellBtn.classList.add("hidden");
+            if (roomSettingsPanel) roomSettingsPanel.classList.add("hidden");
+
+            const offlineHistoryActions = document.getElementById("offlineHistoryActions");
+            if (offlineHistoryActions) offlineHistoryActions.style.display = "flex";
+
+            if (wsStatusBadge) {
+                wsStatusBadge.innerText = "WS: OFFLINE";
+                wsStatusBadge.className = "ws-badge disconnected";
+            }
+
+            currentMentorId = "local_mentor";
+            currentUserName = "local_user";
+            currentUserRole = "toby";
+
+            if (ws) {
+                try {
+                    ws.close();
+                } catch(e) {}
+                ws = null;
+            }
+
+            if (typeof loadSpreads === "function") {
+                loadSpreads();
+            }
+            
+            const tabList = [tabTarot, tabIChing, tabZhuge, tabXiaoliuren, tabDaliuren, tabHistory];
+            tabList.forEach(tab => {
+                if (tab) tab.classList.remove("hidden");
+            });
+
+            const aiLabel = document.querySelector("#interpretationPanel h3");
+            if (aiLabel) {
+                aiLabel.innerText = "本機離線解讀";
+            }
+        } else {
+            console.log("[Mode] Switching to ONLINE (API) mode.");
+            if (loginOverlay) loginOverlay.style.display = "flex";
+            if (socialToggleBtn) socialToggleBtn.classList.remove("hidden");
+            if (notificationBellBtn) notificationBellBtn.classList.remove("hidden");
+
+            const offlineHistoryActions = document.getElementById("offlineHistoryActions");
+            if (offlineHistoryActions) offlineHistoryActions.style.display = "none";
+            
+            if (typeof loadSpreads === "function") {
+                loadSpreads();
+            }
+            const aiLabel = document.querySelector("#interpretationPanel h3");
+            if (aiLabel) {
+                aiLabel.innerText = "AI 專屬解讀";
+            }
+        }
+    }
+
+    if (runModeSelect) {
+        runModeSelect.addEventListener("change", (e) => {
+            applyRunMode(e.target.value);
+        });
+    }
+    // Set initial mode
+    setTimeout(() => {
+        applyRunMode(getRunMode());
+    }, 50);
 
     // SSO & Registration Elements
     const signupModal = document.getElementById("signupModal");
@@ -1137,7 +1244,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const cardHTML = `
                 <div class="card-item" style="animation-delay: ${delay}s">
                   <div class="card-image-wrapper">
-                    <img class="card-image ${cardOrientation}" src="${ASSETS_BASE}${card.image_path.replace('.png', '.jpg')}" alt="${card.name_zh}" onerror="this.src='/vite.svg'">
+                    <img class="card-image ${cardOrientation}" src="${ASSETS_BASE}${card.image_path.replace(/\.(png|jpg|jpeg)$/, '.webp')}" alt="${card.name_zh}" onerror="this.src='/vite.svg'">
                   </div>
                   <div class="card-info glass-panel">
                       <div class="card-position">${card.position_name || ("Card " + (index + 1))}</div>
@@ -1179,14 +1286,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <div style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap;">
                 <div class="glass-panel" style="text-align: center; margin-bottom: 1rem; flex:1; min-width:250px;">
                   <h2 style="color: #E8D5B7;">本卦：${res.hexagram_name}</h2>
-                  <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${res.hexagram_id}.jpg" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
+                  <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${res.hexagram_id}.webp" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
                   <div style="color: #B8A88A; margin-top: 0.5rem;">${res.upper_trigram}上 ${res.lower_trigram}下</div>
                   <div class="hexagram-lines" style="margin-top:1rem;">${linesHtml}</div>
                 </div>
                 ${res.changed_hexagram_id ? `
                 <div class="glass-panel" style="text-align: center; margin-bottom: 1rem; flex:1; min-width:250px;">
                   <h2 style="color: #E8D5B7;">之卦：${res.changed_hexagram_name}</h2>
-                  <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${res.changed_hexagram_id}.jpg" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
+                  <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${res.changed_hexagram_id}.webp" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
                   <div class="hexagram-lines" style="margin-top:1rem;">${changedLinesHtml}</div>
                   <div style="color: #B8A88A; margin-top: 1rem; font-size: 0.9rem;">(動爻變化產生)</div>
                 </div>
@@ -1336,8 +1443,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Init - Load Spreads
     async function loadSpreads() {
         try {
-            const res = await fetch(`${API_BASE}/tarot/spreads`);
-            availableSpreads = await res.json();
+            availableSpreads = await fetchSpreads(API_BASE);
             spreadSelect.innerHTML = "";
             availableSpreads.forEach(s => {
                 const option = document.createElement("option");
@@ -1364,54 +1470,56 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSpreads();
 
     // Load system config for BGM
-    fetch(`${API_BASE}/system/config`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.guide_name) {
-                guideName = data.guide_name;
-            }
-
-            // Auto-login fallback if multiuser login is disabled (backwards compatibility)
-            if (data.enable_multiuser_login !== true) {
-                currentUserName = guideName;
-                currentUserRole = 'toby';
-                loginOverlay.style.display = "none";
-                connectWebSocket(currentUserName);
-
-                const usageSpan = document.getElementById("usageLimitSpan");
-                const usageText = document.getElementById("usageStatusText");
-                if (usageSpan && data.usage_limit !== undefined) {
-                    usageSpan.innerText = data.usage_limit;
-                    usageText.style.display = "block";
+    if (!isOffline()) {
+        fetch(`${API_BASE}/system/config`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.guide_name) {
+                    guideName = data.guide_name;
                 }
-            }
-            if (data.language) {
-                const optionExists = Array.from(langSelect.options).some(opt => opt.value === data.language);
-                if (optionExists) {
-                    langSelect.value = data.language;
-                    updateUI(data.language);
+
+                // Auto-login fallback if multiuser login is disabled (backwards compatibility)
+                if (data.enable_multiuser_login !== true) {
+                    currentUserName = guideName;
+                    currentUserRole = 'toby';
+                    loginOverlay.style.display = "none";
+                    connectWebSocket(currentUserName);
+
+                    const usageSpan = document.getElementById("usageLimitSpan");
+                    const usageText = document.getElementById("usageStatusText");
+                    if (usageSpan && data.usage_limit !== undefined) {
+                        usageSpan.innerText = data.usage_limit;
+                        usageText.style.display = "block";
+                    }
                 }
-            }
+                if (data.language) {
+                    const optionExists = Array.from(langSelect.options).some(opt => opt.value === data.language);
+                    if (optionExists) {
+                        langSelect.value = data.language;
+                        updateUI(data.language);
+                    }
+                }
 
-            // Initializing Firebase-based Google Auth UI
-            const btnContainer = document.getElementById("googleSigninContainer");
-            if (btnContainer) {
-                btnContainer.innerHTML = `
-              <button onclick="loginWithGoogleFirebase()" style="
-                  display: flex; align-items: center; justify-content: center;
-                  width: 310px; height: 50px; background: white; color: #444;
-                  border: 1px solid #ddd; border-radius: 25px; cursor: pointer;
-                  font-family: Roboto, sans-serif; font-weight: 500; font-size: 16px;
-                  transition: all 0.2s;
-              " onmouseover="this.style.background='#f8f8f8'" onmouseout="this.style.background='white'">
-                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width: 18px; margin-right: 12px;">
-                  Continue with Google (Firebase)
-              </button>
-          `;
-            }
+                // Initializing Firebase-based Google Auth UI
+                const btnContainer = document.getElementById("googleSigninContainer");
+                if (btnContainer) {
+                    btnContainer.innerHTML = `
+                  <button onclick="loginWithGoogleFirebase()" style="
+                      display: flex; align-items: center; justify-content: center;
+                      width: 310px; height: 50px; background: white; color: #444;
+                      border: 1px solid #ddd; border-radius: 25px; cursor: pointer;
+                      font-family: Roboto, sans-serif; font-weight: 500; font-size: 16px;
+                      transition: all 0.2s;
+                  " onmouseover="this.style.background='#f8f8f8'" onmouseout="this.style.background='white'">
+                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width: 18px; margin-right: 12px;">
+                      Continue with Google (Firebase)
+                  </button>
+              `;
+                }
 
-        })
-        .catch(err => console.error("Could not load system config", err));
+            })
+            .catch(err => console.warn("Could not load system config from server (running offline):", err.message));
+    }
 
     // Speech Recognition Setup
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1594,22 +1702,12 @@ document.addEventListener("DOMContentLoaded", () => {
         drawBtn.innerText = "靈能抽牌中...";
 
         try {
-            const response = await fetch(`${API_BASE}/tarot/draw`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    mentor_id: currentMentorId || guideName,
-                    spread_id: spreadId,
-                    question: question ? question : null,
-                    language: langSelect.value
-                })
+            const data = await drawTarotCard(API_BASE, {
+                mentor_id: currentMentorId || guideName,
+                spread_id: spreadId,
+                question: question ? question : null,
+                language: langSelect.value
             });
-
-            if (!response.ok) {
-                throw new Error("占卜伺服器無回應，請確認 FastAPI 已啟動。");
-            }
-
-            const data = await response.json();
 
             // Send result to WebSocket Client
             if (ws && ws.readyState === WebSocket.OPEN) {
@@ -1630,7 +1728,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const cardHTML = `
           <div class="card-item" style="animation-delay: ${delay}s">
             <div class="card-image-wrapper">
-              <img class="card-image ${cardOrientation}" src="${ASSETS_BASE}${card.image_path.replace('.png', '.jpg')}" alt="${card.name_zh}" onerror="this.src='/vite.svg'">
+              <img class="card-image ${cardOrientation}" src="${ASSETS_BASE}${card.image_path.replace(/\.(png|jpg|jpeg)$/, '.webp')}" alt="${card.name_zh}" onerror="this.src='/vite.svg'">
             </div>
             <div class="card-info glass-panel">
                 <div class="card-position">${card.position_name || `Card ${index + 1}`}</div>
@@ -1700,21 +1798,11 @@ document.addEventListener("DOMContentLoaded", () => {
         castBtn.innerText = "六爻推演中...";
 
         try {
-            const response = await fetch(`${API_BASE}/iching/cast`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    mentor_id: currentMentorId || guideName,
-                    question: question ? question : null,
-                    language: langSelect.value
-                })
+            const data = await castIChingHexagram(API_BASE, {
+                mentor_id: currentMentorId || guideName,
+                question: question ? question : null,
+                language: langSelect.value
             });
-
-            if (!response.ok) {
-                throw new Error("占卜伺服器無回應，請確認 FastAPI 已啟動。");
-            }
-
-            const data = await response.json();
 
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: "divination_result", mode: "iching", result: data }));
@@ -1738,7 +1826,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap;">
             <div class="glass-panel" style="text-align: center; margin-bottom: 1rem; flex:1; min-width:250px;">
               <h2 style="color: #E8D5B7;">本卦：${data.hexagram_name}</h2>
-              <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${data.hexagram_id}.jpg" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
+              <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${data.hexagram_id}.webp" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
               <div style="color: #B8A88A; margin-top: 0.5rem;">${data.upper_trigram}上 ${data.lower_trigram}下</div>
               <p style="margin-top: 1rem; color: #ccc;">${data.hexagram_description}</p>
               <div class="hexagram-lines" style="margin-top:1rem;">${linesHtml}</div>
@@ -1746,7 +1834,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ${data.changed_hexagram_id ? `
             <div class="glass-panel" style="text-align: center; margin-bottom: 1rem; flex:1; min-width:250px;">
               <h2 style="color: #E8D5B7;">之卦：${data.changed_hexagram_name}</h2>
-              <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${data.changed_hexagram_id}.jpg" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
+              <img src="${ASSETS_BASE}/assets/images/iching/hexagrams/${data.changed_hexagram_id}.webp" style="max-width:200px; border-radius:10px; margin:10px auto; display:block;" onerror="this.src='/vite.svg'">
               <p style="margin-top: 1rem; color: #ccc;">（動爻變化產生）</p>
             </div>
             ` : ''}
@@ -1811,20 +1899,11 @@ document.addEventListener("DOMContentLoaded", () => {
         drawZhugeBtn.innerText = "神算啟動中...";
 
         try {
-            const response = await fetch(`${API_BASE}/zhuge/draw`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    mentor_id: currentMentorId || guideName,
-
-                    question: question ? question : null,
-                    language: langSelect.value
-                })
+            const data = await drawZhugeLot(API_BASE, {
+                mentor_id: currentMentorId || guideName,
+                question: question ? question : null,
+                language: langSelect.value
             });
-
-            if (!response.ok) throw new Error("伺服器無回應，請確認 FastAPI 已啟動。");
-
-            const data = await response.json();
 
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: "divination_result", mode: "zhuge", result: data }));
@@ -1914,20 +1993,11 @@ document.addEventListener("DOMContentLoaded", () => {
         castXiaoliurenBtn.innerText = "起卦中...";
 
         try {
-            const response = await fetch(`${API_BASE}/xiaoliuren/draw`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    mentor_id: currentMentorId || guideName,
-
-                    question: question ? question : null,
-                    language: langSelect.value
-                })
+            const data = await drawXiaoliurenLesson(API_BASE, {
+                mentor_id: currentMentorId || guideName,
+                question: question ? question : null,
+                language: langSelect.value
             });
-
-            if (!response.ok) throw new Error("伺服器無回應，請確認 FastAPI 已啟動。");
-
-            const data = await response.json();
 
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: "divination_result", mode: "xiaoliuren", result: data }));
@@ -2027,20 +2097,11 @@ document.addEventListener("DOMContentLoaded", () => {
         castDaliurenBtn.innerText = "起課中...";
 
         try {
-            const response = await fetch(`${API_BASE}/daliuren/cast`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    mentor_id: currentMentorId || guideName,
-
-                    question: question ? question : null,
-                    language: langSelect.value
-                })
+            const data = await castDaliurenLesson(API_BASE, {
+                mentor_id: currentMentorId || guideName,
+                question: question ? question : null,
+                language: langSelect.value
             });
-
-            if (!response.ok) throw new Error("伺服器無回應，請確認 FastAPI 已啟動。");
-
-            const data = await response.json();
 
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: "divination_result", mode: "daliuren", result: data }));
@@ -2137,22 +2198,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const mentorIdParam = currentMentorId ? `&mentor_id=${encodeURIComponent(currentMentorId)}` : '';
-            const res = await fetch(`${API_BASE}/history/clients?t=${Date.now()}${mentorIdParam}`);
-            if (res.ok) {
-                const clients = await res.json();
-                const historyClientFilter = document.getElementById("historyClientFilter");
-                if (historyClientFilter) {
-                    const currentVal = historyClientFilter.value;
-                    historyClientFilter.innerHTML = `<option value="">全部客戶 (All)</option>`;
-                    clients.forEach(c => {
-                        const opt = document.createElement("option");
-                        opt.value = c;
-                        opt.innerText = c;
-                        historyClientFilter.appendChild(opt);
-                    });
-                    if (clients.includes(currentVal)) {
-                        historyClientFilter.value = currentVal;
-                    }
+            const clients = await fetchClientList(API_BASE, mentorIdParam);
+            const historyClientFilter = document.getElementById("historyClientFilter");
+            if (historyClientFilter) {
+                const currentVal = historyClientFilter.value;
+                historyClientFilter.innerHTML = `<option value="">全部客戶 (All)</option>`;
+                clients.forEach(c => {
+                    const opt = document.createElement("option");
+                    opt.value = c;
+                    opt.innerText = c;
+                    historyClientFilter.appendChild(opt);
+                });
+                if (clients.includes(currentVal)) {
+                    historyClientFilter.value = currentVal;
                 }
             }
         } catch (e) { console.error("載入歷史客戶選單失敗:", e); }
@@ -2163,6 +2221,65 @@ document.addEventListener("DOMContentLoaded", () => {
     const historyClientFilter = document.getElementById("historyClientFilter");
     if (historyClientFilter) {
         historyClientFilter.addEventListener("change", loadHistory);
+    }
+
+    // Offline History Export/Import
+    const exportHistoryBtn = document.getElementById("exportHistoryBtn");
+    const importHistoryBtn = document.getElementById("importHistoryBtn");
+    const importHistoryFile = document.getElementById("importHistoryFile");
+
+    if (exportHistoryBtn) {
+        exportHistoryBtn.addEventListener("click", () => {
+            const dataStr = localStorage.getItem("ai_tarot_offline_history") || "[]";
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `ai_tarot_history_${new Date().toISOString().split('T')[0]}.json`;
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        });
+    }
+
+    if (importHistoryBtn && importHistoryFile) {
+        importHistoryBtn.addEventListener("click", () => {
+            importHistoryFile.click();
+        });
+
+        importHistoryFile.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const imported = JSON.parse(event.target.result);
+                    if (Array.isArray(imported)) {
+                        const existingStr = localStorage.getItem("ai_tarot_offline_history") || "[]";
+                        let existing = [];
+                        try { existing = JSON.parse(existingStr); } catch(err) {}
+                        if (!Array.isArray(existing)) existing = [];
+
+                        const merged = [...imported, ...existing];
+                        const uniqueMap = new Map();
+                        merged.forEach(item => {
+                            if (item && item.id) {
+                                uniqueMap.set(item.id, item);
+                            }
+                        });
+                        const finalHistory = Array.from(uniqueMap.values());
+                        localStorage.setItem("ai_tarot_offline_history", JSON.stringify(finalHistory));
+                        alert("歷史紀錄匯入成功！");
+                        loadHistory();
+                    } else {
+                        alert("無效的檔案格式，請匯入 JSON 陣列。");
+                    }
+                } catch(err) {
+                    alert("解析 JSON 失敗：" + err.message);
+                }
+            };
+            reader.readAsText(file);
+        });
     }
 
     async function loadHistory() {
@@ -2180,8 +2297,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            const res = await fetch(`${API_BASE}/history?limit=30&t=${Date.now()}${qs}`);
-            const records = await res.json();
+            const records = await fetchHistory(API_BASE, qs);
 
             if (records.length === 0) {
                 historyGrid.innerHTML = `<div class="empty-state" style="text-align:center; padding: 3rem; color: #aaa;">${dict["history_no_records"] || fallbackDict["history_no_records"]}</div>`;
@@ -2221,7 +2337,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 itemDiv.innerHTML = `
             <div class="history-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
               <span class="history-type" style="font-weight:bold; color: #FFD700;">${title}</span>
-              <span class="history-time" style="font-size:0.8rem; color:#888;">${r.timestamp.split("T")[0]}</span>
+              <span class="history-time" style="font-size:0.8rem; color:#888;">${(r.timestamp || r.created_at || "").split("T")[0] || ""}</span>
             </div>
             <div class="history-question" style="font-size:0.95rem; color:#fff; margin-bottom:0.5rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                 <span style="color:#B8A88A;">${dict["history_q_prefix"] || "Q:"}</span> ${r.question || "..."}
@@ -2275,7 +2391,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     detailHtml += `
              <div class="card-item">
                <div class="card-image-wrapper">
-                 <img class="card-image ${cardOrientation}" src="${ASSETS_BASE}${imgPath.replace('.png', '.jpg')}" alt="${card.card_name_zh || card.name_zh}" onerror="this.src='/vite.svg'">
+                 <img class="card-image ${cardOrientation}" src="${ASSETS_BASE}${imgPath.replace(/\.(png|jpg|jpeg)$/, '.webp')}" alt="${card.card_name_zh || card.name_zh}" onerror="this.src='/vite.svg'">
                </div>
                <div class="card-info glass-panel" style="background: rgba(0,0,0,0.5);">
                    <div class="card-position">${card.position_name || card.position || `Card ${index + 1}`}</div>
@@ -2351,8 +2467,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             // Image fallbacks
-            const origImgPath = (orig && orig.id) ? `${ASSETS_BASE}/assets/images/iching/hexagrams/${orig.id}.jpg` : (res.original_image_path ? `${ASSETS_BASE}${res.original_image_path.replace('.png', '.jpg')}` : '/vite.svg');
-            const changedImgPath = (changed && changed.id) ? `${ASSETS_BASE}/assets/images/iching/hexagrams/${changed.id}.jpg` : (res.changed_image_path ? `${ASSETS_BASE}${res.changed_image_path.replace('.png', '.jpg')}` : '/vite.svg');
+            const origImgPath = (orig && orig.id) ? `${ASSETS_BASE}/assets/images/iching/hexagrams/${orig.id}.webp` : (res.original_image_path ? `${ASSETS_BASE}${res.original_image_path.replace(/\.(png|jpg|jpeg)$/, '.webp')}` : '/vite.svg');
+            const changedImgPath = (changed && changed.id) ? `${ASSETS_BASE}/assets/images/iching/hexagrams/${changed.id}.webp` : (res.changed_image_path ? `${ASSETS_BASE}${res.changed_image_path.replace(/\.(png|jpg|jpeg)$/, '.webp')}` : '/vite.svg');
 
             // Trigram label fix
             const upperT = (orig.trigrams?.upper && orig.trigrams.upper !== '上') ? orig.trigrams.upper : '';
@@ -2929,29 +3045,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Fetch API key first then init agent
-    console.log("Attempting to fetch Gemini Key for Page-Agent...");
-    fetch(`${API_BASE}/config/keys`).then(r => {
-        if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
-        return r.json();
-    }).then(data => {
-        if (data.gemini_key) {
-            console.log("Gemini Key obtained. Length:", data.gemini_key.length);
-            const script = document.createElement('script');
-            script.src = "https://cdn.jsdelivr.net/npm/@alibaba/page-agent@latest/dist/index.iife.js";
-            script.async = true;
-            script.onload = () => {
-                console.log("Page-Agent script loaded successfully.");
-                initPageAgent(data.gemini_key);
-            };
-            script.onerror = () => console.error("Failed to load Page-Agent script from CDN.");
-            document.head.appendChild(script);
-        } else {
-            console.warn("Gemini Key is empty. Page-Agent will not be initialized.");
-        }
-    }).catch(e => {
-        console.error("Failed to load Gemini Key for PageAgent:", e.message);
-    });
+    // Fetch API key first then init agent (only in online mode)
+    if (!isOffline()) {
+        console.log("Attempting to fetch Gemini Key for Page-Agent...");
+        fetch(`${API_BASE}/config/keys`).then(r => {
+            if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
+            return r.json();
+        }).then(data => {
+            if (data.gemini_key) {
+                console.log("Gemini Key obtained. Length:", data.gemini_key.length);
+                const script = document.createElement('script');
+                script.src = "https://cdn.jsdelivr.net/npm/@alibaba/page-agent@latest/dist/index.iife.js";
+                script.async = true;
+                script.onload = () => {
+                    console.log("Page-Agent script loaded successfully.");
+                    initPageAgent(data.gemini_key);
+                };
+                script.onerror = () => console.error("Failed to load Page-Agent script from CDN.");
+                document.head.appendChild(script);
+            } else {
+                console.warn("Gemini Key is empty. Page-Agent will not be initialized.");
+            }
+        }).catch(e => {
+            console.error("Failed to load Gemini Key for PageAgent:", e.message);
+        });
+    }
 
     renderQuickLogin();
 
