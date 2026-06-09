@@ -4,6 +4,8 @@
 
 AI 驅動的塔羅牌與易經卜卦 Web 應用，提供直覺的占卜體驗與專業的管理後台。
 
+[Demo](https://toydogcat.github.io/ai-tarot/)
+
 ### 🌟 一般使用者占卜介面 (Vite 前端)
 <p align="center">
   <img src="sample/demo2.jpg" alt="AI Tarot & I-Ching UI" width="600">

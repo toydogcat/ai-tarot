@@ -4,6 +4,8 @@
 
 An AI-driven Tarot card and I-Ching (Hexagram) divination web application, featuring intuitive user interfaces and a professional management backend.
 
+[Demo](https://toydogcat.github.io/ai-tarot/)
+
 ### 🌟 General User Interface (Vite Frontend)
 <p align="center">
   <img src="sample/demo2.jpg" alt="AI Tarot & I-Ching UI" width="600">

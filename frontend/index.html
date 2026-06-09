@@ -37,6 +37,8 @@
     firebase.initializeApp(firebaseConfig);
     const analytics = firebase.analytics();
   </script>
+  <!-- Vercount Visitor Counter -->
+  <script async src="https://www.vercount.one/js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -458,6 +460,9 @@
 
     <footer>
       <p data-i18n="footer_text">&copy; 2026 AI Tarot & I-Ching. Powered by FastAPI & Vite.</p>
+      <p style="font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 6px; letter-spacing: 0.5px;">
+        👁️ <span id="vercount_value_site_pv">--</span> 次瀏覽 | 👤 <span id="vercount_value_site_uv">--</span> 人蒞臨
+      </p>
     </footer>
   </div>
 

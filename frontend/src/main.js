@@ -19,7 +19,16 @@ const IS_LOCAL = (window.location.hostname === "localhost" || window.location.ho
 
 // 如果是同域訪問（例如直接開 Tunnel 網址），直接用相對路徑 /api
 const API_BASE = (IS_SAME_ORIGIN || IS_LOCAL) ? "/api" : `${VITE_API_URL}/api`;
-const ASSETS_BASE = (IS_SAME_ORIGIN || IS_LOCAL) ? "" : VITE_API_URL;
+const getGitHubPagesBase = () => {
+    if (window.location.hostname.endsWith('github.io')) {
+        const pathSegments = window.location.pathname.split('/');
+        const repoName = pathSegments.find(segment => segment && segment !== 'index.html');
+        return repoName ? `/${repoName}` : '';
+    }
+    return '';
+};
+const GITHUB_PAGES_BASE = getGitHubPagesBase();
+const ASSETS_BASE = GITHUB_PAGES_BASE || ((IS_SAME_ORIGIN || IS_LOCAL) ? "" : VITE_API_URL);
 const WS_HOST = (IS_SAME_ORIGIN || IS_LOCAL) ? window.location.host : VITE_API_URL.replace(/^https?:\/\//, "");
 const WS_PROTOCOL = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 
@@ -1603,6 +1612,13 @@ document.addEventListener("DOMContentLoaded", () => {
         tabHistory.classList.remove("active");
     }
 
+    // Helper to refresh vercount on tab switch
+    function refreshVercount() {
+        if (window.vercount && typeof window.vercount.fetch === "function") {
+            window.vercount.fetch();
+        }
+    }
+
     // Tab Switch Logic
     tabTarot.addEventListener("click", () => {
         currentMode = "tarot";
@@ -1610,6 +1626,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tabTarot.classList.add("active");
         hideAllPanels();
         tarotPanel.classList.remove("hidden");
+        refreshVercount();
     });
 
     tabIChing.addEventListener("click", () => {
@@ -1618,6 +1635,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tabIChing.classList.add("active");
         hideAllPanels();
         ichingPanel.classList.remove("hidden");
+        refreshVercount();
     });
 
     tabZhuge.addEventListener("click", () => {
@@ -1626,6 +1644,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tabZhuge.classList.add("active");
         hideAllPanels();
         zhugePanel.classList.remove("hidden");
+        refreshVercount();
     });
 
     tabXiaoliuren.addEventListener("click", () => {
@@ -1634,6 +1653,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tabXiaoliuren.classList.add("active");
         hideAllPanels();
         xiaoliurenPanel.classList.remove("hidden");
+        refreshVercount();
     });
 
     tabDaliuren.addEventListener("click", () => {
@@ -1642,6 +1662,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tabDaliuren.classList.add("active");
         hideAllPanels();
         daliurenPanel.classList.remove("hidden");
+        refreshVercount();
     });
 
     tabHistory.addEventListener("click", () => {
@@ -1651,6 +1672,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hideAllPanels();
         historyPanel.classList.remove("hidden");
         loadHistory();
+        refreshVercount();
     });
 
     let selectedEnergyColor = "red";
