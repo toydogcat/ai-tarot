@@ -63,9 +63,9 @@ def get_all_history(client_name: str | None = None, mentor_id: str | None = None
                     orig_name = res.get("original_hexagram")
                     changed_name = res.get("changed_hexagram")
                     if orig_name and orig_name in name2id:
-                        res["original_image_path"] = f"/assets/images/iching/hexagrams/{name2id[orig_name]}.png"
+                        res["original_image_path"] = f"/assets/images/iching/hexagrams/{name2id[orig_name]}.webp"
                     if changed_name and changed_name in name2id:
-                        res["changed_image_path"] = f"/assets/images/iching/hexagrams/{name2id[changed_name]}.png"
+                        res["changed_image_path"] = f"/assets/images/iching/hexagrams/{name2id[changed_name]}.webp"
                 except Exception:
                     pass
 

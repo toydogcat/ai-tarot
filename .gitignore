@@ -7,11 +7,12 @@
 # AI Tarot 專案
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  and can be added to the global gitignore or merged into this file. However, if you prefer, 
-**/assets/audio/
-**/assets/images/
-**/assets/tarot/*.jpg
-**/assets/tarot/*.png
-**/assets/*.zip
+backend/assets/images/
+backend/assets/audio/
+backend/assets/tarot/*.jpg
+backend/assets/tarot/*.png
+backend/assets/*.zip
+!frontend/public/assets/images/
 backend/serviceAccountKey.json
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore

@@ -14,7 +14,7 @@ ICHING_DATA_DIR = BASE_DIR / conf.paths.data_dir / "iching"
 
 # 圖片路徑
 TAROT_ASSETS_DIR = BASE_DIR / conf.paths.assets_dir / "tarot"
-CARD_BACK_IMAGE = TAROT_ASSETS_DIR / "card_back.png"
+CARD_BACK_IMAGE = TAROT_ASSETS_DIR / "card_back.webp"
 MAJOR_IMAGES_DIR = TAROT_ASSETS_DIR / "major"
 MINOR_IMAGES_DIR = TAROT_ASSETS_DIR / "minor"
 

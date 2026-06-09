@@ -85,7 +85,7 @@ with st.sidebar:
         allow_reversed = st.checkbox("允許逆位", value=True)
         
         st.markdown("### 🖼️ 圖片格式")
-        prefer_format = st.radio("圖片格式", ["jpg", "png"], index=0, horizontal=True, label_visibility="collapsed", key="tarot_fmt")
+        prefer_format = st.radio("圖片格式", ["webp", "jpg", "png"], index=0, horizontal=True, label_visibility="collapsed", key="tarot_fmt")
         st.session_state["prefer_image_format"] = prefer_format
         st.markdown("---")
         draw_button = st.button("🃏 開始抽牌", use_container_width=True, type="primary")
@@ -106,7 +106,7 @@ with st.sidebar:
         st.info("系統將模擬六次金錢卦擲爻，由下而上產生本卦與變卦。")
         st.markdown("---")
         st.markdown("### 🖼️ 圖片格式")
-        prefer_format_iching = st.radio("圖片格式", ["jpg", "png"], index=0, horizontal=True, label_visibility="collapsed", key="iching_fmt")
+        prefer_format_iching = st.radio("圖片格式", ["webp", "jpg", "png"], index=0, horizontal=True, label_visibility="collapsed", key="iching_fmt")
         st.session_state["prefer_image_format"] = prefer_format_iching
         st.markdown("---")
         iching_draw_button = st.button("🎲 開始卜卦", use_container_width=True, type="primary")

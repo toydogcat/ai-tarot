@@ -90,30 +90,39 @@ def inject_custom_css():
 
 
 def load_card_image(
-    image_path: str, is_reversed: bool = False, prefer_format: str = "jpg"
+    image_path: str, is_reversed: bool = False, prefer_format: str = "webp"
 ) -> Image.Image | None:
     """
-    載入牌面圖片，支援 JPG/PNG 優先順序
+    載入牌面圖片，支援 WEBP/JPG/PNG 優先順序
     
     Args:
         image_path: 相對圖片路徑（如 major/00_the_fool.png）
         is_reversed: 是否逆位（旋轉 180°）
-        prefer_format: 優先格式 'jpg' 或 'png'
+        prefer_format: 優先格式 'webp', 'jpg' 或 'png'
     """
     base_path = TAROT_ASSETS_DIR / image_path
     stem = base_path.stem
     parent = base_path.parent
     
     # 依照偏好格式建立搜尋順序
-    if prefer_format == "jpg":
+    if prefer_format == "webp":
+        candidates = [
+            parent / f"{stem}.webp",
+            parent / f"{stem}.jpg",
+            parent / f"{stem}.jpeg",
+            parent / f"{stem}.png",
+        ]
+    elif prefer_format == "jpg":
         candidates = [
             parent / f"{stem}.jpg",
             parent / f"{stem}.jpeg",
+            parent / f"{stem}.webp",
             parent / f"{stem}.png",
         ]
     else:
         candidates = [
             parent / f"{stem}.png",
+            parent / f"{stem}.webp",
             parent / f"{stem}.jpg",
             parent / f"{stem}.jpeg",
         ]
