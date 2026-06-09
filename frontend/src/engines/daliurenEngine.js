@@ -19,12 +19,16 @@ export function castDaliuren({ question, language }) {
   
   interpretation += `【三傳（初、中、末）】：\n`;
   Object.entries(lesson.san_chuan).forEach(([k, v]) => {
-    interpretation += `• ${k}：${v.地支} (${v.天將})\n`;
+    const dizhi = Array.isArray(v) && v.length > 0 ? v[0] : '';
+    const tianjiang = Array.isArray(v) && v.length > 1 ? v[1] : '';
+    interpretation += `• ${k}：${dizhi} (${tianjiang})\n`;
   });
   
   interpretation += `\n【四課（一、二、三、四）】：\n`;
   Object.entries(lesson.si_ke).forEach(([k, v]) => {
-    interpretation += `• ${k}：天盤 ${v.天盤} / 地盤 ${v.地盤}\n`;
+    const tian = (Array.isArray(v) && v.length > 0 && v[0] && v[0][0]) || '';
+    const di = (Array.isArray(v) && v.length > 0 && v[0] && v[0][1]) || '';
+    interpretation += `• ${k}：天盤 ${tian} / 地盤 ${di}\n`;
   });
 
   interpretation += `\n💡 *提示：本機離線模式不消耗 Token。如需 AI 深度解讀與語音解說，請切換至 API 連線模式。*`;
