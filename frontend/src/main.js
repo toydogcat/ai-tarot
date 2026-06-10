@@ -75,7 +75,7 @@ function initBGM() {
 
     function loadTrack(idx) {
         const track = bgmTracks[idx];
-        bgmAudio.src = track.file;
+        bgmAudio.src = `${ASSETS_BASE}${track.file}`;
         bgmName.innerText = track.name;
         console.log(`[BGM] Track loaded: ${track.name}`);
     }
@@ -141,7 +141,7 @@ let translations = {};
 
 async function loadTranslations() {
     try {
-        const response = await fetch('/i18n.json');
+        const response = await fetch(`${ASSETS_BASE}/i18n.json`);
         if (!response.ok) throw new Error('Failed to load i18n.json');
         translations = await response.json();
         console.log("Translations loaded successfully.");
